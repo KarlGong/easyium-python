@@ -64,8 +64,8 @@ class WebDriver(Context):
     def after_shutdown(self, method):
         self.__web_driver.stop_client = method
 
-    def start_session(self, desired_capabilities, browser_profile=None):
-        self.__web_driver.start_session(desired_capabilities, browser_profile)
+    def start_session(self, desired_capabilities, profile=None):
+        self.__web_driver.start_session(desired_capabilities, profile)
 
     def maximize_window(self):
         self.__web_driver.maximize_window()

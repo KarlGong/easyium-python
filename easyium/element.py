@@ -13,11 +13,11 @@ __author__ = 'karl.gong'
 class Element(Context):
     def __init__(self, parent):
         Context.__init__(self)
-        self.__browser = parent.get_web_driver()
+        self.__web_driver = parent.get_web_driver()
         self.__parent = parent
 
     def get_web_driver(self):
-        return self.__browser
+        return self.__web_driver
 
     def get_parent(self):
         return self.__parent
@@ -292,16 +292,16 @@ class Element(Context):
             evObj.initMouseEvent("mouseover",true, false, window, 0, 0, 0, 0, 0, false, false, false, false, 0, null);
             arguments[0].dispatchEvent(evObj);
         """
-        browser_type = self.get_web_driver().get_web_driver_type()
+        web_driver_type = self.get_web_driver().get_web_driver_type()
         try:
-            if browser_type == WebDriverType.CHROME or browser_type == WebDriverType.FIREFOX:
+            if web_driver_type == WebDriverType.CHROME or web_driver_type == WebDriverType.FIREFOX:
                 self.get_web_driver().execute_script(script, self._web_element())
             else:
                 ActionChains(self.get_web_driver()._web_driver()).move_to_element(self._web_element()).perform()
         except Exception:
             try:
                 self.wait_for().exists()
-                if browser_type == WebDriverType.CHROME or browser_type == WebDriverType.FIREFOX:
+                if web_driver_type == WebDriverType.CHROME or web_driver_type == WebDriverType.FIREFOX:
                     self.get_web_driver().execute_script(script, self._web_element())
                 else:
                     ActionChains(self.get_web_driver()._web_driver()).move_to_element(self._web_element()).perform()
@@ -314,16 +314,16 @@ class Element(Context):
             evObj.initMouseEvent("mouseout",true, false, window, 0, 0, 0, 0, 0, false, false, false, false, 0, null);
             arguments[0].dispatchEvent(evObj);
         """
-        browser_type = self.get_web_driver().get_web_driver_type()
+        web_driver_type = self.get_web_driver().get_web_driver_type()
         try:
-            if browser_type in [WebDriverType.CHROME, WebDriverType.FIREFOX]:
+            if web_driver_type in [WebDriverType.CHROME, WebDriverType.FIREFOX]:
                 self.get_web_driver().execute_script(script, self._web_element())
             else:
                 ActionChains(self.get_web_driver()._web_driver()).move_to_element(self._web_element()).perform()
         except Exception:
             try:
                 self.wait_for().exists()
-                if browser_type in [WebDriverType.CHROME, WebDriverType.FIREFOX]:
+                if web_driver_type in [WebDriverType.CHROME, WebDriverType.FIREFOX]:
                     self.get_web_driver().execute_script(script, self._web_element())
                 else:
                     ActionChains(self.get_web_driver()._web_driver()).move_to_element(self._web_element()).perform()
@@ -353,7 +353,7 @@ class Element(Context):
     def release_mouse_here_with_offset(self, x_offset, y_offset):
         """
             Release mouse here with offset.
-            The origin is at the top-left corner of browser and offsets are relative to the top-left corner of the element.
+            The origin is at the top-left corner of web driver and offsets are relative to the top-left corner of the element.
         :param x_offset: X offset to release mouse.
         :param y_offset: Y offset to release mouse.
         """
@@ -375,7 +375,7 @@ class Element(Context):
     def drag_and_drop_to_with_offset(self, target_element, x_offset, y_offset):
         """
             Drag and drop to target element with offset.
-            The origin is at the top-left corner of browser and offsets are relative to the top-left corner of the element.
+            The origin is at the top-left corner of web driver and offsets are relative to the top-left corner of the element.
         :param target_element: the target element to drop.
         :param x_offset: X offset to drop
         :param y_offset: Y offset to drop.
