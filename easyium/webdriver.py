@@ -17,6 +17,7 @@ class WebDriverType:
     ANDROID = "android"
     OPERA = "opera"
     SAFARI = "safari"
+    BLACKBERRY = "blackberry"
     PHANTOMJS = "phantomjs"
 
 
@@ -37,6 +38,8 @@ class WebDriver(Context):
             self.__web_driver = webdriver.Opera(**kwargs)
         elif self.__web_driver_type == WebDriverType.SAFARI:
             self.__web_driver = webdriver.Safari(**kwargs)
+        elif self.__web_driver_type == WebDriverType.BLACKBERRY:
+            self.__web_driver = webdriver.BlackBerry(**kwargs)
         elif self.__web_driver_type == WebDriverType.PHANTOMJS:
             self.__web_driver = webdriver.PhantomJS(**kwargs)
         else:
@@ -102,6 +105,9 @@ class WebDriver(Context):
 
     def get_current_url(self):
         return self.__web_driver.current_url
+
+    def get_page_source(self):
+        return self.__web_driver.page_source
 
     def switch_to_frame(self, frame_reference):
         self.__web_driver.switch_to.frame(frame_reference)
