@@ -1,4 +1,4 @@
-from selenium import webdriver
+from selenium.webdriver import Ie, Firefox, Chrome, Opera, Safari, BlackBerry, PhantomJS
 from selenium.common.exceptions import NoAlertPresentException
 
 from context import Context
@@ -14,7 +14,7 @@ class WebDriverType:
     IE = "ie"
     FIREFOX = "firefox"
     CHROME = "chrome"
-    ANDROID = "android"
+    MOBILE = "mobile"
     OPERA = "opera"
     SAFARI = "safari"
     BLACKBERRY = "blackberry"
@@ -27,21 +27,22 @@ class WebDriver(Context):
         Context.__init__(self)
         self.__web_driver_type = web_driver_type.lower()
         if self.__web_driver_type == WebDriverType.IE:
-            self.__web_driver = webdriver.Ie(**kwargs)
+            self.__web_driver = Ie(**kwargs)
         elif self.__web_driver_type == WebDriverType.FIREFOX:
-            self.__web_driver = webdriver.Firefox(**kwargs)
+            self.__web_driver = Firefox(**kwargs)
         elif self.__web_driver_type == WebDriverType.CHROME:
-            self.__web_driver = webdriver.Chrome(**kwargs)
-        elif self.__web_driver_type == WebDriverType.ANDROID:
-            self.__web_driver = webdriver.Android(**kwargs)
+            self.__web_driver = Chrome(**kwargs)
         elif self.__web_driver_type == WebDriverType.OPERA:
-            self.__web_driver = webdriver.Opera(**kwargs)
+            self.__web_driver = Opera(**kwargs)
         elif self.__web_driver_type == WebDriverType.SAFARI:
-            self.__web_driver = webdriver.Safari(**kwargs)
+            self.__web_driver = Safari(**kwargs)
         elif self.__web_driver_type == WebDriverType.BLACKBERRY:
-            self.__web_driver = webdriver.BlackBerry(**kwargs)
+            self.__web_driver = BlackBerry(**kwargs)
         elif self.__web_driver_type == WebDriverType.PHANTOMJS:
-            self.__web_driver = webdriver.PhantomJS(**kwargs)
+            self.__web_driver = PhantomJS(**kwargs)
+        elif self.__web_driver_type == WebDriverType.MOBILE:
+            from appium.webdriver.webdriver import WebDriver as Mobile
+            self.__web_driver = Mobile(**kwargs)
         else:
             raise UnsupportedWebDriverTypeException("The web driver type [%s] is not supported." % web_driver_type)
         self.set_page_load_timeout(default_page_load_timeout if page_load_timeout == DEFAULT else page_load_timeout)
