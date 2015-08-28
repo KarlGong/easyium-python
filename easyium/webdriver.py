@@ -1,4 +1,4 @@
-from selenium.webdriver import Ie, Firefox, Chrome, Opera, Safari, BlackBerry, PhantomJS
+from selenium.webdriver import Ie, Firefox, Chrome, Opera, Safari, PhantomJS
 from selenium.common.exceptions import NoAlertPresentException
 
 from context import Context
@@ -14,11 +14,15 @@ class WebDriverType:
     IE = "ie"
     FIREFOX = "firefox"
     CHROME = "chrome"
-    MOBILE = "mobile"
     OPERA = "opera"
     SAFARI = "safari"
-    BLACKBERRY = "blackberry"
     PHANTOMJS = "phantomjs"
+    ANDROID = "android"
+    IOS = "ios"
+
+    _BROWSER = [IE, FIREFOX, CHROME, OPERA, SAFARI, PHANTOMJS]
+    _MOBILE = [ANDROID, IOS]
+    _ALL = _BROWSER + _MOBILE
 
 
 class WebDriver(Context):
@@ -36,11 +40,9 @@ class WebDriver(Context):
             self.__web_driver = Opera(**kwargs)
         elif self.__web_driver_type == WebDriverType.SAFARI:
             self.__web_driver = Safari(**kwargs)
-        elif self.__web_driver_type == WebDriverType.BLACKBERRY:
-            self.__web_driver = BlackBerry(**kwargs)
         elif self.__web_driver_type == WebDriverType.PHANTOMJS:
             self.__web_driver = PhantomJS(**kwargs)
-        elif self.__web_driver_type == WebDriverType.MOBILE:
+        elif self.__web_driver_type in WebDriverType._MOBILE:
             from appium.webdriver.webdriver import WebDriver as Mobile
             self.__web_driver = Mobile(**kwargs)
         else:

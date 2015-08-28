@@ -27,3 +27,7 @@ class UnsupportedWebDriverTypeException(ESelException):
 
 class InvalidByException(ESelException):
     pass
+
+
+class UnsupportedOperationForWebDriver(ESelException):
+    pass
