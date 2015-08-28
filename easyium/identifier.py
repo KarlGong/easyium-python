@@ -17,7 +17,3 @@ class Identifier:
     @staticmethod
     def link_text(element):
         return "link=" + element.get_text()
-
-    @staticmethod
-    def index(element):
-        pass # todo:
