@@ -3,7 +3,7 @@ from selenium.webdriver import ActionChains
 
 from .decorator import SupportedBy
 from .webdriver import WebDriverType
-from .exceptions import ESelException, NoSuchElementException
+from .exceptions import EasyiumException, NoSuchElementException
 from .waits.waiter import ElementWaiter
 from .context import Context
 from .config import DEFAULT
@@ -39,7 +39,7 @@ class Element(Context):
                 self.wait_for().visible()
                 self._web_element().clear()
             except WebDriverException as wde:
-                raise ESelException("%s\n%s" % (wde.msg, self))
+                raise EasyiumException("%s\n%s" % (wde.msg, self))
 
     def click(self):
         try:
@@ -49,7 +49,7 @@ class Element(Context):
                 self.wait_for().visible()
                 self._web_element().click()
             except WebDriverException as wde:
-                raise ESelException("%s\n%s" % (wde.msg, self))
+                raise EasyiumException("%s\n%s" % (wde.msg, self))
 
     def send_keys(self, value):
         try:
@@ -59,7 +59,7 @@ class Element(Context):
                 self.wait_for().visible()
                 self._web_element().send_keys(value)
             except WebDriverException as wde:
-                raise ESelException("%s\n%s" % (wde.msg, self))
+                raise EasyiumException("%s\n%s" % (wde.msg, self))
 
     def submit(self):
         try:
@@ -69,7 +69,7 @@ class Element(Context):
                 self.wait_for().visible()
                 self._web_element().submit()
             except WebDriverException as wde:
-                raise ESelException("%s\n%s" % (wde.msg, self))
+                raise EasyiumException("%s\n%s" % (wde.msg, self))
 
     def get_attribute(self, name):
         try:
@@ -79,7 +79,7 @@ class Element(Context):
                 self.wait_for().exists()
                 return self._web_element().get_attribute(name)
             except WebDriverException as wde:
-                raise ESelException("%s\n%s" % (wde.msg, self))
+                raise EasyiumException("%s\n%s" % (wde.msg, self))
 
     def get_css_value(self, propertyName):
         try:
@@ -89,7 +89,7 @@ class Element(Context):
                 self.wait_for().exists()
                 return self._web_element().value_of_css_property(propertyName)
             except WebDriverException as wde:
-                raise ESelException("%s\n%s" % (wde.msg, self))
+                raise EasyiumException("%s\n%s" % (wde.msg, self))
 
     def get_location(self):
         """
@@ -105,7 +105,7 @@ class Element(Context):
                 location = self._web_element().location
                 return location["x"], location["y"]
             except WebDriverException as wde:
-                raise ESelException("%s\n%s" % (wde.msg, self))
+                raise EasyiumException("%s\n%s" % (wde.msg, self))
 
     def get_size(self):
         """
@@ -121,7 +121,7 @@ class Element(Context):
                 size = self._web_element().size
                 return size["width"], size["height"]
             except WebDriverException as wde:
-                raise ESelException("%s\n%s" % (wde.msg, self))
+                raise EasyiumException("%s\n%s" % (wde.msg, self))
 
     def get_tag_name(self):
         try:
@@ -131,7 +131,7 @@ class Element(Context):
                 self.wait_for().exists()
                 return self._web_element().tag_name
             except WebDriverException as wde:
-                raise ESelException("%s\n%s" % (wde.msg, self))
+                raise EasyiumException("%s\n%s" % (wde.msg, self))
 
     def get_value(self):
         try:
@@ -141,7 +141,7 @@ class Element(Context):
                 self.wait_for().exists()
                 return self._web_element().get_attribute("value")
             except WebDriverException as wde:
-                raise ESelException("%s\n%s" % (wde.msg, self))
+                raise EasyiumException("%s\n%s" % (wde.msg, self))
 
     def get_text(self):
         try:
@@ -151,7 +151,7 @@ class Element(Context):
                 self.wait_for().exists()
                 return self._web_element().text
             except WebDriverException as wde:
-                raise ESelException("%s\n%s" % (wde.msg, self))
+                raise EasyiumException("%s\n%s" % (wde.msg, self))
 
     def get_text_node_content(self, text_node_index):
         """
@@ -171,10 +171,10 @@ class Element(Context):
                     "return arguments[0].childNodes[%s].nodeValue" % text_node_index,
                     self._web_element())
             except WebDriverException as wde:
-                raise ESelException("%s\n%s" % (wde.msg, self))
+                raise EasyiumException("%s\n%s" % (wde.msg, self))
 
         if content is None:
-            raise ESelException("Cannot get text content of a non-text node in element: \n%s\n" % self)
+            raise EasyiumException("Cannot get text content of a non-text node in element: \n%s\n" % self)
         return content
 
     def set_selection_range(self, start, end):
@@ -255,7 +255,7 @@ class Element(Context):
                 self.wait_for().visible()
                 self.get_web_driver().execute_script(script % (start, end), self._web_element())
             except WebDriverException as wde:
-                raise ESelException("%s\n%s" % (wde.msg, self))
+                raise EasyiumException("%s\n%s" % (wde.msg, self))
 
     def get_inner_html(self):
         try:
@@ -265,7 +265,7 @@ class Element(Context):
                 self.wait_for().exists()
                 return self.get_web_driver().execute_script("return arguments[0].innerHTML", self._web_element())
             except WebDriverException as wde:
-                raise ESelException("%s\n%s" % (wde.msg, self))
+                raise EasyiumException("%s\n%s" % (wde.msg, self))
 
     def is_enabled(self):
         try:
@@ -275,7 +275,7 @@ class Element(Context):
                 self.wait_for().visible()
                 return self._web_element().is_enabled()
             except WebDriverException as wde:
-                raise ESelException("%s\n%s" % (wde.msg, self))
+                raise EasyiumException("%s\n%s" % (wde.msg, self))
 
     def is_selected(self):
         try:
@@ -285,7 +285,7 @@ class Element(Context):
                 self.wait_for().visible()
                 return self._web_element().is_selected()
             except WebDriverException as wde:
-                raise ESelException("%s\n%s" % (wde.msg, self))
+                raise EasyiumException("%s\n%s" % (wde.msg, self))
 
     @SupportedBy(WebDriverType._BROWSER)
     def mouse_over(self):
@@ -308,7 +308,7 @@ class Element(Context):
                 else:
                     ActionChains(self.get_web_driver()._web_driver()).move_to_element(self._web_element()).perform()
             except WebDriverException as wde:
-                raise ESelException("%s\n%s" % (wde.msg, self))
+                raise EasyiumException("%s\n%s" % (wde.msg, self))
 
     @SupportedBy(WebDriverType._BROWSER)
     def mouse_out(self):
@@ -331,7 +331,7 @@ class Element(Context):
                 else:
                     ActionChains(self.get_web_driver()._web_driver()).move_to_element(self._web_element()).perform()
             except WebDriverException as wde:
-                raise ESelException("%s\n%s" % (wde.msg, self))
+                raise EasyiumException("%s\n%s" % (wde.msg, self))
 
     def click_and_hold(self):
         try:
@@ -341,7 +341,7 @@ class Element(Context):
                 self.wait_for().visible()
                 ActionChains(self.get_web_driver()._web_driver()).click_and_hold(self._web_element()).perform()
             except WebDriverException as wde:
-                raise ESelException("%s\n%s" % (wde.msg, self))
+                raise EasyiumException("%s\n%s" % (wde.msg, self))
 
     def release_mouse_here(self):
         try:
@@ -352,7 +352,7 @@ class Element(Context):
                 ActionChains(self.get_web_driver()._web_driver()).move_to_element(
                     self._web_element()).release().perform()
             except WebDriverException as wde:
-                raise ESelException("%s\n%s" % (wde.msg, self))
+                raise EasyiumException("%s\n%s" % (wde.msg, self))
 
     @SupportedBy(WebDriverType._BROWSER)
     def release_mouse_here_with_offset(self, x_offset, y_offset):
@@ -371,7 +371,7 @@ class Element(Context):
                 ActionChains(self.get_web_driver()._web_driver()).move_to_element_with_offset(
                     self._web_element(), x_offset, y_offset).release().perform()
             except WebDriverException as wde:
-                raise ESelException("%s\n%s" % (wde.msg, self))
+                raise EasyiumException("%s\n%s" % (wde.msg, self))
 
     def drag_and_drop_to(self, target_element):
         web_driver_type = self.get_web_driver().get_web_driver_type()
@@ -384,7 +384,7 @@ class Element(Context):
                     target_element.wait_for().visible()
                     self.get_web_driver()._web_driver().drag_and_drop(self._web_element(), target_element._web_element())
                 except WebDriverException as wde:
-                    raise ESelException("%s\n%s" % (wde.msg, self))
+                    raise EasyiumException("%s\n%s" % (wde.msg, self))
         else:
             self.click_and_hold()
             target_element.release_mouse_here()
@@ -413,7 +413,7 @@ class Element(Context):
                 self.wait_for().visible()
                 touch_action.tap(self._web_element(), None, None, 1).perform()
             except WebDriverException as wde:
-                raise ESelException("%s\n%s" % (wde.msg, self))
+                raise EasyiumException("%s\n%s" % (wde.msg, self))
 
     @SupportedBy(WebDriverType._MOBILE)
     def press(self):
@@ -427,7 +427,7 @@ class Element(Context):
                 self.wait_for().visible()
                 touch_action.press(self._web_element(), None, None).release().perform()
             except WebDriverException as wde:
-                raise ESelException("%s\n%s" % (wde.msg, self))
+                raise EasyiumException("%s\n%s" % (wde.msg, self))
 
     @SupportedBy(WebDriverType._MOBILE)
     def long_press(self, duration=1000):
@@ -441,7 +441,7 @@ class Element(Context):
                 self.wait_for().visible()
                 touch_action.long_press(self._web_element(), None, None, duration).release().perform()
             except WebDriverException as wde:
-                raise ESelException("%s\n%s" % (wde.msg, self))
+                raise EasyiumException("%s\n%s" % (wde.msg, self))
 
     @SupportedBy(WebDriverType.ANDROID)
     def set_text(self, text):
@@ -452,7 +452,7 @@ class Element(Context):
                 self.wait_for().exists()
                 self._web_element().set_text(text)
             except WebDriverException as wde:
-                raise ESelException("%s\n%s" % (wde.msg, self))
+                raise EasyiumException("%s\n%s" % (wde.msg, self))
 
     @SupportedBy(WebDriverType._MOBILE)
     def get_location_in_view(self):
@@ -465,7 +465,7 @@ class Element(Context):
                 location = self._web_element().location_in_view
                 return location["x"], location["y"]
             except WebDriverException as wde:
-                raise ESelException("%s\n%s" % (wde.msg, self))
+                raise EasyiumException("%s\n%s" % (wde.msg, self))
 
     @SupportedBy(WebDriverType._MOBILE)
     def set_value(self, value):
@@ -476,7 +476,7 @@ class Element(Context):
                 self.wait_for().exists()
                 self._web_element().set_value(value)
             except WebDriverException as wde:
-                raise ESelException("%s\n%s" % (wde.msg, self))
+                raise EasyiumException("%s\n%s" % (wde.msg, self))
 
     @SupportedBy(WebDriverType._MOBILE)
     def scroll_to(self, target_element):
@@ -488,7 +488,7 @@ class Element(Context):
                 target_element.wait_for().exists()
                 self.get_web_driver()._web_driver().scroll(self._web_element(), target_element._web_element())
             except WebDriverException as wde:
-                raise ESelException("%s\n%s" % (wde.msg, self))
+                raise EasyiumException("%s\n%s" % (wde.msg, self))
 
     @SupportedBy(WebDriverType._MOBILE)
     def pinch(self, percent=200, steps=50):
@@ -499,7 +499,7 @@ class Element(Context):
                 self.wait_for().visible()
                 self.get_web_driver()._web_driver().pinch(self._web_element(), percent, steps)
             except WebDriverException as wde:
-                raise ESelException("%s\n%s" % (wde.msg, self))
+                raise EasyiumException("%s\n%s" % (wde.msg, self))
 
     @SupportedBy(WebDriverType._MOBILE)
     def zoom(self, percent=200, steps=50):
@@ -510,7 +510,7 @@ class Element(Context):
                 self.wait_for().visible()
                 self.get_web_driver()._web_driver().zoom(self._web_element(), percent, steps)
             except WebDriverException as wde:
-                raise ESelException("%s\n%s" % (wde.msg, self))
+                raise EasyiumException("%s\n%s" % (wde.msg, self))
 
     def is_displayed(self):
         try:

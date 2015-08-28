@@ -1,33 +1,33 @@
 __author__ = 'karl.gong'
 
 
-class ESelException(Exception):
+class EasyiumException(Exception):
     pass
 
 
-class TimeoutException(ESelException):
+class TimeoutException(EasyiumException):
     pass
 
 
-class NoSuchElementException(ESelException):
+class NoSuchElementException(EasyiumException):
     pass
 
 
-class NotPersistException(ESelException):
+class NotPersistException(EasyiumException):
     pass
 
 
-class LatePersistException(ESelException):
+class LatePersistException(EasyiumException):
     pass
 
 
-class UnsupportedWebDriverTypeException(ESelException):
+class UnsupportedWebDriverTypeException(EasyiumException):
     pass
 
 
-class InvalidByException(ESelException):
+class InvalidByException(EasyiumException):
     pass
 
 
-class UnsupportedOperationForWebDriver(ESelException):
+class UnsupportedOperationForWebDriver(EasyiumException):
     pass
