@@ -1,6 +1,7 @@
 from selenium.common.exceptions import WebDriverException
 from selenium.webdriver import ActionChains
 
+from .decorator import SupportedBy
 from .webdriver import WebDriverType
 from .exceptions import ESelException, NoSuchElementException
 from .waits.waiter import ElementWaiter
@@ -346,7 +347,8 @@ class Element(Context):
         except Exception:
             try:
                 self.wait_for().visible()
-                ActionChains(self.get_web_driver()._web_driver()).move_to_element(self._web_element()).release().perform()
+                ActionChains(self.get_web_driver()._web_driver()).move_to_element(
+                    self._web_element()).release().perform()
             except WebDriverException as wde:
                 raise ESelException("%s\n%s" % (wde.msg, self))
 
@@ -369,8 +371,20 @@ class Element(Context):
                 raise ESelException("%s\n%s" % (wde.msg, self))
 
     def drag_and_drop_to(self, target_element):
-        self.click_and_hold()
-        target_element.release_mouse_here()
+        web_driver_type = self.get_web_driver().get_web_driver_type()
+        if web_driver_type in WebDriverType._MOBILE:
+            try:
+                self.get_web_driver()._web_driver().drag_and_drop(self._web_element(), target_element._web_element())
+            except Exception:
+                try:
+                    self.wait_for().visible()
+                    target_element.wait_for().visible()
+                    self.get_web_driver()._web_driver().scroll(self._web_element(), target_element._web_element())
+                except WebDriverException as wde:
+                    raise ESelException("%s\n%s" % (wde.msg, self))
+        else:
+            self.click_and_hold()
+            target_element.release_mouse_here()
 
     def drag_and_drop_to_with_offset(self, target_element, x_offset, y_offset):
         """
@@ -382,6 +396,117 @@ class Element(Context):
         """
         self.click_and_hold()
         target_element.release_mouse_here_with_offset(x_offset, y_offset)
+
+    @SupportedBy(WebDriverType._MOBILE)
+    def tap(self, count=1):
+        from appium.webdriver.common.touch_action import TouchAction
+
+        touch_action = TouchAction(self.get_web_driver()._web_driver())
+        try:
+            touch_action.tap(self._web_element(), None, None, count).perform()
+        except Exception:
+            try:
+                self.wait_for().visible()
+                touch_action.tap(self._web_element(), None, None, count).perform()
+            except WebDriverException as wde:
+                raise ESelException("%s\n%s" % (wde.msg, self))
+
+    @SupportedBy(WebDriverType._MOBILE)
+    def press(self):
+        from appium.webdriver.common.touch_action import TouchAction
+
+        touch_action = TouchAction(self.get_web_driver()._web_driver())
+        try:
+            touch_action.press(self._web_element(), None, None).release().perform()
+        except Exception:
+            try:
+                self.wait_for().visible()
+                touch_action.press(self._web_element(), None, None).release().perform()
+            except WebDriverException as wde:
+                raise ESelException("%s\n%s" % (wde.msg, self))
+
+    @SupportedBy(WebDriverType._MOBILE)
+    def long_press(self, duration=1000):
+        from appium.webdriver.common.touch_action import TouchAction
+
+        touch_action = TouchAction(self.get_web_driver()._web_driver())
+        try:
+            touch_action.long_press(self._web_element(), None, None, duration).release().perform()
+        except Exception:
+            try:
+                self.wait_for().visible()
+                touch_action.long_press(self._web_element(), None, None, duration).release().perform()
+            except WebDriverException as wde:
+                raise ESelException("%s\n%s" % (wde.msg, self))
+
+    @SupportedBy(WebDriverType.ANDROID)
+    def set_text(self, text):
+        try:
+            self._web_element().set_text(text)
+        except Exception:
+            try:
+                self.wait_for().exists()
+                self._web_element().set_text(text)
+            except WebDriverException as wde:
+                raise ESelException("%s\n%s" % (wde.msg, self))
+
+    @SupportedBy(WebDriverType._MOBILE)
+    def get_location_in_view(self):
+        try:
+            location = self._web_element().location_in_view
+            return location["x"], location["y"]
+        except Exception:
+            try:
+                self.wait_for().exists()
+                location = self._web_element().location_in_view
+                return location["x"], location["y"]
+            except WebDriverException as wde:
+                raise ESelException("%s\n%s" % (wde.msg, self))
+
+    @SupportedBy(WebDriverType._MOBILE)
+    def set_value(self, value):
+        try:
+            self._web_element().set_value(value)
+        except Exception:
+            try:
+                self.wait_for().exists()
+                self._web_element().set_value(value)
+            except WebDriverException as wde:
+                raise ESelException("%s\n%s" % (wde.msg, self))
+
+    @SupportedBy(WebDriverType._MOBILE)
+    def scroll_to(self, target_element):
+        try:
+            self.get_web_driver()._web_driver().scroll(self._web_element(), target_element._web_element())
+        except Exception:
+            try:
+                self.wait_for().exists()
+                target_element.wait_for().exists()
+                self.get_web_driver()._web_driver().scroll(self._web_element(), target_element._web_element())
+            except WebDriverException as wde:
+                raise ESelException("%s\n%s" % (wde.msg, self))
+
+    @SupportedBy(WebDriverType._MOBILE)
+    def pinch(self, percent=200, steps=50):
+        try:
+            self.get_web_driver()._web_driver().pinch(self._web_element(), percent, steps)
+        except Exception:
+            try:
+                self.wait_for().visible()
+                self.get_web_driver()._web_driver().pinch(self._web_element(), percent, steps)
+            except WebDriverException as wde:
+                raise ESelException("%s\n%s" % (wde.msg, self))
+
+    @SupportedBy(WebDriverType._MOBILE)
+    def zoom(self, percent=200, steps=50):
+        try:
+            self.get_web_driver()._web_driver().zoom(self._web_element(), percent, steps)
+        except Exception:
+            try:
+                self.wait_for().visible()
+                self.get_web_driver()._web_driver().zoom(self._web_element(), percent, steps)
+            except WebDriverException as wde:
+                raise ESelException("%s\n%s" % (wde.msg, self))
 
     def is_displayed(self):
         try:
