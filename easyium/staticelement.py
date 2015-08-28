@@ -1,4 +1,4 @@
-from element import Element
+from .element import Element
 
 __author__ = 'karl.gong'
 

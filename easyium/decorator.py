@@ -1,6 +1,6 @@
 __author__ = 'karl.gong'
 
-from exceptions import UnsupportedOperationForWebDriver
+from .exceptions import UnsupportedOperationForWebDriver
 
 
 def SupportedBy(*web_driver_types):

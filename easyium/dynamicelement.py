@@ -1,5 +1,5 @@
-from exceptions import NotPersistException, LatePersistException
-from element import Element
+from .exceptions import NotPersistException, LatePersistException
+from .element import Element
 
 
 __author__ = 'karl.gong'

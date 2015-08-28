@@ -1,9 +1,9 @@
 import time
 
-from elementattributecontainsall import ElementAttributeContainsAll
-from elementattributecontainsone import ElementAttributeContainsOne
-from elementexistence import ElementExistence
-from elementvisible import ElementVisible
+from .elementattributecontainsall import ElementAttributeContainsAll
+from .elementattributecontainsone import ElementAttributeContainsOne
+from .elementexistence import ElementExistence
+from .elementvisible import ElementVisible
 from ..exceptions import TimeoutException
 from ..config import DEFAULT, default_wait_interval, default_wait_timeout
 

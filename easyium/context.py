@@ -1,8 +1,8 @@
 from selenium.common.exceptions import StaleElementReferenceException, NoSuchElementException
 
-from locator import locator_to_by_value
-from identifier import Identifier
-import exceptions
+from .locator import locator_to_by_value
+from .identifier import Identifier
+from . import exceptions
 
 
 __author__ = 'karl.gong'
@@ -37,7 +37,7 @@ class Context:
 
     def find_element(self, locator, identifier=Identifier.id):
         # import the DynamicElement here to avoid cyclic dependency
-        from dynamicelement import DynamicElement
+        from .dynamicelement import DynamicElement
 
         by, value = locator_to_by_value(locator)
         try:
@@ -51,7 +51,7 @@ class Context:
 
     def find_elements(self, locator, identifier=Identifier.id):
         # import the DynamicElement here to avoid cyclic dependency
-        from dynamicelement import DynamicElement
+        from .dynamicelement import DynamicElement
 
         by, value = locator_to_by_value(locator)
         try:

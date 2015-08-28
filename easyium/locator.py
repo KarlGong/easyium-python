@@ -1,6 +1,6 @@
 from selenium.webdriver.common.by import By
 
-from exceptions import InvalidByException
+from .exceptions import InvalidByException
 from . import appium_installed
 
 __author__ = 'karl.gong'

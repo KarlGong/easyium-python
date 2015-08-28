@@ -1,10 +1,10 @@
 from selenium.webdriver import Ie, Firefox, Chrome, Opera, Safari, PhantomJS
 from selenium.common.exceptions import NoAlertPresentException
 
-from context import Context
-from exceptions import UnsupportedWebDriverTypeException
-from waits.waiter import wait_for
-from config import DEFAULT, default_page_load_timeout, default_script_timeout, default_wait_element_interval, \
+from .context import Context
+from .exceptions import UnsupportedWebDriverTypeException
+from .waits.waiter import wait_for
+from .config import DEFAULT, default_page_load_timeout, default_script_timeout, default_wait_element_interval, \
     default_wait_element_timeout
 
 __author__ = 'karl.gong'

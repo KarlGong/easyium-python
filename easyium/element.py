@@ -1,11 +1,11 @@
 from selenium.common.exceptions import WebDriverException
 from selenium.webdriver import ActionChains
 
-from webdriver import WebDriverType
-from exceptions import ESelException, NoSuchElementException
-from waits.waiter import ElementWaiter
-from context import Context
-from config import DEFAULT
+from .webdriver import WebDriverType
+from .exceptions import ESelException, NoSuchElementException
+from .waits.waiter import ElementWaiter
+from .context import Context
+from .config import DEFAULT
 
 __author__ = 'karl.gong'
 
