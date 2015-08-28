@@ -6,6 +6,7 @@ from .exceptions import UnsupportedWebDriverTypeException
 from .waits.waiter import wait_for
 from .config import DEFAULT, default_page_load_timeout, default_script_timeout, default_wait_element_interval, \
     default_wait_element_timeout
+from .decorator import SupportedBy
 
 __author__ = 'karl.gong'
 
@@ -64,15 +65,6 @@ class WebDriver(Context):
     def get_web_driver_type(self):
         return self.__web_driver_type
 
-    def before_startup(self, method):
-        self.__web_driver.start_client = method
-
-    def after_shutdown(self, method):
-        self.__web_driver.stop_client = method
-
-    def start_session(self, desired_capabilities, profile=None):
-        self.__web_driver.start_session(desired_capabilities, profile)
-
     def maximize_window(self):
         self.__web_driver.maximize_window()
 
@@ -111,6 +103,18 @@ class WebDriver(Context):
 
     def get_page_source(self):
         return self.__web_driver.page_source
+
+    @SupportedBy(WebDriverType._MOBILE)
+    def get_contexts(self):
+        return self.__web_driver.contexts
+
+    @SupportedBy(WebDriverType._MOBILE)
+    def get_current_context(self):
+        return self.__web_driver.current_context
+
+    @SupportedBy(WebDriverType._MOBILE)
+    def switch_to_context(self, context_name):
+        self.__web_driver.switch_to.context(context_name)
 
     def switch_to_frame(self, frame_reference):
         self.__web_driver.switch_to.frame(frame_reference)
@@ -207,6 +211,156 @@ class WebDriver(Context):
 
     def get_log(self, log_type):
         return self.__web_driver.get_log(log_type)
+
+    @SupportedBy(WebDriverType._MOBILE)
+    def swipe(self, start_x, start_y, end_x, end_y, duration=None):
+        self.__web_driver.swipe(start_x, start_y, end_x, end_y, duration)
+
+    @SupportedBy(WebDriverType._MOBILE)
+    def flick(self, start_x, start_y, end_x, end_y):
+        self.__web_driver.flick(start_x, start_y, end_x, end_y)
+
+    @SupportedBy(WebDriverType._MOBILE)
+    def app_strings(self, language=None, string_file=None):
+        return self.__web_driver.app_strings(language, string_file)
+
+    @SupportedBy(WebDriverType._MOBILE)
+    def reset(self):
+        self.__web_driver.reset()
+
+    @SupportedBy(WebDriverType._MOBILE)
+    def hide_keyboard(self, key_name=None, key=None, strategy=None):
+        self.__web_driver.hide_keyboard(key_name, key, strategy)
+
+    @SupportedBy(WebDriverType.ANDROID)
+    def press_key(self, key_code, meta_state=None):
+        self.__web_driver.press_keycode(key_code, meta_state)
+
+    @SupportedBy(WebDriverType.ANDROID)
+    def long_press_key(self, key_code, meta_state=None):
+        self.__web_driver.long_press_keycode(key_code, meta_state)
+
+    @SupportedBy(WebDriverType.ANDROID)
+    def get_current_activity(self):
+        return self.__web_driver.current_activity
+
+    @SupportedBy(WebDriverType._MOBILE)
+    def pull_file(self, path):
+        return self.__web_driver.pull_file(path)
+
+    @SupportedBy(WebDriverType._MOBILE)
+    def pull_folder(self, path):
+        return self.__web_driver.pull_folder(path)
+
+    @SupportedBy(WebDriverType._MOBILE)
+    def push_file(self, path, base64data):
+        self.__web_driver.push_file(path, base64data)
+
+    @SupportedBy(WebDriverType._MOBILE)
+    def send_to_background(self, duration):
+        self.__web_driver.background_app(duration / 1000.0)
+
+    @SupportedBy(WebDriverType._MOBILE)
+    def is_app_installed(self, bundle_id):
+        return self.__web_driver.is_app_installed(bundle_id)
+
+    @SupportedBy(WebDriverType._MOBILE)
+    def install_app(self, app_path):
+        self.__web_driver.install_app(app_path)
+
+    @SupportedBy(WebDriverType._MOBILE)
+    def remove_app(self, app_id):
+        self.__web_driver.remove_app(app_id)
+
+    @SupportedBy(WebDriverType._MOBILE)
+    def launch_app(self):
+        self.__web_driver.launch_app()
+
+    @SupportedBy(WebDriverType._MOBILE)
+    def close_app(self):
+        self.__web_driver.close_app()
+
+    @SupportedBy(WebDriverType.ANDROID)
+    def start_activity(self, app_package, app_activity, app_wait_package=DEFAULT, app_wait_activity=DEFAULT,
+                       intent_action=DEFAULT, intent_category=DEFAULT, intent_flags=DEFAULT,
+                       optional_intent_arguments=DEFAULT, stop_app_on_reset=DEFAULT):
+        options = {}
+        if app_wait_package != DEFAULT:
+            options["app_wait_package"] = app_wait_package
+        if app_wait_activity != DEFAULT:
+            options["app_wait_activity"] = app_wait_activity
+        if intent_action != DEFAULT:
+            options["intent_action"] = intent_action
+        if intent_category != DEFAULT:
+            options["intent_category"] = intent_category
+        if intent_flags != DEFAULT:
+            options["intent_flags"] = intent_flags
+        if optional_intent_arguments != DEFAULT:
+            options["optional_intent_arguments"] = optional_intent_arguments
+        if stop_app_on_reset != DEFAULT:
+            options["stop_app_on_reset"] = stop_app_on_reset
+
+        self.__web_driver.start_activity(app_package, app_activity, **options)
+
+    @SupportedBy(WebDriverType.ANDROID)
+    def end_test_coverage(self, intent, path):
+        self.__web_driver.end_test_coverage(intent, path)
+
+    @SupportedBy(WebDriverType.IOS)
+    def lock(self, duration):
+        self.__web_driver.lock(duration / 1000.0)
+
+    @SupportedBy(WebDriverType._MOBILE)
+    def shake(self):
+        self.__web_driver.shake()
+
+    @SupportedBy(WebDriverType.ANDROID)
+    def open_notifications(self):
+        self.__web_driver.open_notifications()
+
+    @SupportedBy(WebDriverType.ANDROID)
+    def get_network_connection(self):
+        return self.__web_driver.network_connection
+
+    @SupportedBy(WebDriverType.ANDROID)
+    def set_network_connection(self, connection_type):
+        self.__web_driver.set_network_connection(connection_type)
+
+    @SupportedBy(WebDriverType.ANDROID)
+    def get_available_ime_engines(self):
+        return self.__web_driver.available_ime_engines
+
+    @SupportedBy(WebDriverType.ANDROID)
+    def is_ime_service_active(self):
+        return self.__web_driver.is_ime_active()
+
+    @SupportedBy(WebDriverType.ANDROID)
+    def active_ime_engine(self, engine):
+        self.__web_driver.activate_ime_engine(engine)
+
+    @SupportedBy(WebDriverType.ANDROID)
+    def deactivate_current_ime_engine(self):
+        self.__web_driver.deactivate_ime_engine()
+
+    @SupportedBy(WebDriverType.ANDROID)
+    def get_current_ime_engine(self):
+        return self.__web_driver.active_ime_engine
+
+    @SupportedBy(WebDriverType._MOBILE)
+    def get_settings(self):
+        return self.__web_driver.get_settings()
+
+    @SupportedBy(WebDriverType._MOBILE)
+    def update_settings(self, settings):
+        self.__web_driver.update_settings(settings)
+
+    @SupportedBy(WebDriverType.ANDROID)
+    def toggle_location_services(self):
+        self.__web_driver.toggle_location_services()
+
+    @SupportedBy(WebDriverType._MOBILE)
+    def set_location(self, latitude, longitude, altitude):
+        self.__web_driver.set_location(latitude, longitude, altitude)
 
     def __str__(self):
         return "Browser [WebDriver: %s][SessionId: %s]" % (self.__web_driver.name, self.__web_driver.session_id)

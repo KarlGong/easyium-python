@@ -15,7 +15,7 @@ def SupportedBy(*web_driver_types):
                 raise UnsupportedOperationForWebDriver(
                     "The operation is not supported in web driver [%s]." % current_web_driver_type)
 
-            func(*args, **kwargs)
+            return func(*args, **kwargs)
 
         return handle_args
 
