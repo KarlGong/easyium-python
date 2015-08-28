@@ -287,6 +287,7 @@ class Element(Context):
             except WebDriverException as wde:
                 raise ESelException("%s\n%s" % (wde.msg, self))
 
+    @SupportedBy(WebDriverType._BROWSER)
     def mouse_over(self):
         script = """
             var evObj = document.createEvent('MouseEvents');
@@ -309,6 +310,7 @@ class Element(Context):
             except WebDriverException as wde:
                 raise ESelException("%s\n%s" % (wde.msg, self))
 
+    @SupportedBy(WebDriverType._BROWSER)
     def mouse_out(self):
         script = """
             var evObj = document.createEvent('MouseEvents');
@@ -352,6 +354,7 @@ class Element(Context):
             except WebDriverException as wde:
                 raise ESelException("%s\n%s" % (wde.msg, self))
 
+    @SupportedBy(WebDriverType._BROWSER)
     def release_mouse_here_with_offset(self, x_offset, y_offset):
         """
             Release mouse here with offset.
@@ -379,13 +382,14 @@ class Element(Context):
                 try:
                     self.wait_for().visible()
                     target_element.wait_for().visible()
-                    self.get_web_driver()._web_driver().scroll(self._web_element(), target_element._web_element())
+                    self.get_web_driver()._web_driver().drag_and_drop(self._web_element(), target_element._web_element())
                 except WebDriverException as wde:
                     raise ESelException("%s\n%s" % (wde.msg, self))
         else:
             self.click_and_hold()
             target_element.release_mouse_here()
 
+    @SupportedBy(WebDriverType._BROWSER)
     def drag_and_drop_to_with_offset(self, target_element, x_offset, y_offset):
         """
             Drag and drop to target element with offset.
@@ -398,16 +402,16 @@ class Element(Context):
         target_element.release_mouse_here_with_offset(x_offset, y_offset)
 
     @SupportedBy(WebDriverType._MOBILE)
-    def tap(self, count=1):
+    def tap(self):
         from appium.webdriver.common.touch_action import TouchAction
 
         touch_action = TouchAction(self.get_web_driver()._web_driver())
         try:
-            touch_action.tap(self._web_element(), None, None, count).perform()
+            touch_action.tap(self._web_element(), None, None, 1).perform()
         except Exception:
             try:
                 self.wait_for().visible()
-                touch_action.tap(self._web_element(), None, None, count).perform()
+                touch_action.tap(self._web_element(), None, None, 1).perform()
             except WebDriverException as wde:
                 raise ESelException("%s\n%s" % (wde.msg, self))
 

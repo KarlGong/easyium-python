@@ -65,6 +65,7 @@ class WebDriver(Context):
     def get_web_driver_type(self):
         return self.__web_driver_type
 
+    @SupportedBy(WebDriverType._BROWSER)
     def maximize_window(self):
         self.__web_driver.maximize_window()
 
