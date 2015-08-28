@@ -226,7 +226,7 @@ class WebDriver(Context):
         return self.__web_driver.app_strings(language, string_file)
 
     @SupportedBy(WebDriverType._MOBILE)
-    def reset(self):
+    def reset_current_app(self):
         self.__web_driver.reset()
 
     @SupportedBy(WebDriverType._MOBILE)
