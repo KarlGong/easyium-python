@@ -27,8 +27,8 @@ class Element(Context):
         pass
 
     def wait_for(self, interval=DEFAULT, timeout=DEFAULT):
-        interval = self.get_web_driver().wait_element_interval if interval == DEFAULT else interval
-        timeout = self.get_web_driver().wait_element_timeout if timeout == DEFAULT else timeout
+        interval = self.get_web_driver().get_wait_interval() if interval == DEFAULT else interval
+        timeout = self.get_web_driver().get_wait_timeout() if timeout == DEFAULT else timeout
         return ElementWaiter(self, interval, timeout)
 
     def clear(self):

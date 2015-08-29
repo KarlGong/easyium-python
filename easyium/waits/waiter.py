@@ -5,7 +5,7 @@ from .elementattributecontainsone import ElementAttributeContainsOne
 from .elementexistence import ElementExistence
 from .elementvisible import ElementVisible
 from ..exceptions import TimeoutException
-from ..config import DEFAULT, default_wait_interval, default_wait_timeout
+from ..config import DEFAULT, waiter_default_wait_interval, waiter_default_wait_timeout
 
 __author__ = 'karl.gong'
 
@@ -15,8 +15,8 @@ def wait_for(condition_function, interval=DEFAULT, timeout=DEFAULT, **function_a
         Wait for the condition to be true.
     :param condition_function: a function which returns bool
     """
-    interval = default_wait_interval if interval == DEFAULT else interval
-    timeout = default_wait_timeout if timeout == DEFAULT else timeout
+    interval = waiter_default_wait_interval if interval == DEFAULT else interval
+    timeout = waiter_default_wait_timeout if timeout == DEFAULT else timeout
     start_time = time.time() * 1000.0
 
     if condition_function(**function_args):

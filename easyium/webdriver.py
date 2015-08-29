@@ -4,8 +4,8 @@ from selenium.common.exceptions import NoAlertPresentException
 from .context import Context
 from .exceptions import UnsupportedWebDriverTypeException
 from .waits.waiter import wait_for
-from .config import DEFAULT, default_page_load_timeout, default_script_timeout, default_wait_element_interval, \
-    default_wait_element_timeout
+from .config import DEFAULT, web_driver_default_page_load_timeout, web_driver_default_script_timeout, web_driver_default_wait_interval, \
+    web_driver_default_wait_timeout
 from .decorator import SupportedBy
 
 __author__ = 'karl.gong'
@@ -28,7 +28,7 @@ class WebDriverType:
 
 class WebDriver(Context):
     def __init__(self, web_driver_type=WebDriverType.CHROME, page_load_timeout=DEFAULT, script_timeout=DEFAULT,
-                 wait_element_interval=DEFAULT, wait_element_timeout=DEFAULT, **kwargs):
+                 wait_interval=DEFAULT, wait_timeout=DEFAULT, **kwargs):
         Context.__init__(self)
         self.__web_driver_type = web_driver_type.lower()
         if self.__web_driver_type == WebDriverType.IE:
@@ -48,10 +48,10 @@ class WebDriver(Context):
             self.__selenium_web_driver = Mobile(**kwargs)
         else:
             raise UnsupportedWebDriverTypeException("The web driver type [%s] is not supported." % web_driver_type)
-        self.set_page_load_timeout(default_page_load_timeout if page_load_timeout == DEFAULT else page_load_timeout)
-        self.set_script_timeout(default_script_timeout if script_timeout == DEFAULT else script_timeout)
-        self.wait_element_interval = default_wait_element_interval if wait_element_interval == DEFAULT else wait_element_interval
-        self.wait_element_timeout = default_wait_element_timeout if wait_element_timeout == DEFAULT else wait_element_timeout
+        self.set_page_load_timeout(web_driver_default_page_load_timeout if page_load_timeout == DEFAULT else page_load_timeout)
+        self.set_script_timeout(web_driver_default_script_timeout if script_timeout == DEFAULT else script_timeout)
+        self.__wait_interval = web_driver_default_wait_interval if wait_interval == DEFAULT else wait_interval
+        self.__wait_timeout = web_driver_default_wait_timeout if wait_timeout == DEFAULT else wait_timeout
 
     def _selenium_web_driver(self):
         return self.__selenium_web_driver
@@ -64,6 +64,12 @@ class WebDriver(Context):
 
     def get_web_driver_type(self):
         return self.__web_driver_type
+
+    def get_wait_interval(self):
+        return self.__wait_interval
+
+    def get_wait_timeout(self):
+        return self.__wait_timeout
 
     @SupportedBy(WebDriverType._BROWSER)
     def maximize_window(self):
