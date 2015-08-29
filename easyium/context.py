@@ -18,13 +18,13 @@ class Context:
     def _selenium_context(self):
         pass
 
-    def persist(self):
-        pass
-
     def _refresh(self):
         pass
 
-    def _find_web_element(self, locator):
+    def persist(self):
+        pass
+
+    def _find_selenium_element(self, locator):
         by, value = locator_to_by_value(locator)
         try:
             try:
