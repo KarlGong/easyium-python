@@ -43,10 +43,10 @@ class Context:
         by, value = locator_to_by_value(locator)
         try:
             try:
-                return DynamicElement(self, self._selenium_context().find_element(by, value), identifier)
+                return DynamicElement(self, self._selenium_context().find_element(by, value), locator, identifier)
             except StaleElementReferenceException:
                 self._refresh()
-                return DynamicElement(self, self._selenium_context().find_element(by, value), identifier)
+                return DynamicElement(self, self._selenium_context().find_element(by, value), locator, identifier)
         except NoSuchElementException:
             raise exceptions.NoSuchElementException("Cannot find element by [%s] under:\n%s\n" % (locator, self))
         except WebDriverException as wde:
@@ -59,14 +59,14 @@ class Context:
         by, value = locator_to_by_value(locator)
         try:
             try:
-                web_elements = self._selenium_context().find_elements(by, value)
+                selenium_elements = self._selenium_context().find_elements(by, value)
             except StaleElementReferenceException:
                 self._refresh()
-                web_elements = self._selenium_context().find_elements(by, value)
+                selenium_elements = self._selenium_context().find_elements(by, value)
         except WebDriverException as wde:
             raise exceptions.EasyiumException("%s\n%s" % (wde.msg, self))
 
         elements = []
-        for web_element in web_elements:
-            elements.append(DynamicElement(self, web_element, identifier))
+        for selenium_element in selenium_elements:
+            elements.append(DynamicElement(self, selenium_element, locator, identifier))
         return elements
