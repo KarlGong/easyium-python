@@ -233,6 +233,10 @@ class WebDriver(Context):
     def hide_keyboard(self, key_name=None, key=None, strategy=None):
         self.__web_driver.hide_keyboard(key_name, key, strategy)
 
+    @SupportedBy(WebDriverType._MOBILE)
+    def key_event(self, key_code, meta_state=None):
+        self.__web_driver.keyevent(key_code, meta_state)
+
     @SupportedBy(WebDriverType.ANDROID)
     def press_key(self, key_code, meta_state=None):
         self.__web_driver.press_keycode(key_code, meta_state)
