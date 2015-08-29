@@ -1,9 +1,8 @@
-from selenium.common.exceptions import StaleElementReferenceException, NoSuchElementException
+from selenium.common.exceptions import StaleElementReferenceException, NoSuchElementException, WebDriverException
 
 from .locator import locator_to_by_value
 from .identifier import Identifier
 from . import exceptions
-
 
 __author__ = 'karl.gong'
 
@@ -34,6 +33,8 @@ class Context:
                 return self._selenium_context().find_element(by, value)
         except NoSuchElementException:
             raise exceptions.NoSuchElementException("Cannot find element by [%s] under:\n%s\n" % (locator, self))
+        except WebDriverException as wde:
+            raise exceptions.EasyiumException("%s\n%s" % (wde.msg, self))
 
     def find_element(self, locator, identifier=Identifier.id):
         # import the DynamicElement here to avoid cyclic dependency
@@ -48,6 +49,8 @@ class Context:
                 return DynamicElement(self, self._selenium_context().find_element(by, value), identifier)
         except NoSuchElementException:
             raise exceptions.NoSuchElementException("Cannot find element by [%s] under:\n%s\n" % (locator, self))
+        except WebDriverException as wde:
+            raise exceptions.EasyiumException("%s\n%s" % (wde.msg, self))
 
     def find_elements(self, locator, identifier=Identifier.id):
         # import the DynamicElement here to avoid cyclic dependency
@@ -55,13 +58,15 @@ class Context:
 
         by, value = locator_to_by_value(locator)
         try:
-            web_elements = self._selenium_context().find_elements(by, value)
-        except StaleElementReferenceException:
-            self._refresh()
-            web_elements = self._selenium_context().find_elements(by, value)
+            try:
+                web_elements = self._selenium_context().find_elements(by, value)
+            except StaleElementReferenceException:
+                self._refresh()
+                web_elements = self._selenium_context().find_elements(by, value)
+        except WebDriverException as wde:
+            raise exceptions.EasyiumException("%s\n%s" % (wde.msg, self))
 
         elements = []
         for web_element in web_elements:
             elements.append(DynamicElement(self, web_element, identifier))
         return elements
-
