@@ -30,4 +30,4 @@ class StaticElement(Element):
             element_id = None
         else:
             element_id = self.__selenium_element.id
-        return "%s\n|- StaticElement [WebElement: %s][Locator: %s]" % (self.get_parent(), element_id, self.__locator)
+        return "%s\n|- StaticElement [SeleniumElement: %s][Locator: %s]" % (self.get_parent(), element_id, self.__locator)
