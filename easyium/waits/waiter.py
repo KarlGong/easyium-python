@@ -10,25 +10,28 @@ from ..config import DEFAULT, waiter_default_wait_interval, waiter_default_wait_
 __author__ = 'karl.gong'
 
 
-def wait_for(condition_function, interval=DEFAULT, timeout=DEFAULT, **function_args):
+def wait_for(condition_function, interval=DEFAULT, timeout=DEFAULT, **function_kwargs):
     """
-        Wait for the condition to be true.
-    :param condition_function: a function which returns bool
+        Wait for the condition.
+    :param condition_function: the condition function
+    :param interval: the wait interval (in milliseconds)
+    :param timeout: the wait timeout (in milliseconds)
+    :param function_kwargs: the kwargs for condition_function
     """
     interval = waiter_default_wait_interval if interval == DEFAULT else interval
     timeout = waiter_default_wait_timeout if timeout == DEFAULT else timeout
     start_time = time.time() * 1000.0
 
-    if condition_function(**function_args):
+    if condition_function(**function_kwargs):
         return
 
     while (time.time() * 1000.0 - start_time) <= timeout:
-        if condition_function(**function_args):
+        if condition_function(**function_kwargs):
             return
         else:
             time.sleep(interval / 1000.0)
 
-    raise TimeoutException("Timed out waiting for [%s]." % condition_function.__name__)
+    raise TimeoutException("Timed out waiting for <%s>." % condition_function.__name__)
 
 
 class ElementWaiter:
@@ -51,7 +54,7 @@ class ElementWaiter:
                 time.sleep(self.__interval / 1000.0)
 
         raise TimeoutException(
-            "Timed out waiting for [%s] to be [%s]." % (element_condition, self.__desired_occurrence))
+            "Timed out waiting for <%s> to be <%s>." % (element_condition, self.__desired_occurrence))
 
     def not_(self):
         self.__desired_occurrence = not self.__desired_occurrence
