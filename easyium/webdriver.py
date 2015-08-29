@@ -208,7 +208,7 @@ class WebDriver(Context):
         return self.__selenium_web_driver.orientation
 
     def set_orientation(self, value):
-        self.__selenium_web_driver = value
+        self.__selenium_web_driver.orientation = value.upper()
 
     def get_application_cache(self):
         return self.__selenium_web_driver.application_cache
