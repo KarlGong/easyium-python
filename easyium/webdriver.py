@@ -29,6 +29,16 @@ class WebDriverType:
 class WebDriver(Context):
     def __init__(self, web_driver_type=WebDriverType.CHROME, page_load_timeout=DEFAULT, script_timeout=DEFAULT,
                  wait_interval=DEFAULT, wait_timeout=DEFAULT, **kwargs):
+        """
+            Creates a new instance of the WebDriver.
+
+        :param web_driver_type: the web driver type
+        :param page_load_timeout: the page load timeout (in milliseconds)
+        :param script_timeout: the script timeout (in milliseconds)
+        :param wait_interval: the wait interval (in milliseconds)
+        :param wait_timeout: the wait timeout (in milliseconds)
+        :param kwargs: the keyword args for the web driver specified by web_driver_type
+        """
         Context.__init__(self)
         self.__web_driver_type = web_driver_type.lower()
         if self.__web_driver_type == WebDriverType.IE:

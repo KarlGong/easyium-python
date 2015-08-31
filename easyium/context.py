@@ -37,6 +37,13 @@ class Context:
             raise exceptions.EasyiumException("%s\n%s" % (wde.msg, self))
 
     def find_element(self, locator, identifier=Identifier.id):
+        """
+            Find a DynamicElement under this context.
+
+        :param locator: the locator to find the DynamicElement (relative to parent context)
+        :param identifier: the identifier to refresh the DynamicElement
+        :return the DynamicElement found by locator
+        """
         # import the DynamicElement here to avoid cyclic dependency
         from .dynamicelement import DynamicElement
 
@@ -53,6 +60,13 @@ class Context:
             raise exceptions.EasyiumException("%s\n%s" % (wde.msg, self))
 
     def find_elements(self, locator, identifier=Identifier.id):
+        """
+            Find DynamicElement list under this context.
+
+        :param locator: the locator to find the DynamicElement list (relative to parent context)
+        :param identifier: the identifier to refresh the DynamicElement
+        :return the DynamicElement list found by locator
+        """
         # import the DynamicElement here to avoid cyclic dependency
         from .dynamicelement import DynamicElement
 

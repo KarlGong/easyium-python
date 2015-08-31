@@ -5,6 +5,12 @@ __author__ = 'karl.gong'
 
 class StaticElement(Element):
     def __init__(self, parent, locator):
+        """
+            Creates a new instance of the StaticElement.
+
+        :param parent: the parent context
+        :param locator: the locator of this element (relative to parent context)
+        """
         Element.__init__(self, parent)
         self.__selenium_element = None
         self.__locator = locator
