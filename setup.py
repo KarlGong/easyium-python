@@ -21,6 +21,7 @@ def main():
         name="easyium",
         description="easy use of selenium and appium",
         long_description=long_description,
+        install_requires = ["selenium"],
         version="1.0.0",
         keywords="test testing framework automation selenium appium",
         author="Karl Gong",
