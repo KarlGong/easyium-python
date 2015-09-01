@@ -92,10 +92,28 @@ class WebDriver(Context):
         self.__selenium_web_driver.set_script_timeout(timeout / 1000.0)
 
     def execute_script(self, script, *args):
-        return self.__selenium_web_driver.execute_script(script, *args)
+        from .element import Element
+
+        converted_args = []
+        for arg in args:
+            if isinstance(arg, Element):
+                converted_args.append(arg._selenium_element())
+            else:
+                converted_args.append(arg)
+
+        return self.__selenium_web_driver.execute_script(script, *converted_args)
 
     def execute_async_script(self, script, *args):
-        return self.__selenium_web_driver.execute_async_script(script, *args)
+        from .element import Element
+
+        converted_args = []
+        for arg in args:
+            if isinstance(arg, Element):
+                converted_args.append(arg._selenium_element())
+            else:
+                converted_args.append(arg)
+
+        return self.__selenium_web_driver.execute_async_script(script, *converted_args)
 
     def open(self, url):
         self.__selenium_web_driver.get(url)

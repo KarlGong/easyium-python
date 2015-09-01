@@ -163,13 +163,11 @@ class Element(Context):
         try:
             try:
                 content = self.get_web_driver().execute_script(
-                    "return arguments[0].childNodes[%s].nodeValue" % text_node_index,
-                    self._selenium_element())
+                    "return arguments[0].childNodes[%s].nodeValue" % text_node_index, self)
             except (NoSuchElementException, StaleElementReferenceException):
                 self.wait_for().exists()
                 content = self.get_web_driver().execute_script(
-                    "return arguments[0].childNodes[%s].nodeValue" % text_node_index,
-                    self._selenium_element())
+                    "return arguments[0].childNodes[%s].nodeValue" % text_node_index, self)
         except WebDriverException as wde:
             raise EasyiumException("%s\n%s" % (wde.msg, self))
 
@@ -250,20 +248,20 @@ class Element(Context):
         """
         try:
             try:
-                self.get_web_driver().execute_script(script % (start, end), self._selenium_element())
+                self.get_web_driver().execute_script(script % (start, end), self)
             except (NoSuchElementException, StaleElementReferenceException):
                 self.wait_for().visible()
-                self.get_web_driver().execute_script(script % (start, end), self._selenium_element())
+                self.get_web_driver().execute_script(script % (start, end), self)
         except WebDriverException as wde:
             raise EasyiumException("%s\n%s" % (wde.msg, self))
 
     def get_inner_html(self):
         try:
             try:
-                return self.get_web_driver().execute_script("return arguments[0].innerHTML", self._selenium_element())
+                return self.get_web_driver().execute_script("return arguments[0].innerHTML", self)
             except (NoSuchElementException, StaleElementReferenceException):
                 self.wait_for().exists()
-                return self.get_web_driver().execute_script("return arguments[0].innerHTML", self._selenium_element())
+                return self.get_web_driver().execute_script("return arguments[0].innerHTML", self)
         except WebDriverException as wde:
             raise EasyiumException("%s\n%s" % (wde.msg, self))
 
@@ -298,14 +296,14 @@ class Element(Context):
         try:
             try:
                 if web_driver_type == WebDriverType.CHROME or web_driver_type == WebDriverType.FIREFOX:
-                    self.get_web_driver().execute_script(script, self._selenium_element())
+                    self.get_web_driver().execute_script(script, self)
                 else:
                     ActionChains(self.get_web_driver()._selenium_web_driver()).move_to_element(
                         self._selenium_element()).perform()
             except (NoSuchElementException, StaleElementReferenceException):
                 self.wait_for().exists()
                 if web_driver_type == WebDriverType.CHROME or web_driver_type == WebDriverType.FIREFOX:
-                    self.get_web_driver().execute_script(script, self._selenium_element())
+                    self.get_web_driver().execute_script(script, self)
                 else:
                     ActionChains(self.get_web_driver()._selenium_web_driver()).move_to_element(
                         self._selenium_element()).perform()
@@ -323,14 +321,14 @@ class Element(Context):
         try:
             try:
                 if web_driver_type in [WebDriverType.CHROME, WebDriverType.FIREFOX]:
-                    self.get_web_driver().execute_script(script, self._selenium_element())
+                    self.get_web_driver().execute_script(script, self)
                 else:
                     ActionChains(self.get_web_driver()._selenium_web_driver()).move_to_element(
                         self._selenium_element()).perform()
             except (NoSuchElementException, StaleElementReferenceException):
                 self.wait_for().exists()
                 if web_driver_type in [WebDriverType.CHROME, WebDriverType.FIREFOX]:
-                    self.get_web_driver().execute_script(script, self._selenium_element())
+                    self.get_web_driver().execute_script(script, self)
                 else:
                     ActionChains(self.get_web_driver()._selenium_web_driver()).move_to_element(
                         self._selenium_element()).perform()
