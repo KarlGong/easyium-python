@@ -2,6 +2,8 @@ from selenium.common.exceptions import StaleElementReferenceException, NoSuchEle
 
 from .locator import locator_to_by_value
 from .identifier import Identifier
+from .waiter import ContextWaiter
+from .config import DEFAULT
 from . import exceptions
 
 __author__ = 'karl.gong'
@@ -13,6 +15,26 @@ class Context:
 
     def get_web_driver(self):
         pass
+
+    def get_web_driver_type(self):
+        pass
+
+    def get_wait_interval(self):
+        pass
+
+    def get_wait_timeout(self):
+        pass
+
+    def waiter(self, interval=DEFAULT, timeout=DEFAULT):
+        """"
+            Get a ContextWait instance.
+
+        :param interval: the wait interval (in milliseconds), default value is web driver's wait interval
+        :param timeout: the wait timeout (in milliseconds), default value is web driver's wait timeout
+        """
+        interval = self.get_wait_interval() if interval == DEFAULT else interval
+        timeout = self.get_wait_timeout() if timeout == DEFAULT else timeout
+        return ContextWaiter(self, interval, timeout)
 
     def _selenium_context(self):
         pass

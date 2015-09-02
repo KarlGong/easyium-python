@@ -4,7 +4,7 @@ from selenium.webdriver import ActionChains
 from .decorator import SupportedBy
 from .webdriver import WebDriverType
 from .exceptions import EasyiumException, NoSuchElementException
-from .waits.waiter import ElementWaiter
+from .waiter import ElementWaitFor
 from .context import Context
 from .config import DEFAULT
 
@@ -14,11 +14,19 @@ __author__ = 'karl.gong'
 class Element(Context):
     def __init__(self, parent):
         Context.__init__(self)
-        self.__web_driver = parent.get_web_driver()
         self.__parent = parent
 
     def get_web_driver(self):
-        return self.__web_driver
+        return self.get_parent().get_web_driver()
+
+    def get_web_driver_type(self):
+        return self.get_web_driver().get_web_driver_type()
+
+    def get_wait_interval(self):
+        return self.get_web_driver().get_wait_interval()
+
+    def get_wait_timeout(self):
+        return self.get_web_driver().get_wait_timeout()
 
     def get_parent(self):
         return self.__parent
@@ -27,9 +35,15 @@ class Element(Context):
         pass
 
     def wait_for(self, interval=DEFAULT, timeout=DEFAULT):
-        interval = self.get_web_driver().get_wait_interval() if interval == DEFAULT else interval
-        timeout = self.get_web_driver().get_wait_timeout() if timeout == DEFAULT else timeout
-        return ElementWaiter(self, interval, timeout)
+        """
+            Get a ElementWaitFor instance.
+
+        :param interval: the wait interval (in milliseconds), default value is web driver's wait interval
+        :param timeout: the wait timeout (in milliseconds), default value is web driver's wait timeout
+        """
+        interval = self.get_wait_interval() if interval == DEFAULT else interval
+        timeout = self.get_wait_timeout() if timeout == DEFAULT else timeout
+        return ElementWaitFor(self, interval, timeout)
 
     def clear(self):
         try:
@@ -292,7 +306,7 @@ class Element(Context):
             evObj.initMouseEvent("mouseover",true, false, window, 0, 0, 0, 0, 0, false, false, false, false, 0, null);
             arguments[0].dispatchEvent(evObj);
         """
-        web_driver_type = self.get_web_driver().get_web_driver_type()
+        web_driver_type = self.get_web_driver_type()
         try:
             try:
                 if web_driver_type == WebDriverType.CHROME or web_driver_type == WebDriverType.FIREFOX:
@@ -317,7 +331,7 @@ class Element(Context):
             evObj.initMouseEvent("mouseout",true, false, window, 0, 0, 0, 0, 0, false, false, false, false, 0, null);
             arguments[0].dispatchEvent(evObj);
         """
-        web_driver_type = self.get_web_driver().get_web_driver_type()
+        web_driver_type = self.get_web_driver_type()
         try:
             try:
                 if web_driver_type in [WebDriverType.CHROME, WebDriverType.FIREFOX]:
@@ -379,7 +393,7 @@ class Element(Context):
             raise EasyiumException("%s\n%s" % (wde.msg, self))
 
     def drag_and_drop_to(self, target_element):
-        web_driver_type = self.get_web_driver().get_web_driver_type()
+        web_driver_type = self.get_web_driver_type()
         if web_driver_type in WebDriverType._MOBILE:
             try:
                 try:

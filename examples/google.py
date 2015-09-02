@@ -62,7 +62,7 @@ class GoogleApp:
         self.__name = StaticElement(self.__element, "class=gb_4")
 
     def get_name(self):
-        # get_text() doesn't work here, so use java script
+        # get_text() doesn't work here, so use javascript
         # return self.name.get_text()
         return self.__name.get_web_driver().execute_script('return arguments[0].innerText', self.__name)
 

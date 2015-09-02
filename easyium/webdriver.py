@@ -3,7 +3,6 @@ from selenium.common.exceptions import NoAlertPresentException
 
 from .context import Context
 from .exceptions import UnsupportedWebDriverTypeException
-from .waits.waiter import wait_for
 from .config import DEFAULT, web_driver_default_page_load_timeout, web_driver_default_script_timeout, web_driver_default_wait_interval, \
     web_driver_default_wait_timeout
 from .decorator import SupportedBy
@@ -33,10 +32,10 @@ class WebDriver(Context):
             Creates a new instance of the WebDriver.
 
         :param web_driver_type: the web driver type
-        :param page_load_timeout: the page load timeout (in milliseconds)
-        :param script_timeout: the script timeout (in milliseconds)
-        :param wait_interval: the wait interval (in milliseconds)
-        :param wait_timeout: the wait timeout (in milliseconds)
+        :param page_load_timeout: the page load timeout (in milliseconds), default value is from config.web_driver_default_page_load_timeout
+        :param script_timeout: the script timeout (in milliseconds), default value is from config.web_driver_default_script_timeout
+        :param wait_interval: the wait interval (in milliseconds), default value is from config.web_driver_default_wait_interval
+        :param wait_timeout: the wait timeout (in milliseconds), default value is from config.web_driver_default_wait_timeout
         :param kwargs: the keyword args for the web driver specified by web_driver_type
         """
         Context.__init__(self)
@@ -165,13 +164,13 @@ class WebDriver(Context):
 
     def is_alert_present(self):
         try:
-            alert = self.__selenium_web_driver.switch_to.alert
+            alert_text = self.__selenium_web_driver.switch_to.alert.text
             return True
         except NoAlertPresentException:
             return False
 
     def wait_for_alert_present(self):
-        wait_for(self.is_alert_present)
+        self.waiter().wait_for(WebDriver.is_alert_present)
 
     def get_cookies(self):
         return self.__selenium_web_driver.get_cookies()

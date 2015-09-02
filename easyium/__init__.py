@@ -7,6 +7,6 @@ except ImportError:
 from .webdriver import WebDriver, WebDriverType
 from .staticelement import StaticElement
 from .identifier import Identifier
-from .waits.waiter import wait_for
+from .waiter import Waiter
 
 __author__ = 'karl.gong'
