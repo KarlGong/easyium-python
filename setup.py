@@ -29,7 +29,7 @@ def main():
         url="https://github.com/KarlGong/easyium",
         license="Apache",
         classifiers=classifiers,
-        packages=["easyium","easyium.waits"],
+        packages=["easyium"],
         zip_safe=False,
     )
 
