@@ -38,7 +38,8 @@ class Context:
 
     def find_element(self, locator, identifier=Identifier.id):
         """
-            Find a DynamicElement under this context.
+            Find a DynamicElement under this context immediately.
+            If this context is not existing, it will raise NoSuchElementException.
 
         :param locator: the locator to find the DynamicElement (relative to parent context)
         :param identifier: the identifier to refresh the DynamicElement
@@ -61,7 +62,8 @@ class Context:
 
     def find_elements(self, locator, identifier=Identifier.id):
         """
-            Find DynamicElement list under this context.
+            Find DynamicElement list under this context immediately.
+            If this context is not existing, it will raise NoSuchElementException.
 
         :param locator: the locator to find the DynamicElement list (relative to parent context)
         :param identifier: the identifier to refresh the DynamicElement
