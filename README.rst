@@ -57,6 +57,10 @@ For information and suggestions you can contact me at karl.gong@outlook.com
 
 Change Log
 ----------
+1.1.0 (compared to 1.0.0)
+
+- Refactor the waiter.
+
 1.0.0
 
-- Baby easyium
+- Baby easyium.
