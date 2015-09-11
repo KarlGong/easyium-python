@@ -45,6 +45,16 @@ class Element(Context):
         timeout = self.get_wait_timeout() if timeout == DEFAULT else timeout
         return ElementWaitFor(self, interval, timeout)
 
+    def blur(self):
+        try:
+            try:
+                self.get_web_driver().execute_script("arguments[0].blur()", self)
+            except (NoSuchElementException, StaleElementReferenceException):
+                self.wait_for().visible()
+                self.get_web_driver().execute_script("arguments[0].blur()", self)
+        except WebDriverException as wde:
+            raise EasyiumException("%s\n%s" % (wde.msg, self))
+
     def clear(self):
         try:
             try:
