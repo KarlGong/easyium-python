@@ -41,23 +41,6 @@ class Waiter:
         raise TimeoutException("Timed out waiting for <%s>." % condition_function.__name__)
 
 
-class ContextWaiter(Waiter):
-    def __init__(self, context, interval, timeout):
-        Waiter.__init__(self, interval, timeout)
-        self.__context = context
-
-    def wait_for(self, condition_function, *function_args, **function_kwargs):
-        """
-            Wait for the condition.
-            The context will be passed to to condition_function as first argument.
-
-        :param condition_function: the condition function which accepts context as first argument
-        :param function_args: the args for condition_function (except context)
-        :param function_kwargs: the kwargs for condition_function (except context)
-        """
-        Waiter.wait_for(self, condition_function, self.__context, *function_args, **function_kwargs)
-
-
 class ElementWaitFor:
     def __init__(self, element, interval, timeout):
         self.__element = element
