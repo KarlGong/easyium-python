@@ -71,8 +71,12 @@ class WebDriver(Context):
     def get_web_driver(self):
         return self
 
+    get_browser = get_web_driver
+
     def get_web_driver_type(self):
         return self.__web_driver_type
+
+    get_browser_type = get_web_driver_type
 
     def get_wait_interval(self):
         return self.__wait_interval
@@ -116,6 +120,8 @@ class WebDriver(Context):
 
     def open(self, url):
         self.__selenium_web_driver.get(url)
+
+    get = open
 
     def get_title(self):
         return self.__selenium_web_driver.title
@@ -402,3 +408,7 @@ class WebDriver(Context):
 
     def __str__(self):
         return "WebDriver [WebDriverType: %s][SessionId: %s]" % (self.__selenium_web_driver.name, self.__selenium_web_driver.session_id)
+
+
+Browser = WebDriver
+BrowserType = WebDriverType

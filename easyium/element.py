@@ -19,8 +19,12 @@ class Element(Context):
     def get_web_driver(self):
         return self.get_parent().get_web_driver()
 
+    get_browser = get_web_driver
+
     def get_web_driver_type(self):
         return self.get_web_driver().get_web_driver_type()
+
+    get_browser_type = get_web_driver_type
 
     def get_wait_interval(self):
         return self.get_web_driver().get_wait_interval()
