@@ -1,6 +1,8 @@
 import time
 
-from .exceptions import TimeoutException
+from selenium.common.exceptions import NoAlertPresentException
+
+from .exceptions import TimeoutException, NoSuchElementException
 from .config import DEFAULT, waiter_default_wait_interval, waiter_default_wait_timeout
 
 __author__ = 'karl.gong'
@@ -145,3 +147,61 @@ class ElementAttributeContainsAll:
     def __str__(self):
         return "ElementAttributeContainsAll [element: \n%s\n][attribute: %s][values: %s]" % (
             self.__element, self.__attribute, self.__values)
+
+
+class WebDriverWaitFor:
+    def __init__(self, web_driver, interval, timeout):
+        self.__web_driver = web_driver
+        self.__desired_occurrence = True
+        self.__waiter = Waiter(interval, timeout)
+
+    def __wait_for(self, web_driver_condition):
+        def is_web_driver_condition_occurred():
+            return web_driver_condition.occurred() == self.__desired_occurrence
+
+        try:
+            self.__waiter.wait_for(is_web_driver_condition_occurred)
+        except TimeoutException:
+            raise TimeoutException(
+                "Timed out waiting for <%s> to be <%s>." % (web_driver_condition, self.__desired_occurrence))
+
+    def not_(self):
+        self.__desired_occurrence = not self.__desired_occurrence
+        return self
+
+    def alert_present(self):
+        self.__wait_for(AlertPresent(self.__web_driver))
+
+    def text_present(self, text):
+        self.__wait_for(TextPresent(self.__web_driver, text))
+
+
+class AlertPresent:
+    def __init__(self, web_driver):
+        self.__web_driver = web_driver
+
+    def occurred(self):
+        try:
+            alert_text = self.__web_driver.get_alert().text
+            return True
+        except NoAlertPresentException:
+            return False
+
+    def __str__(self):
+        return "AlertPresent [\n%s\n]" % self.__web_driver
+
+
+class TextPresent:
+    def __init__(self, web_driver, text):
+        self.__web_driver = web_driver
+        self.__text = text
+
+    def occurred(self):
+        try:
+            self.__web_driver.find_element("xpath=//*[contains(text(), '%s')]" % self.__text)
+            return True
+        except NoSuchElementException:
+            return False
+
+    def __str__(self):
+        return "TextPresent [webdriver: \n%s\n][text: %s]" % (self.__web_driver, self.__text)

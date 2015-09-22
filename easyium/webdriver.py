@@ -2,6 +2,7 @@ from selenium.webdriver import Ie, Firefox, Chrome, Opera, Safari, PhantomJS
 from selenium.common.exceptions import NoAlertPresentException
 
 from .context import Context
+from .waiter import WebDriverWaitFor
 from .exceptions import UnsupportedWebDriverTypeException
 from .config import DEFAULT, web_driver_default_page_load_timeout, web_driver_default_script_timeout, web_driver_default_wait_interval, \
     web_driver_default_wait_timeout
@@ -83,6 +84,17 @@ class WebDriver(Context):
 
     def get_wait_timeout(self):
         return self.__wait_timeout
+
+    def wait_for(self, interval=DEFAULT, timeout=DEFAULT):
+        """
+            Get a WebDriverWaitFor instance.
+
+        :param interval: the wait interval (in milliseconds), default value is web driver's wait interval
+        :param timeout: the wait timeout (in milliseconds), default value is web driver's wait timeout
+        """
+        interval = self.get_wait_interval() if interval == DEFAULT else interval
+        timeout = self.get_wait_timeout() if timeout == DEFAULT else timeout
+        return WebDriverWaitFor(self, interval, timeout)
 
     @SupportedBy(WebDriverType._BROWSER)
     def maximize_window(self):
@@ -174,9 +186,6 @@ class WebDriver(Context):
             return True
         except NoAlertPresentException:
             return False
-
-    def wait_for_alert_present(self):
-        self.waiter().wait_for(WebDriver.is_alert_present)
 
     def get_cookies(self):
         return self.__selenium_web_driver.get_cookies()
