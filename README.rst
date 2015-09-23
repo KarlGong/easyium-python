@@ -57,6 +57,12 @@ For information and suggestions you can contact me at karl.gong@outlook.com
 
 Change Log
 ----------
+1.1.1 (compared to 1.1.0)
+
+- Optimize the waiter.
+
+- Add blur() for class Element.
+
 1.1.0 (compared to 1.0.0)
 
 - Refactor the waiter.
