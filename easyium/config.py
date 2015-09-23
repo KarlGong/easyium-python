@@ -3,12 +3,18 @@ __author__ = 'karl.gong'
 # place holder for using default value
 DEFAULT = "DEFAULT"
 
-# default configuration for web driver
-web_driver_default_page_load_timeout = 30000
-web_driver_default_script_timeout = 30000
-web_driver_default_wait_interval = 1000
-web_driver_default_wait_timeout = 30000
 
-# default configuration for waiter
-waiter_default_wait_interval = 1000
-waiter_default_wait_timeout = 30000
+class Config:
+    def __init__(self):
+        # default configuration for web driver
+        self.web_driver_page_load_timeout = 30000
+        self.web_driver_script_timeout = 30000
+        self.web_driver_wait_interval = 1000
+        self.web_driver_wait_timeout = 30000
+
+        # default configuration for waiter
+        self.waiter_wait_interval = 1000
+        self.waiter_wait_timeout = 30000
+
+
+default_config = Config()

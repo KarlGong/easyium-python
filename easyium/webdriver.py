@@ -4,8 +4,7 @@ from selenium.common.exceptions import NoAlertPresentException
 from .context import Context
 from .waiter import WebDriverWaitFor
 from .exceptions import UnsupportedWebDriverTypeException
-from .config import DEFAULT, web_driver_default_page_load_timeout, web_driver_default_script_timeout, web_driver_default_wait_interval, \
-    web_driver_default_wait_timeout
+from .config import DEFAULT, default_config
 from .decorator import SupportedBy
 
 __author__ = 'karl.gong'
@@ -33,10 +32,10 @@ class WebDriver(Context):
             Creates a new instance of the WebDriver.
 
         :param web_driver_type: the web driver type
-        :param page_load_timeout: the page load timeout (in milliseconds), default value is from config.web_driver_default_page_load_timeout
-        :param script_timeout: the script timeout (in milliseconds), default value is from config.web_driver_default_script_timeout
-        :param wait_interval: the wait interval (in milliseconds), default value is from config.web_driver_default_wait_interval
-        :param wait_timeout: the wait timeout (in milliseconds), default value is from config.web_driver_default_wait_timeout
+        :param page_load_timeout: the page load timeout (in milliseconds), default value is from default_config.web_driver_page_load_timeout
+        :param script_timeout: the script timeout (in milliseconds), default value is from default_config.web_driver_script_timeout
+        :param wait_interval: the wait interval (in milliseconds), default value is from default_config.web_driver_wait_interval
+        :param wait_timeout: the wait timeout (in milliseconds), default value is from default_config.web_driver_wait_timeout
         :param kwargs: the keyword args for the web driver specified by web_driver_type
         """
         Context.__init__(self)
@@ -58,10 +57,10 @@ class WebDriver(Context):
             self.__selenium_web_driver = Mobile(**kwargs)
         else:
             raise UnsupportedWebDriverTypeException("The web driver type [%s] is not supported." % web_driver_type)
-        self.set_page_load_timeout(web_driver_default_page_load_timeout if page_load_timeout == DEFAULT else page_load_timeout)
-        self.set_script_timeout(web_driver_default_script_timeout if script_timeout == DEFAULT else script_timeout)
-        self.__wait_interval = web_driver_default_wait_interval if wait_interval == DEFAULT else wait_interval
-        self.__wait_timeout = web_driver_default_wait_timeout if wait_timeout == DEFAULT else wait_timeout
+        self.set_page_load_timeout(default_config.web_driver_page_load_timeout if page_load_timeout == DEFAULT else page_load_timeout)
+        self.set_script_timeout(default_config.web_driver_script_timeout if script_timeout == DEFAULT else script_timeout)
+        self.__wait_interval = default_config.web_driver_wait_interval if wait_interval == DEFAULT else wait_interval
+        self.__wait_timeout = default_config.web_driver_wait_timeout if wait_timeout == DEFAULT else wait_timeout
 
     def _selenium_web_driver(self):
         return self.__selenium_web_driver

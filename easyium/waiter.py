@@ -3,7 +3,7 @@ import time
 from selenium.common.exceptions import NoAlertPresentException
 
 from .exceptions import TimeoutException, NoSuchElementException
-from .config import DEFAULT, waiter_default_wait_interval, waiter_default_wait_timeout
+from .config import DEFAULT, default_config
 
 __author__ = 'karl.gong'
 
@@ -13,11 +13,11 @@ class Waiter:
         """
             Create a Waiter instance.
 
-        :param interval: the wait interval (in milliseconds), default value is from config.waiter_default_wait_interval
-        :param timeout: the wait timeout (in milliseconds), default value is from config.waiter_default_wait_timeout
+        :param interval: the wait interval (in milliseconds), default value is from default_config.waiter_wait_interval
+        :param timeout: the wait timeout (in milliseconds), default value is from default_config.waiter_wait_timeout
         """
-        self.__interval = waiter_default_wait_interval if interval == DEFAULT else interval
-        self.__timeout = waiter_default_wait_timeout if timeout == DEFAULT else timeout
+        self.__interval = default_config.waiter_wait_interval if interval == DEFAULT else interval
+        self.__timeout = default_config.waiter_wait_timeout if timeout == DEFAULT else timeout
 
     def wait_for(self, condition_function, *function_args, **function_kwargs):
         """
