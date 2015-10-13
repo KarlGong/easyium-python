@@ -29,5 +29,5 @@ class InvalidByException(EasyiumException):
     pass
 
 
-class UnsupportedOperationForWebDriver(EasyiumException):
+class UnsupportedOperationException(EasyiumException):
     pass

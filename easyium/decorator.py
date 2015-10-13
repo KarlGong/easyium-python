@@ -1,6 +1,6 @@
 __author__ = 'karl.gong'
 
-from .exceptions import UnsupportedOperationForWebDriver
+from .exceptions import UnsupportedOperationException
 
 
 def SupportedBy(*web_driver_types):
@@ -13,10 +13,10 @@ def SupportedBy(*web_driver_types):
                 else:
                     wd_types += [wd_type]
 
-            current_web_driver_type = args[0].get_web_driver().get_web_driver_type()
+            current_web_driver_type = args[0].get_web_driver_type()
             if current_web_driver_type not in wd_types:
-                raise UnsupportedOperationForWebDriver(
-                    "The operation is not supported in web driver [%s]." % current_web_driver_type)
+                raise UnsupportedOperationException(
+                    "This operation is not supported by web driver [%s]." % current_web_driver_type)
 
             return func(*args, **kwargs)
 
