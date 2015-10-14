@@ -88,16 +88,18 @@ class WebDriver(Context):
     def get_wait_timeout(self):
         return self.__wait_timeout
 
-    def wait_for(self, interval=DEFAULT, timeout=DEFAULT):
+    def wait_for(self, pre_wait_time=DEFAULT, interval=DEFAULT, timeout=DEFAULT):
         """
             Get a WebDriverWaitFor instance.
 
+        :param pre_wait_time: the pre wait time (in milliseconds), default value is web driver's pre wait time
         :param interval: the wait interval (in milliseconds), default value is web driver's wait interval
         :param timeout: the wait timeout (in milliseconds), default value is web driver's wait timeout
         """
+        pre_wait_time = self.get_pre_wait_time() if pre_wait_time == DEFAULT else pre_wait_time
         interval = self.get_wait_interval() if interval == DEFAULT else interval
         timeout = self.get_wait_timeout() if timeout == DEFAULT else timeout
-        return WebDriverWaitFor(self, interval, timeout)
+        return WebDriverWaitFor(self, pre_wait_time, interval, timeout)
 
     @SupportedBy(WebDriverType._BROWSER)
     def maximize_window(self):
