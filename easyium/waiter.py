@@ -196,6 +196,7 @@ class TextPresent:
     def __str__(self):
         return "TextPresent [webdriver: \n%s\n][text: %s]" % (self.__web_driver, self.__text)
 
+
 class URLChanged:
     def __init__(self, web_driver, current_url):
         self.__web_driver = web_driver
