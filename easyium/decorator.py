@@ -16,7 +16,7 @@ def SupportedBy(*web_driver_types):
             current_web_driver_type = args[0].get_web_driver_type()
             if current_web_driver_type not in wd_types:
                 raise UnsupportedOperationException(
-                    "This operation is not supported by web driver [%s]." % current_web_driver_type)
+                    "Operation [%s] is not supported by web driver [%s]." % (func.__name__, current_web_driver_type))
 
             return func(*args, **kwargs)
 
