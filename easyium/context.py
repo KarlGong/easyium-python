@@ -19,22 +19,27 @@ class Context:
     def get_web_driver_type(self):
         pass
 
+    def get_pre_wait_time(self):
+        pass
+
     def get_wait_interval(self):
         pass
 
     def get_wait_timeout(self):
         pass
 
-    def waiter(self, interval=DEFAULT, timeout=DEFAULT):
+    def waiter(self, pre_wait_time=DEFAULT, interval=DEFAULT, timeout=DEFAULT):
         """"
             Get a Waiter instance.
 
+        :param pre_wait_time: the pre wait time (in milliseconds), default value is web driver's pre wait time
         :param interval: the wait interval (in milliseconds), default value is web driver's wait interval
         :param timeout: the wait timeout (in milliseconds), default value is web driver's wait timeout
         """
+        pre_wait_time = self.get_pre_wait_time() if pre_wait_time == DEFAULT else pre_wait_time
         interval = self.get_wait_interval() if interval == DEFAULT else interval
         timeout = self.get_wait_timeout() if timeout == DEFAULT else timeout
-        return Waiter(interval, timeout)
+        return Waiter(pre_wait_time, interval, timeout)
 
     def _selenium_context(self):
         pass

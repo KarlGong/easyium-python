@@ -9,13 +9,15 @@ __author__ = 'karl.gong'
 
 
 class Waiter:
-    def __init__(self, interval=DEFAULT, timeout=DEFAULT):
+    def __init__(self, pre_wait_time=DEFAULT, interval=DEFAULT, timeout=DEFAULT):
         """
             Create a Waiter instance.
 
+        :param pre_wait_time: the pre wait time (in milliseconds), default value is from default_config.waiter_pre_wait_time
         :param interval: the wait interval (in milliseconds), default value is from default_config.waiter_wait_interval
         :param timeout: the wait timeout (in milliseconds), default value is from default_config.waiter_wait_timeout
         """
+        self.__pre_wait_time = default_config.waiter_pre_wait_time if pre_wait_time == DEFAULT else pre_wait_time
         self.__interval = default_config.waiter_wait_interval if interval == DEFAULT else interval
         self.__timeout = default_config.waiter_wait_timeout if timeout == DEFAULT else timeout
 
@@ -27,6 +29,8 @@ class Waiter:
         :param function_args: the args for condition_function
         :param function_kwargs: the kwargs for condition_function
         """
+        time.sleep(self.__pre_wait_time / 1000.0)
+
         start_time = time.time() * 1000.0
 
         if condition_function(*function_args, **function_kwargs):
@@ -42,10 +46,10 @@ class Waiter:
 
 
 class ElementWaitFor:
-    def __init__(self, element, interval, timeout):
+    def __init__(self, element, pre_wait_time, interval, timeout):
         self.__element = element
         self.__desired_occurrence = True
-        self.__waiter = Waiter(interval, timeout)
+        self.__waiter = Waiter(pre_wait_time, interval, timeout)
 
     def __wait_for(self, element_condition):
         def is_element_condition_occurred():
@@ -133,10 +137,10 @@ class ElementAttributeContainsAll:
 
 
 class WebDriverWaitFor:
-    def __init__(self, web_driver, interval, timeout):
+    def __init__(self, web_driver, pre_wait_time, interval, timeout):
         self.__web_driver = web_driver
         self.__desired_occurrence = True
-        self.__waiter = Waiter(interval, timeout)
+        self.__waiter = Waiter(pre_wait_time, interval, timeout)
 
     def __wait_for(self, web_driver_condition):
         def is_web_driver_condition_occurred():

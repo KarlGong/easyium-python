@@ -27,7 +27,7 @@ class WebDriverType:
 
 class WebDriver(Context):
     def __init__(self, web_driver_type=WebDriverType.CHROME, page_load_timeout=DEFAULT, script_timeout=DEFAULT,
-                 wait_interval=DEFAULT, wait_timeout=DEFAULT, **kwargs):
+                 pre_wait_time=DEFAULT, wait_interval=DEFAULT, wait_timeout=DEFAULT, **kwargs):
         """
             Creates a new instance of the WebDriver.
 
@@ -59,6 +59,7 @@ class WebDriver(Context):
             raise UnsupportedWebDriverTypeException("The web driver type [%s] is not supported." % web_driver_type)
         self.set_page_load_timeout(default_config.web_driver_page_load_timeout if page_load_timeout == DEFAULT else page_load_timeout)
         self.set_script_timeout(default_config.web_driver_script_timeout if script_timeout == DEFAULT else script_timeout)
+        self.__pre_wait_time = default_config.web_driver_pre_wait_time if pre_wait_time == DEFAULT else pre_wait_time
         self.__wait_interval = default_config.web_driver_wait_interval if wait_interval == DEFAULT else wait_interval
         self.__wait_timeout = default_config.web_driver_wait_timeout if wait_timeout == DEFAULT else wait_timeout
 
@@ -77,6 +78,9 @@ class WebDriver(Context):
         return self.__web_driver_type
 
     get_browser_type = get_web_driver_type
+
+    def get_pre_wait_time(self):
+        return self.__pre_wait_time
 
     def get_wait_interval(self):
         return self.__wait_interval
