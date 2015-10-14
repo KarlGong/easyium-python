@@ -162,6 +162,9 @@ class WebDriverWaitFor:
     def text_present(self, text):
         self.__wait_for(TextPresent(self.__web_driver, text))
 
+    def url_changed(self, current_url):
+        self.__wait_for(URLChanged(self.__web_driver, current_url))
+
 
 class AlertPresent:
     def __init__(self, web_driver):
@@ -192,3 +195,14 @@ class TextPresent:
 
     def __str__(self):
         return "TextPresent [webdriver: \n%s\n][text: %s]" % (self.__web_driver, self.__text)
+
+class URLChanged:
+    def __init__(self, web_driver, current_url):
+        self.__web_driver = web_driver
+        self.__current_url = current_url
+
+    def occurred(self):
+        return self.__web_driver.get_current_url() != self.__current_url
+
+    def __str__(self):
+        return "URLChanged [\n%s\n]" % self.__web_driver
