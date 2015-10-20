@@ -36,10 +36,10 @@ class Context:
         :param interval: the wait interval (in milliseconds), default value is web driver's wait interval
         :param timeout: the wait timeout (in milliseconds), default value is web driver's wait timeout
         """
-        pre_wait_time = self.get_pre_wait_time() if pre_wait_time == DEFAULT else pre_wait_time
-        interval = self.get_wait_interval() if interval == DEFAULT else interval
-        timeout = self.get_wait_timeout() if timeout == DEFAULT else timeout
-        return Waiter(pre_wait_time, interval, timeout)
+        _pre_wait_time = self.get_pre_wait_time() if pre_wait_time == DEFAULT else pre_wait_time
+        _interval = self.get_wait_interval() if interval == DEFAULT else interval
+        _timeout = self.get_wait_timeout() if timeout == DEFAULT else timeout
+        return Waiter(_pre_wait_time, _interval, _timeout)
 
     def _selenium_context(self):
         pass
