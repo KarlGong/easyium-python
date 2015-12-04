@@ -1,12 +1,11 @@
 from selenium.common.exceptions import WebDriverException, StaleElementReferenceException
-from selenium.webdriver import ActionChains
 
+from .config import DEFAULT
+from .context import Context
 from .decorator import SupportedBy
-from .webdriver import WebDriverType
 from .exceptions import EasyiumException, NoSuchElementException
 from .waiter import ElementWaitFor
-from .context import Context
-from .config import DEFAULT
+from .webdriver import WebDriverType
 
 __author__ = 'karl.gong'
 
@@ -86,6 +85,26 @@ class Element(Context):
             except (NoSuchElementException, StaleElementReferenceException):
                 self.wait_for().visible()
                 self._selenium_element().click()
+        except WebDriverException as wde:
+            raise EasyiumException("%s\n%s" % (wde.msg, self))
+
+    def double_click(self):
+        try:
+            try:
+                self.get_web_driver().create_action_chains().double_click(self._selenium_element()).perform()
+            except (NoSuchElementException, StaleElementReferenceException):
+                self.wait_for().visible()
+                self.get_web_driver().create_action_chains().double_click(self._selenium_element()).perform()
+        except WebDriverException as wde:
+            raise EasyiumException("%s\n%s" % (wde.msg, self))
+
+    def context_click(self):
+        try:
+            try:
+                self.get_web_driver().create_action_chains().context_click(self._selenium_element()).perform()
+            except (NoSuchElementException, StaleElementReferenceException):
+                self.wait_for().visible()
+                self.get_web_driver().create_action_chains().context_click(self._selenium_element()).perform()
         except WebDriverException as wde:
             raise EasyiumException("%s\n%s" % (wde.msg, self))
 
@@ -333,18 +352,16 @@ class Element(Context):
         web_driver_type = self.get_web_driver_type()
         try:
             try:
-                if web_driver_type == WebDriverType.CHROME or web_driver_type == WebDriverType.FIREFOX:
+                if web_driver_type in [WebDriverType.CHROME, WebDriverType.FIREFOX]:
                     self.get_web_driver().execute_script(script, self)
                 else:
-                    ActionChains(self.get_web_driver()._selenium_web_driver()).move_to_element(
-                        self._selenium_element()).perform()
+                    self.get_web_driver().create_action_chains().move_to_element(self._selenium_element()).perform()
             except (NoSuchElementException, StaleElementReferenceException):
                 self.wait_for().exists()
-                if web_driver_type == WebDriverType.CHROME or web_driver_type == WebDriverType.FIREFOX:
+                if web_driver_type in [WebDriverType.CHROME, WebDriverType.FIREFOX]:
                     self.get_web_driver().execute_script(script, self)
                 else:
-                    ActionChains(self.get_web_driver()._selenium_web_driver()).move_to_element(
-                        self._selenium_element()).perform()
+                    self.get_web_driver().create_action_chains().move_to_element(self._selenium_element()).perform()
         except WebDriverException as wde:
             raise EasyiumException("%s\n%s" % (wde.msg, self))
 
@@ -361,78 +378,53 @@ class Element(Context):
                 if web_driver_type in [WebDriverType.CHROME, WebDriverType.FIREFOX]:
                     self.get_web_driver().execute_script(script, self)
                 else:
-                    ActionChains(self.get_web_driver()._selenium_web_driver()).move_to_element(
-                        self._selenium_element()).perform()
+                    self.get_web_driver().create_action_chains().move_to_element(self._selenium_element()).perform()
             except (NoSuchElementException, StaleElementReferenceException):
                 self.wait_for().exists()
                 if web_driver_type in [WebDriverType.CHROME, WebDriverType.FIREFOX]:
                     self.get_web_driver().execute_script(script, self)
                 else:
-                    ActionChains(self.get_web_driver()._selenium_web_driver()).move_to_element(
-                        self._selenium_element()).perform()
-        except WebDriverException as wde:
-            raise EasyiumException("%s\n%s" % (wde.msg, self))
-
-    def click_and_hold(self):
-        try:
-            try:
-                ActionChains(self.get_web_driver()._selenium_web_driver()).click_and_hold(
-                    self._selenium_element()).perform()
-            except (NoSuchElementException, StaleElementReferenceException):
-                self.wait_for().visible()
-                ActionChains(self.get_web_driver()._selenium_web_driver()).click_and_hold(
-                    self._selenium_element()).perform()
-        except WebDriverException as wde:
-            raise EasyiumException("%s\n%s" % (wde.msg, self))
-
-    def release_mouse_here(self):
-        try:
-            try:
-                ActionChains(self.get_web_driver()._selenium_web_driver()).move_to_element(
-                    self._selenium_element()).release().perform()
-            except (NoSuchElementException, StaleElementReferenceException):
-                self.wait_for().visible()
-                ActionChains(self.get_web_driver()._selenium_web_driver()).move_to_element(
-                    self._selenium_element()).release().perform()
+                    self.get_web_driver().create_action_chains().move_to_element(self._selenium_element()).perform()
         except WebDriverException as wde:
             raise EasyiumException("%s\n%s" % (wde.msg, self))
 
     @SupportedBy(WebDriverType._BROWSER)
-    def release_mouse_here_with_offset(self, x_offset, y_offset):
+    def drag_and_drop_by_offset(self, x_offset, y_offset):
         """
-            Release mouse here with offset.
-            The origin is at the top-left corner of web driver and offsets are relative to the top-left corner of the element.
-        :param x_offset: X offset to release mouse.
-        :param y_offset: Y offset to release mouse.
+            Drag and drop to target offset.
+        :param x_offset: X offset to drop
+        :param y_offset: Y offset to drop
         """
         try:
             try:
-                ActionChains(self.get_web_driver()._selenium_web_driver()).move_to_element_with_offset(
-                    self._selenium_element(), x_offset, y_offset).release().perform()
+                self.get_web_driver().create_action_chains().click_and_hold(self._selenium_element()).move_by_offset(x_offset, y_offset).release().perform()
             except (NoSuchElementException, StaleElementReferenceException):
                 self.wait_for().visible()
-                ActionChains(self.get_web_driver()._selenium_web_driver()).move_to_element_with_offset(
-                    self._selenium_element(), x_offset, y_offset).release().perform()
+                self.get_web_driver().create_action_chains().click_and_hold(self._selenium_element()).move_by_offset(x_offset, y_offset).release().perform()
         except WebDriverException as wde:
             raise EasyiumException("%s\n%s" % (wde.msg, self))
 
     def drag_and_drop_to(self, target_element):
         web_driver_type = self.get_web_driver_type()
-        if web_driver_type in WebDriverType._MOBILE:
+        try:
             try:
-                try:
-                    self.get_web_driver()._selenium_web_driver().drag_and_drop(self._selenium_element(),
-                                                                               target_element._selenium_element())
-                except (NoSuchElementException, StaleElementReferenceException):
-                    self.wait_for().visible()
-                    target_element.wait_for().visible()
-                    self.get_web_driver()._selenium_web_driver().drag_and_drop(self._selenium_element(),
-                                                                               target_element._selenium_element())
-            except WebDriverException as wde:
-                raise EasyiumException("%s\n%s" % (wde.msg, self))
-        else:
-            self.click_and_hold()
-            target_element.release_mouse_here()
+                if web_driver_type in WebDriverType._MOBILE:
+                    self.get_web_driver().create_touch_action().press(self._selenium_element()).move_to(
+                        target_element._selenium_element()).release().perform()
+                else:
+                    self.get_web_driver().create_action_chains().click_and_hold(
+                        self._selenium_element()).move_to_element(self._selenium_element()).release().perform()
+            except (NoSuchElementException, StaleElementReferenceException):
+                self.wait_for().visible()
+                target_element.wait_for().visible()
+                if web_driver_type in WebDriverType._MOBILE:
+                    self.get_web_driver().create_touch_action().press(self._selenium_element()).move_to(
+                        target_element._selenium_element()).release().perform()
+                else:
+                    self.get_web_driver().create_action_chains().click_and_hold(
+                        self._selenium_element()).move_to_element(self._selenium_element()).release().perform()
+        except WebDriverException as wde:
+            raise EasyiumException("%s\n%s" % (wde.msg, self))
 
     @SupportedBy(WebDriverType._BROWSER)
     def drag_and_drop_to_with_offset(self, target_element, x_offset, y_offset):
@@ -441,50 +433,39 @@ class Element(Context):
             The origin is at the top-left corner of web driver and offsets are relative to the top-left corner of the element.
         :param target_element: the target element to drop.
         :param x_offset: X offset to drop
-        :param y_offset: Y offset to drop.
+        :param y_offset: Y offset to drop
         """
-        self.click_and_hold()
-        target_element.release_mouse_here_with_offset(x_offset, y_offset)
-
-    @SupportedBy(WebDriverType._MOBILE)
-    def tap(self):
-        from appium.webdriver.common.touch_action import TouchAction
-
-        touch_action = TouchAction(self.get_web_driver()._selenium_web_driver())
         try:
             try:
-                touch_action.tap(self._selenium_element(), None, None, 1).perform()
+                self.get_web_driver().create_action_chains().click_and_hold(self._selenium_element()).move_to_element_with_offset(
+                    self._selenium_element(), x_offset, y_offset).release().perform()
             except (NoSuchElementException, StaleElementReferenceException):
                 self.wait_for().visible()
-                touch_action.tap(self._selenium_element(), None, None, 1).perform()
+                target_element.wait_for().visible()
+                self.get_web_driver().create_action_chains().click_and_hold(self._selenium_element()).move_to_element_with_offset(
+                    self._selenium_element(), x_offset, y_offset).release().perform()
         except WebDriverException as wde:
             raise EasyiumException("%s\n%s" % (wde.msg, self))
 
     @SupportedBy(WebDriverType._MOBILE)
-    def press(self):
-        from appium.webdriver.common.touch_action import TouchAction
-
-        touch_action = TouchAction(self.get_web_driver()._selenium_web_driver())
+    def tap(self, count=1):
         try:
             try:
-                touch_action.press(self._selenium_element(), None, None).release().perform()
+                self.get_web_driver().create_touch_action().tap(self._selenium_element(), None, None, count).perform()
             except (NoSuchElementException, StaleElementReferenceException):
                 self.wait_for().visible()
-                touch_action.press(self._selenium_element(), None, None).release().perform()
+                self.get_web_driver().create_touch_action().tap(self._selenium_element(), None, None, count).perform()
         except WebDriverException as wde:
             raise EasyiumException("%s\n%s" % (wde.msg, self))
 
     @SupportedBy(WebDriverType._MOBILE)
     def long_press(self, duration=1000):
-        from appium.webdriver.common.touch_action import TouchAction
-
-        touch_action = TouchAction(self.get_web_driver()._selenium_web_driver())
         try:
             try:
-                touch_action.long_press(self._selenium_element(), None, None, duration).release().perform()
+                self.get_web_driver().create_touch_action().long_press(self._selenium_element(), None, None, duration).release().perform()
             except (NoSuchElementException, StaleElementReferenceException):
                 self.wait_for().visible()
-                touch_action.long_press(self._selenium_element(), None, None, duration).release().perform()
+                self.get_web_driver().create_touch_action().long_press(self._selenium_element(), None, None, duration).release().perform()
         except WebDriverException as wde:
             raise EasyiumException("%s\n%s" % (wde.msg, self))
 
