@@ -150,8 +150,10 @@ class Element(Context):
 
     def get_location(self):
         """
-            Usage: x, y = element.get_location()
-        :return: The location for the top-left corner of this element.
+            Gets the location for the top-left corner of this element.
+
+        :Usage:
+            x, y = element.get_location()
         """
         try:
             try:
@@ -166,8 +168,10 @@ class Element(Context):
 
     def get_size(self):
         """
-            Usage: width, height = element.get_size()
-        :return: The size (including border) of this element.
+            Gets the size (including border) of this element.
+
+        :Usage:
+            width, height = element.get_size()
         """
         try:
             try:
@@ -214,6 +218,7 @@ class Element(Context):
         """
             Get content of the text node in this element.
             If the text_node_index refers to a non-text node or be out of bounds, an exception will be thrown.
+
         :param text_node_index: index of text node in this element
         :return: the content of the text node in this element.
         """
@@ -234,7 +239,8 @@ class Element(Context):
 
     def set_selection_range(self, start, end):
         """
-            Set the selection range for text in this element..
+            Set the selection range for text in this element.
+
         :param start: start position
         :param end: end position
         """
@@ -392,6 +398,7 @@ class Element(Context):
     def drag_and_drop_by_offset(self, x_offset, y_offset):
         """
             Drag and drop to target offset.
+
         :param x_offset: X offset to drop
         :param y_offset: Y offset to drop
         """
@@ -405,6 +412,11 @@ class Element(Context):
             raise EasyiumException("%s\n%s" % (wde.msg, self))
 
     def drag_and_drop_to(self, target_element):
+        """
+            Drag and drop to target element.
+
+        :param target_element: the target element to drop
+        """
         web_driver_type = self.get_web_driver_type()
         try:
             try:
@@ -431,7 +443,8 @@ class Element(Context):
         """
             Drag and drop to target element with offset.
             The origin is at the top-left corner of web driver and offsets are relative to the top-left corner of the element.
-        :param target_element: the target element to drop.
+
+        :param target_element: the target element to drop
         :param x_offset: X offset to drop
         :param y_offset: Y offset to drop
         """
@@ -471,6 +484,12 @@ class Element(Context):
 
     @SupportedBy(WebDriverType.ANDROID)
     def set_text(self, text):
+        """
+            Sends text to this element. Previous text is removed.
+            Android only.
+
+        :param text: the text to be sent to this element
+        """
         try:
             try:
                 self._selenium_element().set_text(text)
@@ -482,6 +501,12 @@ class Element(Context):
 
     @SupportedBy(WebDriverType._MOBILE)
     def get_location_in_view(self):
+        """
+            Gets the location of an element relative to the view.
+
+        :Usage:
+            x, y = element.get_location_in_view()
+        """
         try:
             try:
                 location = self._selenium_element().location_in_view
@@ -495,6 +520,11 @@ class Element(Context):
 
     @SupportedBy(WebDriverType._MOBILE)
     def set_value(self, value):
+        """
+            Set the value on this element in the application
+
+        :param value: the value to be set on this element
+        """
         try:
             try:
                 self._selenium_element().set_value(value)
@@ -506,6 +536,11 @@ class Element(Context):
 
     @SupportedBy(WebDriverType._MOBILE)
     def scroll_to(self, target_element):
+        """
+            Scrolls from this element to another.
+
+        :param target_element: the target element to be scrolled to
+        """
         try:
             try:
                 self.get_web_driver()._selenium_web_driver().scroll(self._selenium_element(),
@@ -520,6 +555,12 @@ class Element(Context):
 
     @SupportedBy(WebDriverType._MOBILE)
     def pinch(self, percent=200, steps=50):
+        """
+            Pinch on this element a certain amount
+
+        :param percent: amount to pinch. Defaults to 200%
+        :param steps: number of steps in the pinch action
+        """
         try:
             try:
                 self.get_web_driver()._selenium_web_driver().pinch(self._selenium_element(), percent, steps)
@@ -531,6 +572,12 @@ class Element(Context):
 
     @SupportedBy(WebDriverType._MOBILE)
     def zoom(self, percent=200, steps=50):
+        """
+            Zooms in on an element a certain amount.
+
+        :param percent: amount to zoom. Defaults to 200%
+        :param steps: number of steps in the zoom action
+        """
         try:
             try:
                 self.get_web_driver()._selenium_web_driver().zoom(self._selenium_element(), percent, steps)
