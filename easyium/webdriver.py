@@ -1,4 +1,4 @@
-from selenium.webdriver import Ie, Firefox, Chrome, Opera, Safari, PhantomJS
+from selenium.webdriver import Ie, Firefox, Chrome, Opera, Safari, PhantomJS, ActionChains
 from selenium.common.exceptions import NoAlertPresentException
 
 from .context import Context
@@ -81,6 +81,19 @@ class WebDriver(Context):
         return self.__web_driver_type
 
     get_browser_type = get_web_driver_type
+
+    def create_action_chains(self):
+        return ActionChains(self._selenium_web_driver())
+
+    @SupportedBy(WebDriverType._MOBILE)
+    def create_touch_action(self):
+        from appium.webdriver.common.touch_action import TouchAction
+        return TouchAction(self._selenium_web_driver())
+
+    @SupportedBy(WebDriverType._MOBILE)
+    def create_multi_action(self):
+        from appium.webdriver.common.multi_action import MultiAction
+        return MultiAction(self._selenium_web_driver())
 
     def get_wait_interval(self):
         return self.__wait_interval
@@ -303,7 +316,7 @@ class WebDriver(Context):
         self.__selenium_web_driver.press_keycode(key_code, meta_state)
 
     @SupportedBy(WebDriverType.ANDROID)
-    def long_press_key(self, key_code, meta_state=None):
+    def long_press_keycode(self, key_code, meta_state=None):
         self.__selenium_web_driver.long_press_keycode(key_code, meta_state)
 
     @SupportedBy(WebDriverType.ANDROID)
