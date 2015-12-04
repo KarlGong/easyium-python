@@ -26,14 +26,17 @@ class Element(Context):
 
     get_browser_type = get_web_driver_type
 
-    def get_pre_wait_time(self):
-        return self.get_web_driver().get_pre_wait_time()
-
     def get_wait_interval(self):
         return self.get_web_driver().get_wait_interval()
 
     def get_wait_timeout(self):
         return self.get_web_driver().get_wait_timeout()
+
+    def get_pre_wait_time(self):
+        return self.get_web_driver().get_pre_wait_time()
+
+    def get_post_wait_time(self):
+        return self.get_web_driver().get_post_wait_time()
 
     def get_parent(self):
         return self.__parent
@@ -41,18 +44,20 @@ class Element(Context):
     def _selenium_element(self):
         pass
 
-    def wait_for(self, pre_wait_time=DEFAULT, interval=DEFAULT, timeout=DEFAULT):
+    def wait_for(self, interval=DEFAULT, timeout=DEFAULT, pre_wait_time=DEFAULT, post_wait_time=DEFAULT):
         """
             Get a ElementWaitFor instance.
 
-        :param pre_wait_time: the pre wait time (in milliseconds), default value is web driver's pre wait time
         :param interval: the wait interval (in milliseconds), default value is web driver's wait interval
         :param timeout: the wait timeout (in milliseconds), default value is web driver's wait timeout
+        :param pre_wait_time: the pre wait time (in milliseconds), default value is web driver's pre wait time
+        :param post_wait_time: the post wait time (in milliseconds), default value is web driver's post wait time
         """
-        _pre_wait_time = self.get_pre_wait_time() if pre_wait_time == DEFAULT else pre_wait_time
         _interval = self.get_wait_interval() if interval == DEFAULT else interval
         _timeout = self.get_wait_timeout() if timeout == DEFAULT else timeout
-        return ElementWaitFor(self, _pre_wait_time, _interval, _timeout)
+        _pre_wait_time = self.get_pre_wait_time() if pre_wait_time == DEFAULT else pre_wait_time
+        _post_wait_time = self.get_post_wait_time() if post_wait_time == DEFAULT else post_wait_time
+        return ElementWaitFor(self, _interval, _timeout, _pre_wait_time, _post_wait_time)
 
     def blur(self):
         try:

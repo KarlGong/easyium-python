@@ -2,24 +2,26 @@ import time
 
 from selenium.common.exceptions import NoAlertPresentException
 
-from .exceptions import TimeoutException, NoSuchElementException
 from .config import DEFAULT, default_config
+from .exceptions import TimeoutException, NoSuchElementException
 
 __author__ = 'karl.gong'
 
 
 class Waiter:
-    def __init__(self, pre_wait_time=DEFAULT, interval=DEFAULT, timeout=DEFAULT):
+    def __init__(self, interval=DEFAULT, timeout=DEFAULT, pre_wait_time=DEFAULT, post_wait_time=DEFAULT):
         """
             Create a Waiter instance.
 
-        :param pre_wait_time: the pre wait time (in milliseconds), default value is from default_config.waiter_pre_wait_time
         :param interval: the wait interval (in milliseconds), default value is from default_config.waiter_wait_interval
         :param timeout: the wait timeout (in milliseconds), default value is from default_config.waiter_wait_timeout
+        :param pre_wait_time: the pre wait time (in milliseconds), default value is from default_config.waiter_pre_wait_time
+        :param post_wait_time: the post wait time (in milliseconds), default value is from default_config.waiter_post_wait_time
         """
-        self.__pre_wait_time = default_config.waiter_pre_wait_time if pre_wait_time == DEFAULT else pre_wait_time
         self.__interval = default_config.waiter_wait_interval if interval == DEFAULT else interval
         self.__timeout = default_config.waiter_wait_timeout if timeout == DEFAULT else timeout
+        self.__pre_wait_time = default_config.waiter_pre_wait_time if pre_wait_time == DEFAULT else pre_wait_time
+        self.__post_wait_time = default_config.waiter_post_wait_time if post_wait_time == DEFAULT else post_wait_time
 
     def wait_for(self, condition_function, *function_args, **function_kwargs):
         """
@@ -34,10 +36,12 @@ class Waiter:
         start_time = time.time() * 1000.0
 
         if condition_function(*function_args, **function_kwargs):
+            time.sleep(self.__post_wait_time / 1000.0)
             return
 
         while (time.time() * 1000.0 - start_time) <= self.__timeout:
             if condition_function(*function_args, **function_kwargs):
+                time.sleep(self.__post_wait_time / 1000.0)
                 return
             else:
                 time.sleep(self.__interval / 1000.0)
@@ -46,10 +50,10 @@ class Waiter:
 
 
 class ElementWaitFor:
-    def __init__(self, element, pre_wait_time, interval, timeout):
+    def __init__(self, element, interval, timeout, pre_wait_time, post_wait_time):
         self.__element = element
         self.__desired_occurrence = True
-        self.__waiter = Waiter(pre_wait_time, interval, timeout)
+        self.__waiter = Waiter(interval, timeout, pre_wait_time, post_wait_time)
 
     def __wait_for(self, element_condition):
         def is_element_condition_occurred():
@@ -137,10 +141,10 @@ class ElementAttributeContainsAll:
 
 
 class WebDriverWaitFor:
-    def __init__(self, web_driver, pre_wait_time, interval, timeout):
+    def __init__(self, web_driver, interval, timeout, pre_wait_time, post_wait_time):
         self.__web_driver = web_driver
         self.__desired_occurrence = True
-        self.__waiter = Waiter(pre_wait_time, interval, timeout)
+        self.__waiter = Waiter(interval, timeout, pre_wait_time, post_wait_time)
 
     def __wait_for(self, web_driver_condition):
         def is_web_driver_condition_occurred():

@@ -27,7 +27,7 @@ class WebDriverType:
 
 class WebDriver(Context):
     def __init__(self, web_driver_type=WebDriverType.CHROME, page_load_timeout=DEFAULT, script_timeout=DEFAULT,
-                 pre_wait_time=DEFAULT, wait_interval=DEFAULT, wait_timeout=DEFAULT, **kwargs):
+                 wait_interval=DEFAULT, wait_timeout=DEFAULT, pre_wait_time=DEFAULT, post_wait_time=DEFAULT, **kwargs):
         """
             Creates a new instance of the WebDriver.
 
@@ -36,6 +36,8 @@ class WebDriver(Context):
         :param script_timeout: the script timeout (in milliseconds), default value is from default_config.web_driver_script_timeout
         :param wait_interval: the wait interval (in milliseconds), default value is from default_config.web_driver_wait_interval
         :param wait_timeout: the wait timeout (in milliseconds), default value is from default_config.web_driver_wait_timeout
+        :param pre_wait_time: the pre wait time (in milliseconds), default value is from default_config.web_driver_pre_wait_time
+        :param post_wait_time: the post wait time (in milliseconds), default value is from default_config.web_driver_post_wait_time
         :param kwargs: the keyword args for the web driver specified by web_driver_type
         """
         Context.__init__(self)
@@ -59,9 +61,10 @@ class WebDriver(Context):
             raise UnsupportedWebDriverTypeException("The web driver type [%s] is not supported." % web_driver_type)
         self.set_page_load_timeout(default_config.web_driver_page_load_timeout if page_load_timeout == DEFAULT else page_load_timeout)
         self.set_script_timeout(default_config.web_driver_script_timeout if script_timeout == DEFAULT else script_timeout)
-        self.__pre_wait_time = default_config.web_driver_pre_wait_time if pre_wait_time == DEFAULT else pre_wait_time
         self.__wait_interval = default_config.web_driver_wait_interval if wait_interval == DEFAULT else wait_interval
         self.__wait_timeout = default_config.web_driver_wait_timeout if wait_timeout == DEFAULT else wait_timeout
+        self.__pre_wait_time = default_config.web_driver_pre_wait_time if pre_wait_time == DEFAULT else pre_wait_time
+        self.__post_wait_time = default_config.web_driver_post_wait_time if post_wait_time == DEFAULT else post_wait_time
 
     def _selenium_web_driver(self):
         return self.__selenium_web_driver
@@ -79,27 +82,32 @@ class WebDriver(Context):
 
     get_browser_type = get_web_driver_type
 
-    def get_pre_wait_time(self):
-        return self.__pre_wait_time
-
     def get_wait_interval(self):
         return self.__wait_interval
 
     def get_wait_timeout(self):
         return self.__wait_timeout
 
-    def wait_for(self, pre_wait_time=DEFAULT, interval=DEFAULT, timeout=DEFAULT):
+    def get_pre_wait_time(self):
+        return self.__pre_wait_time
+
+    def get_post_wait_time(self):
+        return self.__post_wait_time
+
+    def wait_for(self, interval=DEFAULT, timeout=DEFAULT, pre_wait_time=DEFAULT, post_wait_time=DEFAULT):
         """
             Get a WebDriverWaitFor instance.
 
-        :param pre_wait_time: the pre wait time (in milliseconds), default value is web driver's pre wait time
         :param interval: the wait interval (in milliseconds), default value is web driver's wait interval
         :param timeout: the wait timeout (in milliseconds), default value is web driver's wait timeout
+        :param pre_wait_time: the pre wait time (in milliseconds), default value is web driver's pre wait time
+        :param post_wait_time: the post wait time (in milliseconds), default value is web driver's post wait time
         """
-        _pre_wait_time = self.get_pre_wait_time() if pre_wait_time == DEFAULT else pre_wait_time
         _interval = self.get_wait_interval() if interval == DEFAULT else interval
         _timeout = self.get_wait_timeout() if timeout == DEFAULT else timeout
-        return WebDriverWaitFor(self, _pre_wait_time, _interval, _timeout)
+        _pre_wait_time = self.get_pre_wait_time() if pre_wait_time == DEFAULT else pre_wait_time
+        _post_wait_time = self.get_post_wait_time() if post_wait_time == DEFAULT else post_wait_time
+        return WebDriverWaitFor(self, _interval, _timeout, _pre_wait_time, _post_wait_time)
 
     @SupportedBy(WebDriverType._BROWSER)
     def maximize_window(self):
