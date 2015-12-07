@@ -151,36 +151,26 @@ class Element(Context):
     def get_location(self):
         """
             Gets the location for the top-left corner of this element.
-
-        :Usage:
-            x, y = element.get_location()
         """
         try:
             try:
-                location = self._selenium_element().location
-                return location["x"], location["y"]
+                return self._selenium_element().location
             except (NoSuchElementException, StaleElementReferenceException):
                 self.wait_for().exists()
-                location = self._selenium_element().location
-                return location["x"], location["y"]
+                return self._selenium_element().location
         except WebDriverException as wde:
             raise EasyiumException("%s\n%s" % (wde.msg, self))
 
     def get_size(self):
         """
             Gets the size (including border) of this element.
-
-        :Usage:
-            width, height = element.get_size()
         """
         try:
             try:
-                size = self._selenium_element().size
-                return size["width"], size["height"]
+                return self._selenium_element().size
             except (NoSuchElementException, StaleElementReferenceException):
                 self.wait_for().exists()
-                size = self._selenium_element().size
-                return size["width"], size["height"]
+                return self._selenium_element().size
         except WebDriverException as wde:
             raise EasyiumException("%s\n%s" % (wde.msg, self))
 
@@ -489,18 +479,13 @@ class Element(Context):
     def get_location_in_view(self):
         """
             Gets the location of an element relative to the view.
-
-        :Usage:
-            x, y = element.get_location_in_view()
         """
         try:
             try:
-                location = self._selenium_element().location_in_view
-                return location["x"], location["y"]
+                return self._selenium_element().location_in_view
             except (NoSuchElementException, StaleElementReferenceException):
                 self.wait_for().exists()
-                location = self._selenium_element().location_in_view
-                return location["x"], location["y"]
+                return self._selenium_element().location_in_view
         except WebDriverException as wde:
             raise EasyiumException("%s\n%s" % (wde.msg, self))
 
