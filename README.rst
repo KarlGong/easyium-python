@@ -57,6 +57,12 @@ For information and suggestions you can contact me at karl.gong@outlook.com
 
 Change Log
 ----------
+1.1.3 (compared to 1.1.2)
+
+- Add docstring for apis.
+
+- Add post wait time for waiter.
+
 1.1.2 (compared to 1.1.1)
 
 - Add pre wait time for waiter.
