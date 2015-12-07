@@ -651,7 +651,7 @@ class WebDriver(Context):
         """
             Puts the application in the background on the device for a certain duration.
 
-         :param duration: the duration for the application to remain in the background
+         :param duration: the duration for the application to remain in the background, in ms.
         """
         self.__selenium_web_driver.background_app(duration / 1000.0)
 
@@ -752,7 +752,7 @@ class WebDriver(Context):
         """
             Lock the device for a certain period of time. iOS only.
 
-        :param duration: the duration to lock the device.
+        :param duration: the duration to lock the device, in ms.
         """
         self.__selenium_web_driver.lock(duration / 1000.0)
 

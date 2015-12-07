@@ -352,22 +352,15 @@ class Element(Context):
     def mouse_over(self):
         script = """
             var evObj = document.createEvent('MouseEvents');
-            evObj.initMouseEvent("mouseover",true, false, window, 0, 0, 0, 0, 0, false, false, false, false, 0, null);
+            evObj.initMouseEvent("mouseover", true, false, window, 0, 0, 0, 0, 0, false, false, false, false, 0, null);
             arguments[0].dispatchEvent(evObj);
         """
-        web_driver_type = self.get_web_driver_type()
         try:
             try:
-                if web_driver_type in [WebDriverType.CHROME, WebDriverType.FIREFOX]:
-                    self.get_web_driver().execute_script(script, self)
-                else:
-                    self.get_web_driver().create_action_chains().move_to_element(self._selenium_element()).perform()
+                self.get_web_driver().execute_script(script, self)
             except (NoSuchElementException, StaleElementReferenceException):
                 self.wait_for().exists()
-                if web_driver_type in [WebDriverType.CHROME, WebDriverType.FIREFOX]:
-                    self.get_web_driver().execute_script(script, self)
-                else:
-                    self.get_web_driver().create_action_chains().move_to_element(self._selenium_element()).perform()
+                self.get_web_driver().execute_script(script, self)
         except WebDriverException as wde:
             raise EasyiumException("%s\n%s" % (wde.msg, self))
 
@@ -375,22 +368,15 @@ class Element(Context):
     def mouse_out(self):
         script = """
             var evObj = document.createEvent('MouseEvents');
-            evObj.initMouseEvent("mouseout",true, false, window, 0, 0, 0, 0, 0, false, false, false, false, 0, null);
+            evObj.initMouseEvent("mouseout", true, false, window, 0, 0, 0, 0, 0, false, false, false, false, 0, null);
             arguments[0].dispatchEvent(evObj);
         """
-        web_driver_type = self.get_web_driver_type()
         try:
             try:
-                if web_driver_type in [WebDriverType.CHROME, WebDriverType.FIREFOX]:
-                    self.get_web_driver().execute_script(script, self)
-                else:
-                    self.get_web_driver().create_action_chains().move_to_element(self._selenium_element()).perform()
+                self.get_web_driver().execute_script(script, self)
             except (NoSuchElementException, StaleElementReferenceException):
                 self.wait_for().exists()
-                if web_driver_type in [WebDriverType.CHROME, WebDriverType.FIREFOX]:
-                    self.get_web_driver().execute_script(script, self)
-                else:
-                    self.get_web_driver().create_action_chains().move_to_element(self._selenium_element()).perform()
+                self.get_web_driver().execute_script(script, self)
         except WebDriverException as wde:
             raise EasyiumException("%s\n%s" % (wde.msg, self))
 
@@ -421,7 +407,7 @@ class Element(Context):
         try:
             try:
                 if web_driver_type in WebDriverType._MOBILE:
-                    self.get_web_driver().create_touch_action().press(self._selenium_element()).move_to(
+                    self.get_web_driver().create_touch_action().long_press(self._selenium_element()).move_to(
                         target_element._selenium_element()).release().perform()
                 else:
                     self.get_web_driver().create_action_chains().click_and_hold(
@@ -430,7 +416,7 @@ class Element(Context):
                 self.wait_for().visible()
                 target_element.wait_for().visible()
                 if web_driver_type in WebDriverType._MOBILE:
-                    self.get_web_driver().create_touch_action().press(self._selenium_element()).move_to(
+                    self.get_web_driver().create_touch_action().long_press(self._selenium_element()).move_to(
                         target_element._selenium_element()).release().perform()
                 else:
                     self.get_web_driver().create_action_chains().click_and_hold(
