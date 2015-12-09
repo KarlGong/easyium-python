@@ -123,7 +123,7 @@ class Element(Context):
         except WebDriverException as wde:
             raise EasyiumException("%s\n%s" % (wde.msg, self))
 
-    def send_keys(self, value):
+    def send_keys(self, *value):
         """
             Simulates typing into this element.
 
@@ -146,10 +146,10 @@ class Element(Context):
         """
         try:
             try:
-                self._selenium_element().send_keys(value)
+                self._selenium_element().send_keys(*value)
             except (NoSuchElementException, StaleElementReferenceException):
                 self.wait_for().visible()
-                self._selenium_element().send_keys(value)
+                self._selenium_element().send_keys(*value)
         except WebDriverException as wde:
             raise EasyiumException("%s\n%s" % (wde.msg, self))
 
