@@ -383,13 +383,19 @@ class WebDriver(Context):
     def get_screenshot_as_png(self):
         """
             Gets the screenshot of the current window as a binary data.
+
+        :Usage:
+            driver.get_screenshot_as_png()
         """
         return self.__selenium_web_driver.get_screenshot_as_png()
 
     def get_screenshot_as_base64(self):
         """
             Gets the screenshot of the current window as a base64 encoded string
-           which is useful in embedded images in HTML.
+            which is useful in embedded images in HTML.
+
+        :Usage:
+            driver.get_screenshot_as_base64()
         """
         return self.__selenium_web_driver.get_screenshot_as_base64()
 
@@ -783,7 +789,7 @@ class WebDriver(Context):
     def set_network_connection(self, connection_type):
         """
             Sets the network connection type. Android only.
-            Possible values:
+            Possible values::
                 Value (Alias)      | Data | Wifi | Airplane Mode
                 -------------------------------------------------
                 0 (None)           | 0    | 0    | 0

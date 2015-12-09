@@ -59,6 +59,9 @@ class Element(Context):
         return ElementWaitFor(self, _interval, _timeout, _pre_wait_time, _post_wait_time)
 
     def blur(self):
+        """
+            Removes keyboard focus from this element.
+        """
         try:
             try:
                 self.get_web_driver().execute_script("arguments[0].blur()", self)
@@ -69,6 +72,9 @@ class Element(Context):
             raise EasyiumException("%s\n%s" % (wde.msg, self))
 
     def clear(self):
+        """
+            Clears the text if it's a text entry element.
+        """
         try:
             try:
                 self._selenium_element().clear()
@@ -79,6 +85,9 @@ class Element(Context):
             raise EasyiumException("%s\n%s" % (wde.msg, self))
 
     def click(self):
+        """
+            Clicks this element.
+        """
         try:
             try:
                 self._selenium_element().click()
@@ -89,6 +98,9 @@ class Element(Context):
             raise EasyiumException("%s\n%s" % (wde.msg, self))
 
     def double_click(self):
+        """
+            Double clicks this element.
+        """
         try:
             try:
                 self.get_web_driver().create_action_chains().double_click(self._selenium_element()).perform()
@@ -99,6 +111,9 @@ class Element(Context):
             raise EasyiumException("%s\n%s" % (wde.msg, self))
 
     def context_click(self):
+        """
+            Context click this element.
+        """
         try:
             try:
                 self.get_web_driver().create_action_chains().context_click(self._selenium_element()).perform()
@@ -109,6 +124,26 @@ class Element(Context):
             raise EasyiumException("%s\n%s" % (wde.msg, self))
 
     def send_keys(self, value):
+        """
+            Simulates typing into this element.
+
+        :param value: A string for typing, or setting form fields.  For setting
+            file inputs, this could be a local file path.
+
+        Use this to send simple key events or to fill out form fields::
+
+            form_textfield = driver.find_element('name=username')
+            form_textfield.send_keys("admin")
+
+        This can also be used to set file inputs::
+
+            file_input = driver.find_element('name=profilePic')
+            file_input.send_keys("path/to/profilepic.gif")
+            # Generally it's better to wrap the file path in one of the methods
+            # in os.path to return the actual path to support cross OS testing.
+            # file_input.send_keys(os.path.abspath("path/to/profilepic.gif"))
+
+        """
         try:
             try:
                 self._selenium_element().send_keys(value)
@@ -119,6 +154,9 @@ class Element(Context):
             raise EasyiumException("%s\n%s" % (wde.msg, self))
 
     def submit(self):
+        """
+            Submits a form.
+        """
         try:
             try:
                 self._selenium_element().submit()
@@ -129,6 +167,25 @@ class Element(Context):
             raise EasyiumException("%s\n%s" % (wde.msg, self))
 
     def get_attribute(self, name):
+        """
+            Gets the given attribute or property of the element.
+
+            This method will first try to return the value of a property with the
+            given name. If a property with that name doesn't exist, it returns the
+            value of the attribute with the same name. If there's no attribute with
+            that name, ``None`` is returned.
+
+            Values which are considered truthy, that is equals "true" or "false",
+            are returned as booleans.  All other non-``None`` values are returned
+            as strings.  For attributes or properties which do not exist, ``None``
+            is returned.
+
+        :param name: Name of the attribute/property to retrieve.
+
+        :Usage:
+            # Check if the "active" CSS class is applied to an element.
+            is_active = "active" in target_element.get_attribute("class")
+        """
         try:
             try:
                 return self._selenium_element().get_attribute(name)
@@ -139,6 +196,11 @@ class Element(Context):
             raise EasyiumException("%s\n%s" % (wde.msg, self))
 
     def get_css_value(self, property_name):
+        """
+            Gets the value of a CSS property.
+
+        :param property_name: the property name
+        """
         try:
             try:
                 return self._selenium_element().value_of_css_property(property_name)
@@ -147,6 +209,8 @@ class Element(Context):
                 return self._selenium_element().value_of_css_property(property_name)
         except WebDriverException as wde:
             raise EasyiumException("%s\n%s" % (wde.msg, self))
+
+    get_value_of_css_property = get_css_value
 
     def get_location(self):
         """
@@ -174,7 +238,23 @@ class Element(Context):
         except WebDriverException as wde:
             raise EasyiumException("%s\n%s" % (wde.msg, self))
 
+    def get_rect(self):
+        """
+            Gets a dictionary with the size and location of this element.
+        """
+        try:
+            try:
+                return self._selenium_element().rect
+            except (NoSuchElementException, StaleElementReferenceException):
+                self.wait_for().exists()
+                return self._selenium_element().rect
+        except WebDriverException as wde:
+            raise EasyiumException("%s\n%s" % (wde.msg, self))
+
     def get_tag_name(self):
+        """
+            Gets this element's tagName property.
+        """
         try:
             try:
                 return self._selenium_element().tag_name
@@ -185,6 +265,10 @@ class Element(Context):
             raise EasyiumException("%s\n%s" % (wde.msg, self))
 
     def get_value(self):
+        """
+            Gets the value of this element.
+            Can be used to get the text of a text entry element.
+        """
         try:
             try:
                 return self._selenium_element().get_attribute("value")
@@ -195,6 +279,9 @@ class Element(Context):
             raise EasyiumException("%s\n%s" % (wde.msg, self))
 
     def get_text(self):
+        """
+            Gets the text of this element(including the text of its children).
+        """
         try:
             try:
                 return self._selenium_element().text
@@ -309,6 +396,9 @@ class Element(Context):
             raise EasyiumException("%s\n%s" % (wde.msg, self))
 
     def get_inner_html(self):
+        """
+            Get the inner html of this element.
+        """
         try:
             try:
                 return self.get_web_driver().execute_script("return arguments[0].innerHTML", self)
@@ -319,6 +409,9 @@ class Element(Context):
             raise EasyiumException("%s\n%s" % (wde.msg, self))
 
     def is_enabled(self):
+        """
+            Returns whether the element is enabled.
+        """
         try:
             try:
                 return self._selenium_element().is_enabled()
@@ -329,6 +422,10 @@ class Element(Context):
             raise EasyiumException("%s\n%s" % (wde.msg, self))
 
     def is_selected(self):
+        """
+            Returns whether this element is selected.
+            Can be used to check if a checkbox or radio button is selected.
+        """
         try:
             try:
                 return self._selenium_element().is_selected()
@@ -340,6 +437,9 @@ class Element(Context):
 
     @SupportedBy(WebDriverType._BROWSER)
     def mouse_over(self):
+        """
+            Do mouse over this element.
+        """
         script = """
             var evObj = document.createEvent('MouseEvents');
             evObj.initMouseEvent("mouseover", true, false, window, 0, 0, 0, 0, 0, false, false, false, false, 0, null);
@@ -356,6 +456,9 @@ class Element(Context):
 
     @SupportedBy(WebDriverType._BROWSER)
     def mouse_out(self):
+        """
+            Do mouse out this element.
+        """
         script = """
             var evObj = document.createEvent('MouseEvents');
             evObj.initMouseEvent("mouseout", true, false, window, 0, 0, 0, 0, 0, false, false, false, false, 0, null);
@@ -418,7 +521,7 @@ class Element(Context):
     def drag_and_drop_to_with_offset(self, target_element, x_offset, y_offset):
         """
             Drag and drop to target element with offset.
-            The origin is at the top-left corner of web driver and offsets are relative to the top-left corner of the element.
+            The origin is at the top-left corner of web driver and offsets are relative to the top-left corner of the target element.
 
         :param target_element: the target element to drop
         :param x_offset: X offset to drop
@@ -438,6 +541,11 @@ class Element(Context):
 
     @SupportedBy(WebDriverType._MOBILE)
     def tap(self, count=1):
+        """
+            Perform a tap action on this element
+
+        :param count: how many tap actions to perform on this element.
+        """
         try:
             try:
                 self.get_web_driver().create_touch_action().tap(self._selenium_element(), None, None, count).perform()
@@ -449,6 +557,11 @@ class Element(Context):
 
     @SupportedBy(WebDriverType._MOBILE)
     def long_press(self, duration=1000):
+        """
+            Long press on this element.
+
+        :param duration: the duration of long press lasts(in ms).
+        """
         try:
             try:
                 self.get_web_driver().create_touch_action().long_press(self._selenium_element(), None, None, duration).release().perform()
@@ -558,7 +671,42 @@ class Element(Context):
         except WebDriverException as wde:
             raise EasyiumException("%s\n%s" % (wde.msg, self))
 
+    def get_screenshot_as_file(self, filename):
+        """
+            Gets the screenshot of the current element. Returns False if there is
+            any IOError, else returns True. Use full paths in your filename.
+
+        :param filename: The full path you wish to save your screenshot to.
+
+        :Usage:
+            element.get_screenshot_as_file('/Screenshots/foo.png')
+        """
+        return self._selenium_element().screenshot(filename)
+
+    def get_screenshot_as_png(self):
+        """
+            Gets the screenshot of the current element as a binary data.
+
+        :Usage:
+            element_png = element.get_screenshot_as_png()
+        """
+        return self._selenium_element().screenshot_as_png
+
+    def get_screenshot_as_base64(self):
+        """
+            Gets the screenshot of the current element as a base64 encoded string.
+
+        :Usage:
+            img_b64 = element.get_screenshot_as_base64()
+        """
+        return self._selenium_element().screenshot_as_base64
+
+    save_screenshot = get_screenshot_as_file
+
     def is_displayed(self):
+        """
+            Return whether this element is displayed or not.
+        """
         try:
             try:
                 return self._selenium_element().is_displayed()
@@ -571,6 +719,9 @@ class Element(Context):
             raise EasyiumException("%s\n%s" % (wde.msg, self))
 
     def exists(self):
+        """
+            Return whether this element is existing or not.
+        """
         try:
             try:
                 self._selenium_element().is_displayed()
