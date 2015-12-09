@@ -401,7 +401,7 @@ class Element(Context):
                         target_element._selenium_element()).release().perform()
                 else:
                     self.get_web_driver().create_action_chains().click_and_hold(
-                        self._selenium_element()).move_to_element(self._selenium_element()).release().perform()
+                        self._selenium_element()).move_to_element(target_element._selenium_element()).release().perform()
             except (NoSuchElementException, StaleElementReferenceException):
                 self.wait_for().visible()
                 target_element.wait_for().visible()
@@ -410,7 +410,7 @@ class Element(Context):
                         target_element._selenium_element()).release().perform()
                 else:
                     self.get_web_driver().create_action_chains().click_and_hold(
-                        self._selenium_element()).move_to_element(self._selenium_element()).release().perform()
+                        self._selenium_element()).move_to_element(target_element._selenium_element()).release().perform()
         except WebDriverException as wde:
             raise EasyiumException("%s\n%s" % (wde.msg, self))
 
@@ -427,12 +427,12 @@ class Element(Context):
         try:
             try:
                 self.get_web_driver().create_action_chains().click_and_hold(self._selenium_element()).move_to_element_with_offset(
-                    self._selenium_element(), x_offset, y_offset).release().perform()
+                    target_element._selenium_element(), x_offset, y_offset).release().perform()
             except (NoSuchElementException, StaleElementReferenceException):
                 self.wait_for().visible()
                 target_element.wait_for().visible()
                 self.get_web_driver().create_action_chains().click_and_hold(self._selenium_element()).move_to_element_with_offset(
-                    self._selenium_element(), x_offset, y_offset).release().perform()
+                    target_element._selenium_element(), x_offset, y_offset).release().perform()
         except WebDriverException as wde:
             raise EasyiumException("%s\n%s" % (wde.msg, self))
 
