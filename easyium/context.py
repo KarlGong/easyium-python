@@ -73,7 +73,21 @@ class Context:
             Find a DynamicElement under this context immediately.
             If this context is not existing, it will raise NoSuchElementException.
 
-        :param locator: the locator to find the DynamicElement (relative to parent context)
+        :param locator:
+            the locator of this element (relative to parent context).
+            The format of locator is: "by=value", the possible values of "by" are::
+
+                "id": By.ID
+                "xpath": By.XPATH
+                "link": By.LINK_TEXT
+                "partial_link": By.PARTIAL_LINK_TEXT
+                "name": By.NAME
+                "tag": By.TAG_NAME
+                "class": By.CLASS_NAME
+                "css": By.CSS_SELECTOR
+                "ios_uiautomation": MobileBy.IOS_UIAUTOMATION
+                "android_uiautomation": MobileBy.ANDROID_UIAUTOMATOR
+                "accessibility_id": MobileBy.ACCESSIBILITY_ID
         :param identifier:
             the identifier is a function to generate the locator of the found element, you can get the standard ones in class Identifier.
             Otherwise, you can create one like this::
@@ -101,7 +115,21 @@ class Context:
             Find DynamicElement list under this context immediately.
             If this context is not existing, it will raise NoSuchElementException.
 
-        :param locator: the locator to find the DynamicElement list (relative to parent context)
+        :param locator:
+            the locator of this element (relative to parent context).
+            The format of locator is: "by=value", the possible values of "by" are::
+
+                "id": By.ID
+                "xpath": By.XPATH
+                "link": By.LINK_TEXT
+                "partial_link": By.PARTIAL_LINK_TEXT
+                "name": By.NAME
+                "tag": By.TAG_NAME
+                "class": By.CLASS_NAME
+                "css": By.CSS_SELECTOR
+                "ios_uiautomation": MobileBy.IOS_UIAUTOMATION
+                "android_uiautomation": MobileBy.ANDROID_UIAUTOMATOR
+                "accessibility_id": MobileBy.ACCESSIBILITY_ID
         :param identifier:
             the identifier is a function to generate the locator of the found elements, you can get the standard ones in class Identifier.
             Otherwise, you can create one like this::

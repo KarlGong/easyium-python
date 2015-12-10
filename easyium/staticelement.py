@@ -9,7 +9,21 @@ class StaticElement(Element):
             Creates a new instance of the StaticElement.
 
         :param parent: the parent context
-        :param locator: the locator of this element (relative to parent context)
+        :param locator:
+            the locator of this element (relative to parent context).
+            The format of locator is: "by=value", the possible values of "by" are::
+
+                "id": By.ID
+                "xpath": By.XPATH
+                "link": By.LINK_TEXT
+                "partial_link": By.PARTIAL_LINK_TEXT
+                "name": By.NAME
+                "tag": By.TAG_NAME
+                "class": By.CLASS_NAME
+                "css": By.CSS_SELECTOR
+                "ios_uiautomation": MobileBy.IOS_UIAUTOMATION
+                "android_uiautomation": MobileBy.ANDROID_UIAUTOMATOR
+                "accessibility_id": MobileBy.ACCESSIBILITY_ID
         """
         Element.__init__(self, parent)
         self.__selenium_element = None
