@@ -74,8 +74,12 @@ class Context:
             If this context is not existing, it will raise NoSuchElementException.
 
         :param locator: the locator to find the DynamicElement (relative to parent context)
-        :param identifier: the identifier to refresh the DynamicElement
-        :return the DynamicElement found by locator
+        :param identifier:
+            the identifier is a function to generate the locator of the found element, you can get the standard ones in class Identifier.
+            Otherwise, you can create one like this::
+
+                context.find_element("class=food", lambda e: "xpath=.//div[@attr='%s']" % e.get_attribute("attr"))
+        :return: the DynamicElement found by locator
         """
         # import the DynamicElement here to avoid cyclic dependency
         from .dynamicelement import DynamicElement
@@ -98,8 +102,12 @@ class Context:
             If this context is not existing, it will raise NoSuchElementException.
 
         :param locator: the locator to find the DynamicElement list (relative to parent context)
-        :param identifier: the identifier to refresh the DynamicElement
-        :return the DynamicElement list found by locator
+        :param identifier:
+            the identifier is a function to generate the locator of the found elements, you can get the standard ones in class Identifier.
+            Otherwise, you can create one like this::
+
+                context.find_elements("class=food", lambda e: "xpath=.//div[@attr='%s']" % e.get_attribute("attr"))
+        :return: the DynamicElement list found by locator
         """
         # import the DynamicElement here to avoid cyclic dependency
         from .dynamicelement import DynamicElement

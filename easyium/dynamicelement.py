@@ -24,6 +24,9 @@ class DynamicElement(Element):
         self.__selenium_element = self.get_parent()._find_selenium_element(self.__locator)
 
     def persist(self):
+        """
+            Generate the locator of this element by identifier, so this element can auto-refresh.
+        """
         self.get_parent().persist()
 
         try:
