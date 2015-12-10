@@ -57,6 +57,10 @@ For information and suggestions you can contact me at karl.gong@outlook.com
 
 Change Log
 ----------
+1.1.4 (compared to 1.1.3)
+
+- Add get_screenshot_as_xxx() to Element.
+
 1.1.3 (compared to 1.1.2)
 
 - Add docstring for apis.
