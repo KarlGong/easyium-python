@@ -285,6 +285,7 @@ class WebDriver(Context):
         from .element import Element
 
         if isinstance(frame_reference, Element):
+            frame_reference.wait_for().exists()
             self.__selenium_web_driver.switch_to.frame(frame_reference._selenium_element())
         else:
             self.__selenium_web_driver.switch_to.frame(frame_reference)
@@ -308,6 +309,7 @@ class WebDriver(Context):
 
         :return: the Alert instance
         """
+        self.waiter().wait_for(self.is_alert_present)
         return self.__selenium_web_driver.switch_to.alert
 
     def is_alert_present(self):
@@ -424,6 +426,27 @@ class WebDriver(Context):
         """
         self.__selenium_web_driver.switch_to.window(window_reference)
 
+    def switch_to_new_window(self, previous_window_handles):
+        """
+            Switch to the new opened window.
+
+        :param previous_window_handles: the window handles before opening new window
+
+        :Usage:
+            previous_window_handles = driver.get_window_handles()
+            # open the new window
+            StaticElement(driver, "id=open-new-window").click()
+            driver.switch_to_new_window(previous_window_handles)
+        """
+        def get_new_window_handles():
+            return [handle for handle in self.get_window_handles() if handle not in previous_window_handles]
+
+        def new_window_opened():
+            return len(get_new_window_handles()) > 0
+
+        self.waiter().wait_for(new_window_opened)
+        self.switch_to_window(get_new_window_handles()[0])
+
     def close_window(self, window_reference="current"):
         """
             Close the specified window.
@@ -431,13 +454,13 @@ class WebDriver(Context):
         :param window_reference: The name or window handle of the window to close,
                     default is current window.
         """
-        if window_reference == "current":
+        if window_reference == "current" or window_reference == self.get_current_window_handle():
             self.__selenium_web_driver.close()
         else:
-            current_window = self.get_current_window_handle()
+            current_window_handle = self.get_current_window_handle()
             self.switch_to_window(window_reference)
             self.__selenium_web_driver.close()
-            self.switch_to_window(current_window)
+            self.switch_to_window(current_window_handle)
 
     def set_window_size(self, width, height, window_reference="current"):
         """

@@ -32,7 +32,7 @@ class Context:
         pass
 
     def waiter(self, interval=DEFAULT, timeout=DEFAULT, pre_wait_time=DEFAULT, post_wait_time=DEFAULT):
-        """"
+        """
             Get a Waiter instance.
 
         :param interval: the wait interval (in milliseconds), default value is web driver's wait interval
