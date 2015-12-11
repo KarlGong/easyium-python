@@ -154,12 +154,3 @@ class Context:
         for selenium_element in selenium_elements:
             elements.append(DynamicElement(self, selenium_element, locator, identifier))
         return elements
-
-    def get_screenshot_as_file(self, filename):
-        pass
-
-    def get_screenshot_as_png(self):
-        pass
-
-    def get_screenshot_as_base64(self):
-        pass
