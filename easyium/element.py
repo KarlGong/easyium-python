@@ -621,15 +621,26 @@ class Element(Context):
     @SupportedBy(WebDriverType._MOBILE)
     def scroll(self, direction):
         """
-            Scroll to direction in this element.
+            Scrolls to direction in this element.
 
         :param direction: the direction to scroll, the possible values are: up, down, left, right
         """
-        scroll_params = {
-            "direction": direction,
-            "element": self._selenium_element().id
-        }
-        self.get_web_driver().execute_script("mobile: scroll", scroll_params)
+        try:
+            try:
+                scroll_params = {
+                    "direction": direction,
+                    "element": self._selenium_element().id
+                }
+                self.get_web_driver().execute_script("mobile: scroll", scroll_params)
+            except (NoSuchElementException, StaleElementReferenceException):
+                self.wait_for().visible()
+                scroll_params = {
+                    "direction": direction,
+                    "element": self._selenium_element().id
+                }
+                self.get_web_driver().execute_script("mobile: scroll", scroll_params)
+        except WebDriverException as wde:
+            raise EasyiumException("%s\n%s" % (wde.msg, self))
 
     @SupportedBy(WebDriverType._MOBILE)
     def scroll_to(self, target_element):
@@ -647,6 +658,32 @@ class Element(Context):
                 target_element.wait_for().exists()
                 self.get_web_driver()._selenium_web_driver().scroll(self._selenium_element(),
                                                                     target_element._selenium_element())
+        except WebDriverException as wde:
+            raise EasyiumException("%s\n%s" % (wde.msg, self))
+
+    def scroll_into_view(self):
+        """
+            Scrolls this element into view.
+        """
+        web_driver_type = self.get_web_driver_type()
+        try:
+            try:
+                if web_driver_type in WebDriverType._MOBILE:
+                    scroll_params = {
+                        "element": self._selenium_element().id
+                    }
+                    self.get_web_driver().execute_script("mobile: scrollTo", scroll_params)
+                else:
+                    self.get_web_driver().execute_script("arguments[0].scrollIntoView();", self)
+            except (NoSuchElementException, StaleElementReferenceException):
+                self.wait_for().exists()
+                if web_driver_type in WebDriverType._MOBILE:
+                    scroll_params = {
+                        "element": self._selenium_element().id
+                    }
+                    self.get_web_driver().execute_script("mobile: scrollTo", scroll_params)
+                else:
+                    self.get_web_driver().execute_script("arguments[0].scrollIntoView();", self)
         except WebDriverException as wde:
             raise EasyiumException("%s\n%s" % (wde.msg, self))
 
@@ -694,7 +731,14 @@ class Element(Context):
         :Usage:
             element.get_screenshot_as_file('/Screenshots/foo.png')
         """
-        return self._selenium_element().screenshot(filename)
+        try:
+            try:
+                return self._selenium_element().screenshot(filename)
+            except (NoSuchElementException, StaleElementReferenceException):
+                self.wait_for().exists()
+                return self._selenium_element().screenshot(filename)
+        except WebDriverException as wde:
+            raise EasyiumException("%s\n%s" % (wde.msg, self))
 
     def get_screenshot_as_png(self):
         """
@@ -703,7 +747,14 @@ class Element(Context):
         :Usage:
             element_png = element.get_screenshot_as_png()
         """
-        return self._selenium_element().screenshot_as_png
+        try:
+            try:
+                return self._selenium_element().screenshot_as_png
+            except (NoSuchElementException, StaleElementReferenceException):
+                self.wait_for().exists()
+                return self._selenium_element().screenshot_as_png
+        except WebDriverException as wde:
+            raise EasyiumException("%s\n%s" % (wde.msg, self))
 
     def get_screenshot_as_base64(self):
         """
@@ -712,7 +763,14 @@ class Element(Context):
         :Usage:
             img_b64 = element.get_screenshot_as_base64()
         """
-        return self._selenium_element().screenshot_as_base64
+        try:
+            try:
+                return self._selenium_element().screenshot_as_base64
+            except (NoSuchElementException, StaleElementReferenceException):
+                self.wait_for().exists()
+                return self._selenium_element().screenshot_as_base64
+        except WebDriverException as wde:
+            raise EasyiumException("%s\n%s" % (wde.msg, self))
 
     save_screenshot = get_screenshot_as_file
 

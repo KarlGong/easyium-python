@@ -312,6 +312,8 @@ class WebDriver(Context):
         self.waiter().wait_for(self.is_alert_present)
         return self.__selenium_web_driver.switch_to.alert
 
+    switch_to_alert = get_alert
+
     def is_alert_present(self):
         """
             Return whether the alert is present on the page or not.
@@ -581,7 +583,7 @@ class WebDriver(Context):
     @SupportedBy(WebDriverType._MOBILE)
     def scroll(self, direction):
         """
-            Scroll the device to direction.
+            Scrolls the device to direction.
             It will try to scroll in the first element of type scroll view, table or collection view it finds.
             If you want to scroll in element, please use Element.scroll(direction)
 
