@@ -579,6 +579,20 @@ class WebDriver(Context):
         self.__selenium_web_driver.flick(start_x, start_y, end_x, end_y)
 
     @SupportedBy(WebDriverType._MOBILE)
+    def scroll(self, direction):
+        """
+            Scroll the device to direction.
+            It will try to scroll in the first element of type scroll view, table or collection view it finds.
+            If you want to scroll in element, please use Element.scroll(direction)
+
+        :param direction: the direction to scroll, the possible values are: up, down, left, right
+        """
+        scroll_params = {
+            "direction": direction
+        }
+        self.execute_script("mobile: scroll", scroll_params)
+
+    @SupportedBy(WebDriverType._MOBILE)
     def app_strings(self, language=None, string_file=None):
         """
             Returns the application strings from the device for the specified language.

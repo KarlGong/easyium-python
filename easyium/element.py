@@ -619,6 +619,19 @@ class Element(Context):
             raise EasyiumException("%s\n%s" % (wde.msg, self))
 
     @SupportedBy(WebDriverType._MOBILE)
+    def scroll(self, direction):
+        """
+            Scroll to direction in this element.
+
+        :param direction: the direction to scroll, the possible values are: up, down, left, right
+        """
+        scroll_params = {
+            "direction": direction,
+            "element": self._selenium_element().id
+        }
+        self.get_web_driver().execute_script("mobile: scroll", scroll_params)
+
+    @SupportedBy(WebDriverType._MOBILE)
     def scroll_to(self, target_element):
         """
             Scrolls from this element to another.
