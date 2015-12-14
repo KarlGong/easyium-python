@@ -540,9 +540,9 @@ class Element(Context):
             raise EasyiumException("%s\n%s" % (wde.msg, self))
 
     @SupportedBy(WebDriverType._MOBILE)
-    def tap(self, count=1):
+    def multiple_tap(self, count=1):
         """
-            Perform a tap action on this element
+            Perform a multiple-tap action on this element
 
         :param count: how many tap actions to perform on this element.
         """
@@ -554,6 +554,20 @@ class Element(Context):
                 self.get_web_driver().create_touch_action().tap(self._selenium_element(), None, None, count).perform()
         except WebDriverException as wde:
             raise EasyiumException("%s\n%s" % (wde.msg, self))
+
+    @SupportedBy(WebDriverType._MOBILE)
+    def tap(self):
+        """
+            Perform a tap action on this element.
+        """
+        self.multiple_tap(1)
+
+    @SupportedBy(WebDriverType._MOBILE)
+    def double_tap(self):
+        """
+            Perform a double-tap action on this element.
+        """
+        self.multiple_tap(2)
 
     @SupportedBy(WebDriverType._MOBILE)
     def long_press(self, duration=1000):
