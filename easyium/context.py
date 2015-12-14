@@ -31,6 +31,27 @@ class Context:
     def get_post_wait_time(self):
         pass
 
+    def _selenium_context(self):
+        pass
+
+    def _refresh(self):
+        pass
+
+    def persist(self):
+        pass
+
+    def get_screenshot_as_file(self, filename):
+        pass
+
+    def get_screenshot_as_png(self):
+        pass
+
+    def get_screenshot_as_base64(self):
+        pass
+
+    def wait_for(self, interval=DEFAULT, timeout=DEFAULT, pre_wait_time=DEFAULT, post_wait_time=DEFAULT):
+        pass
+
     def waiter(self, interval=DEFAULT, timeout=DEFAULT, pre_wait_time=DEFAULT, post_wait_time=DEFAULT):
         """
             Get a Waiter instance.
@@ -45,15 +66,6 @@ class Context:
         _pre_wait_time = self.get_pre_wait_time() if pre_wait_time == DEFAULT else pre_wait_time
         _post_wait_time = self.get_post_wait_time() if post_wait_time == DEFAULT else post_wait_time
         return Waiter(_interval, _timeout, _pre_wait_time, _post_wait_time)
-
-    def _selenium_context(self):
-        pass
-
-    def _refresh(self):
-        pass
-
-    def persist(self):
-        pass
 
     def _find_selenium_element(self, locator):
         by, value = locator_to_by_value(locator)
@@ -73,7 +85,6 @@ class Context:
     def find_element(self, locator, identifier=Identifier.id):
         """
             Find a DynamicElement under this context immediately.
-            If this context is not existing, it will raise NoSuchElementException.
 
         :param locator:
             the locator of this element (relative to parent context).
@@ -94,7 +105,7 @@ class Context:
             the identifier is a function to generate the locator of the found element, you can get the standard ones in class Identifier.
             Otherwise, you can create one like this::
 
-                context.find_element("class=food", lambda e: "xpath=.//div[@attr='%s']" % e.get_attribute("attr"))
+                context.find_element("class=food", lambda e: "xpath=.//*[@attr='%s']" % e.get_attribute("attr"))
         :return: the DynamicElement found by locator
         """
         # import the DynamicElement here to avoid cyclic dependency
@@ -104,8 +115,9 @@ class Context:
         try:
             try:
                 return DynamicElement(self, self._selenium_context().find_element(by, value), locator, identifier)
-            except StaleElementReferenceException:
-                self._refresh()
+            except (exceptions.NoSuchElementException, StaleElementReferenceException):
+                # Only Element can reach here
+                self.wait_for().exists()
                 return DynamicElement(self, self._selenium_context().find_element(by, value), locator, identifier)
         except InvalidSelectorException as ise:
             raise exceptions.EasyiumException("%s\n%s" % (ise.msg, self))
@@ -117,7 +129,6 @@ class Context:
     def find_elements(self, locator, identifier=Identifier.id):
         """
             Find DynamicElement list under this context immediately.
-            If this context is not existing, it will raise NoSuchElementException.
 
         :param locator:
             the locator of this element (relative to parent context).
@@ -138,7 +149,7 @@ class Context:
             the identifier is a function to generate the locator of the found elements, you can get the standard ones in class Identifier.
             Otherwise, you can create one like this::
 
-                context.find_elements("class=food", lambda e: "xpath=.//div[@attr='%s']" % e.get_attribute("attr"))
+                context.find_elements("class=food", lambda e: "xpath=.//*[@attr='%s']" % e.get_attribute("attr"))
         :return: the DynamicElement list found by locator
         """
         # import the DynamicElement here to avoid cyclic dependency
@@ -148,8 +159,9 @@ class Context:
         try:
             try:
                 selenium_elements = self._selenium_context().find_elements(by, value)
-            except StaleElementReferenceException:
-                self._refresh()
+            except (exceptions.NoSuchElementException, StaleElementReferenceException):
+                # Only Element can reach here
+                self.wait_for().exists()
                 selenium_elements = self._selenium_context().find_elements(by, value)
         except InvalidSelectorException as ise:
             raise exceptions.EasyiumException("%s\n%s" % (ise.msg, self))
