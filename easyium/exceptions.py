@@ -25,7 +25,7 @@ class UnsupportedWebDriverTypeException(EasyiumException):
     pass
 
 
-class InvalidByException(EasyiumException):
+class InvalidLocatorException(EasyiumException):
     pass
 
 

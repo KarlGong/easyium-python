@@ -1,6 +1,6 @@
 from selenium.webdriver.common.by import By
 
-from .exceptions import InvalidByException
+from .exceptions import InvalidLocatorException
 from . import appium_installed
 
 __author__ = 'karl.gong'
@@ -35,5 +35,5 @@ def locator_to_by_value(locator):
     try:
         by = locator_to_by_map[by]
     except KeyError:
-        raise InvalidByException("Invalid By: [%s] for locator: [%s]." % (by, locator))
+        raise InvalidLocatorException("The by <%s> of locator <%s> is not a valid By." % (by, locator))
     return by, value

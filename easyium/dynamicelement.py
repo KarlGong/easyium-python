@@ -37,5 +37,5 @@ class DynamicElement(Element):
                 "Trying to persist() a stale element. Try invoking persist() earlier.\n%s" % self)
 
     def __str__(self):
-        return "%s\n|- DynamicElement [SeleniumElement: %s][Locator: %s][FoundBy: %s]" % (
+        return "%s\n|- DynamicElement <SeleniumElementId: %s><Locator: %s><FoundBy: %s>" % (
             self.get_parent(), self.__selenium_element.id, self.__locator, self.__found_by)

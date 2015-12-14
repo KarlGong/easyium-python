@@ -923,7 +923,7 @@ class WebDriver(Context):
         self.__selenium_web_driver.set_location(latitude, longitude, altitude)
 
     def __str__(self):
-        return "WebDriver [WebDriverType: %s][SessionId: %s]" % (self.__selenium_web_driver.name, self.__selenium_web_driver.session_id)
+        return "WebDriver <WebDriverType: %s><SessionId: %s>" % (self.__selenium_web_driver.name, self.__selenium_web_driver.session_id)
 
 
 Browser = WebDriver

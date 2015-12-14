@@ -75,10 +75,10 @@ class Context:
             except StaleElementReferenceException:
                 self._refresh()
                 return self._selenium_context().find_element(by, value)
-        except InvalidSelectorException as ise:
-            raise exceptions.EasyiumException("%s\n%s" % (ise.msg, self))
+        except InvalidSelectorException:
+            raise exceptions.InvalidLocatorException("The value <%s> of locator <%s> is not a valid expression.\n%s" % (value, locator, self))
         except NoSuchElementException:
-            raise exceptions.NoSuchElementException("Cannot find element by [%s] under:\n%s\n" % (locator, self))
+            raise exceptions.NoSuchElementException("Cannot find element by <%s> under:\n%s\n" % (locator, self))
         except WebDriverException as wde:
             raise exceptions.EasyiumException("%s\n%s" % (wde.msg, self))
 
@@ -119,10 +119,10 @@ class Context:
                 # Only Element can reach here
                 self.wait_for().exists()
                 return DynamicElement(self, self._selenium_context().find_element(by, value), locator, identifier)
-        except InvalidSelectorException as ise:
-            raise exceptions.EasyiumException("%s\n%s" % (ise.msg, self))
+        except InvalidSelectorException:
+            raise exceptions.InvalidLocatorException("The value <%s> of locator <%s> is not a valid expression.\n%s" % (value, locator, self))
         except NoSuchElementException:
-            raise exceptions.NoSuchElementException("Cannot find element by [%s] under:\n%s\n" % (locator, self))
+            raise exceptions.NoSuchElementException("Cannot find element by <%s> under:\n%s\n" % (locator, self))
         except WebDriverException as wde:
             raise exceptions.EasyiumException("%s\n%s" % (wde.msg, self))
 
@@ -163,8 +163,8 @@ class Context:
                 # Only Element can reach here
                 self.wait_for().exists()
                 selenium_elements = self._selenium_context().find_elements(by, value)
-        except InvalidSelectorException as ise:
-            raise exceptions.EasyiumException("%s\n%s" % (ise.msg, self))
+        except InvalidSelectorException:
+            raise exceptions.InvalidLocatorException("The value <%s> of locator <%s> is not a valid expression.\n%s" % (value, locator, self))
         except WebDriverException as wde:
             raise exceptions.EasyiumException("%s\n%s" % (wde.msg, self))
 

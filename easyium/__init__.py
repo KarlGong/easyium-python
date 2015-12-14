@@ -9,7 +9,7 @@ from .staticelement import StaticElement
 from .identifier import Identifier
 from .waiter import Waiter
 from .exceptions import EasyiumException, TimeoutException, NoSuchElementException, NotPersistException, \
-    LatePersistException, UnsupportedWebDriverTypeException, InvalidByException, UnsupportedOperationException
+    LatePersistException, UnsupportedWebDriverTypeException, InvalidLocatorException, UnsupportedOperationException
 from .config import default_config
 
 __author__ = 'karl.gong'
