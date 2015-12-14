@@ -66,19 +66,50 @@ class ElementWaitFor:
                 "Timed out waiting for <%s> to be <%s>." % (element_condition, self.__desired_occurrence))
 
     def not_(self):
+        """
+            Wait for not.
+        """
         self.__desired_occurrence = not self.__desired_occurrence
         return self
 
     def exists(self):
+        """
+            Wait for this element exists.
+        """
         self.__wait_for(ElementExistence(self.__element))
 
     def visible(self):
+        """
+            Wait for this element visible.
+        """
         self.__wait_for(ElementVisible(self.__element))
 
     def attribute_contains_one(self, attribute, *values):
+        """
+            Wait for this element's attribute value contains one of the value list.
+
+        :param attribute: the attribute of this element.
+        :param values: the value list.
+
+        :Usage:
+            element.wait_for().attribute_contains_one("class", "foo", "bar")
+            element.wait_for().attribute_contains_one("class", ["foo", "bar"])
+            element.wait_for().attribute_contains_one("class", ("foo", "bar"))
+        """
         self.__wait_for(ElementAttributeContainsOne(self.__element, attribute, *values))
 
     def attribute_contains_all(self, attribute, *values):
+        """
+            Wait for this element's attribute value contains all of the value list.
+
+        :param attribute: the attribute of this element.
+        :param values: the value list.
+
+        :Usage:
+            element.wait_for().attribute_contains_all("class", "foo", "bar")
+            element.wait_for().attribute_contains_all("class", ["foo", "bar"])
+            element.wait_for().attribute_contains_all("class", ("foo", "bar"))
+        """
         self.__wait_for(ElementAttributeContainsAll(self.__element, attribute, *values))
 
 
@@ -108,12 +139,17 @@ class ElementAttributeContainsOne:
     def __init__(self, element, attribute, *values):
         self.__element = element
         self.__attribute = attribute
-        self.__values = values
+        self.__values = []
+        for value in values:
+            if isinstance(value, (tuple, list)):
+                self.__values.extend(value)
+            else:
+                self.__values.append(value)
 
     def occurred(self):
         attribute_value = self.__element.get_attribute(self.__attribute)
         for value in self.__values:
-            if attribute_value.find(value) != -1:
+            if value in attribute_value:
                 return True
         return False
 
@@ -126,12 +162,17 @@ class ElementAttributeContainsAll:
     def __init__(self, element, attribute, *values):
         self.__element = element
         self.__attribute = attribute
-        self.__values = values
+        self.__values = []
+        for value in values:
+            if isinstance(value, (tuple, list)):
+                self.__values.extend(value)
+            else:
+                self.__values.append(value)
 
     def occurred(self):
         attribute_value = self.__element.get_attribute(self.__attribute)
         for value in self.__values:
-            if attribute_value.find(value) == -1:
+            if value not in attribute_value:
                 return False
         return True
 
@@ -157,16 +198,37 @@ class WebDriverWaitFor:
                 "Timed out waiting for <%s> to be <%s>." % (web_driver_condition, self.__desired_occurrence))
 
     def not_(self):
+        """
+            Wait for not.
+        """
         self.__desired_occurrence = not self.__desired_occurrence
         return self
 
     def alert_present(self):
+        """
+            Wait for the alert present.
+        """
         self.__wait_for(AlertPresent(self.__web_driver))
 
     def text_present(self, text):
+        """
+            Wait for the text present.
+
+        :param text: the text to wait
+        """
         self.__wait_for(TextPresent(self.__web_driver, text))
 
     def url_changed(self, previous_url):
+        """
+            Wait for the url changed.
+
+        :param previous_url: the url before url changed
+
+        :Usage:
+            previous_url = driver.get_current_url()
+            StaticElement(driver, "id=change_url").click() # url changed
+            driver.wait_for().url_changed(previous_url)
+        """
         self.__wait_for(URLChanged(self.__web_driver, previous_url))
 
 

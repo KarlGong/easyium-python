@@ -309,7 +309,7 @@ class WebDriver(Context):
 
         :return: the Alert instance
         """
-        self.waiter().wait_for(self.is_alert_present)
+        self.wait_for().alert_present()
         return self.__selenium_web_driver.switch_to.alert
 
     switch_to_alert = get_alert
@@ -436,8 +436,7 @@ class WebDriver(Context):
 
         :Usage:
             previous_window_handles = driver.get_window_handles()
-            # open the new window
-            StaticElement(driver, "id=open-new-window").click()
+            StaticElement(driver, "id=open-new-window").click() # open the new window
             driver.switch_to_new_window(previous_window_handles)
         """
         def get_new_window_handles():
