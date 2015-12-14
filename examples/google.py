@@ -39,7 +39,7 @@ class GoogleAppsList:
         # Wait for the google apps list visible.
         self.__element.wait_for().visible()
 
-        # In most case we should wait for the mask not existing here .
+        # In most cases we should wait for the mask not existing here .
         # But in this case, no mask here.
         # self.__loading_mask.wait_for().not_().existing
 

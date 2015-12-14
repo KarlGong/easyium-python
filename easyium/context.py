@@ -1,4 +1,4 @@
-from selenium.common.exceptions import StaleElementReferenceException, NoSuchElementException, WebDriverException
+from selenium.common.exceptions import StaleElementReferenceException, NoSuchElementException, InvalidSelectorException, WebDriverException
 
 from .locator import locator_to_by_value
 from .identifier import Identifier
@@ -63,6 +63,8 @@ class Context:
             except StaleElementReferenceException:
                 self._refresh()
                 return self._selenium_context().find_element(by, value)
+        except InvalidSelectorException as ise:
+            raise exceptions.EasyiumException("%s\n%s" % (ise.msg, self))
         except NoSuchElementException:
             raise exceptions.NoSuchElementException("Cannot find element by [%s] under:\n%s\n" % (locator, self))
         except WebDriverException as wde:
@@ -105,6 +107,8 @@ class Context:
             except StaleElementReferenceException:
                 self._refresh()
                 return DynamicElement(self, self._selenium_context().find_element(by, value), locator, identifier)
+        except InvalidSelectorException as ise:
+            raise exceptions.EasyiumException("%s\n%s" % (ise.msg, self))
         except NoSuchElementException:
             raise exceptions.NoSuchElementException("Cannot find element by [%s] under:\n%s\n" % (locator, self))
         except WebDriverException as wde:
@@ -147,6 +151,8 @@ class Context:
             except StaleElementReferenceException:
                 self._refresh()
                 selenium_elements = self._selenium_context().find_elements(by, value)
+        except InvalidSelectorException as ise:
+            raise exceptions.EasyiumException("%s\n%s" % (ise.msg, self))
         except WebDriverException as wde:
             raise exceptions.EasyiumException("%s\n%s" % (wde.msg, self))
 
