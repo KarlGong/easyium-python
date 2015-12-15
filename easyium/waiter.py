@@ -84,12 +84,24 @@ class ElementWaitFor:
         """
         self.__wait_for(ElementVisible(self.__element))
 
+    def attribute_equals(self, attribute, value):
+        """
+            Wait for this element's attribute value equals the value.
+
+        :param attribute: the attribute of this element.
+        :param value: the expected value.
+
+        :Usage:
+            element.wait_for().attribute_equals("class", "foo bar")
+        """
+        self.__wait_for(ElementAttributeEquals(self.__element, attribute, value))
+
     def attribute_contains_one(self, attribute, *values):
         """
             Wait for this element's attribute value contains one of the value list.
 
         :param attribute: the attribute of this element.
-        :param values: the value list.
+        :param values: the expected value list.
 
         :Usage:
             element.wait_for().attribute_contains_one("class", "foo", "bar")
@@ -103,7 +115,7 @@ class ElementWaitFor:
             Wait for this element's attribute value contains all of the value list.
 
         :param attribute: the attribute of this element.
-        :param values: the value list.
+        :param values: the expected value list.
 
         :Usage:
             element.wait_for().attribute_contains_all("class", "foo", "bar")
@@ -134,6 +146,18 @@ class ElementVisible:
     def __str__(self):
         return "ElementVisible [\n%s\n]" % self.__element
 
+class ElementAttributeEquals:
+    def __init__(self, element, attribute, value):
+        self.__element = element
+        self.__attribute = attribute
+        self.__value = value
+
+    def occurred(self):
+        return self.__element.get_attribute(self.__attribute) == self.__value
+
+    def __str__(self):
+        return "ElementAttributeEquals [element: \n%s\n][attribute: %s][value: %s]" % (
+            self.__element, self.__attribute, self.__value)
 
 class ElementAttributeContainsOne:
     def __init__(self, element, attribute, *values):
