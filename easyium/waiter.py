@@ -31,17 +31,23 @@ class Waiter:
         :param function_args: the args for condition_function
         :param function_kwargs: the kwargs for condition_function
         """
+        def run_condition_function():
+            try:
+                return condition_function(*function_args, **function_kwargs)
+            except TimeoutException:
+                return False
+
         time.sleep(self.__pre_wait_time / 1000.0)
 
         start_time = time.time() * 1000.0
 
-        if condition_function(*function_args, **function_kwargs):
+        if run_condition_function():
             time.sleep(self.__post_wait_time / 1000.0)
             return
 
         while (time.time() * 1000.0 - start_time) <= self.__timeout:
             time.sleep(self.__interval / 1000.0)
-            if condition_function(*function_args, **function_kwargs):
+            if run_condition_function():
                 time.sleep(self.__post_wait_time / 1000.0)
                 return
 
