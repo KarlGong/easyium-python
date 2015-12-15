@@ -40,11 +40,10 @@ class Waiter:
             return
 
         while (time.time() * 1000.0 - start_time) <= self.__timeout:
+            time.sleep(self.__interval / 1000.0)
             if condition_function(*function_args, **function_kwargs):
                 time.sleep(self.__post_wait_time / 1000.0)
                 return
-            else:
-                time.sleep(self.__interval / 1000.0)
 
         raise TimeoutException("Timed out waiting for <%s>." % condition_function.__name__)
 
