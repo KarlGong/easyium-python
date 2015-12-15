@@ -17,7 +17,7 @@ Advantages
 
 - easyium provides easy-to-use wait method for element. e.g., my_element.wait_for().not_().exists()
 
-- easyium provides a better way to define a locator. e.g., use ``"xpath=.//mytag"`` instead of ``By.XPATH, ".//mytag"``
+- easyium provides a simple way to define a locator. e.g., use ``"xpath=.//mytag"`` instead of ``By.XPATH, ".//mytag"``
 
 - easyium provides a mechanism to avoid StaleElementReferenceException.
 
