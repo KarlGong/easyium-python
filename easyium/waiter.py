@@ -152,7 +152,7 @@ class ElementAttributeEquals:
         self.__value = value
 
     def occurred(self):
-        return self.__element.get_attribute(self.__attribute) == self.__value
+        return self.__element.exists() and self.__element._selenium_element().get_attribute(self.__attribute) == self.__value
 
     def __str__(self):
         return "ElementAttributeEquals [element: \n%s\n][attribute: %s][value: %s]" % (
@@ -170,7 +170,9 @@ class ElementAttributeContainsOne:
                 self.__values.append(value)
 
     def occurred(self):
-        attribute_value = self.__element.get_attribute(self.__attribute)
+        if not self.__element.exists():
+            return False
+        attribute_value = self.__element._selenium_element().get_attribute(self.__attribute)
         for value in self.__values:
             if value in attribute_value:
                 return True
@@ -193,7 +195,9 @@ class ElementAttributeContainsAll:
                 self.__values.append(value)
 
     def occurred(self):
-        attribute_value = self.__element.get_attribute(self.__attribute)
+        if not self.__element.exists():
+            return False
+        attribute_value = self.__element._selenium_element().get_attribute(self.__attribute)
         for value in self.__values:
             if value not in attribute_value:
                 return False
@@ -261,7 +265,7 @@ class AlertPresent:
 
     def occurred(self):
         try:
-            alert_text = self.__web_driver.get_alert().text
+            alert_text = self.__web_driver._selenium_web_driver().switch_to.alert.text
             return True
         except NoAlertPresentException:
             return False
