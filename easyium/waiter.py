@@ -3,7 +3,7 @@ import time
 from selenium.common.exceptions import NoAlertPresentException
 
 from .config import DEFAULT, default_config
-from .exceptions import TimeoutException, NoSuchElementException
+from .exceptions import TimeoutException, ElementTimeoutException, WebDriverTimeoutException, NoSuchElementException
 
 __author__ = 'karl.gong'
 
@@ -31,23 +31,17 @@ class Waiter:
         :param function_args: the args for condition_function
         :param function_kwargs: the kwargs for condition_function
         """
-        def run_condition_function():
-            try:
-                return condition_function(*function_args, **function_kwargs)
-            except TimeoutException:
-                return False
-
         time.sleep(self.__pre_wait_time / 1000.0)
 
         start_time = time.time() * 1000.0
 
-        if run_condition_function():
+        if condition_function(*function_args, **function_kwargs):
             time.sleep(self.__post_wait_time / 1000.0)
             return
 
         while (time.time() * 1000.0 - start_time) <= self.__timeout:
             time.sleep(self.__interval / 1000.0)
-            if run_condition_function():
+            if condition_function(*function_args, **function_kwargs):
                 time.sleep(self.__post_wait_time / 1000.0)
                 return
 
@@ -67,7 +61,7 @@ class ElementWaitFor:
         try:
             self.__waiter.wait_for(is_element_condition_occurred)
         except TimeoutException:
-            raise TimeoutException(
+            raise ElementTimeoutException(
                 "Timed out waiting for <%s> to be <%s>." % (element_condition, self.__desired_occurrence))
 
     def not_(self):
@@ -223,7 +217,7 @@ class WebDriverWaitFor:
         try:
             self.__waiter.wait_for(is_web_driver_condition_occurred)
         except TimeoutException:
-            raise TimeoutException(
+            raise WebDriverTimeoutException(
                 "Timed out waiting for <%s> to be <%s>." % (web_driver_condition, self.__desired_occurrence))
 
     def not_(self):
