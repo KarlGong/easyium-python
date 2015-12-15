@@ -22,14 +22,14 @@ class DynamicElement(Element):
         """
             Generate the locator of this element by identifier, so this element can auto-refresh.
         """
+        self.get_parent().persist()
+
         try:
             if self._locator is None:
                 self._locator = self.__identifier(self)
         except NotPersistException:
             raise LatePersistException(
                 "Trying to persist() a stale element. Try invoking persist() earlier.\n%s" % self)
-
-        self.get_parent().persist()
 
     def __str__(self):
         if self._inner_selenium_element is None:
