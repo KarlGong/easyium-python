@@ -52,14 +52,17 @@ class ElementWaitFor:
     def __init__(self, element, interval, timeout, pre_wait_time, post_wait_time):
         self.__element = element
         self.__desired_occurrence = True
-        self.__waiter = Waiter(interval, timeout, pre_wait_time, post_wait_time)
+        self.__interval = interval
+        self.__timeout = timeout
+        self.__pre_wait_time = pre_wait_time
+        self.__post_wait_time = post_wait_time
 
-    def __wait_for(self, element_condition):
+    def __wait_for(self, element_condition, interval, timeout, pre_wait_time, post_wait_time):
         def is_element_condition_occurred():
             return element_condition.occurred() == self.__desired_occurrence
 
         try:
-            self.__waiter.wait_for(is_element_condition_occurred)
+            Waiter(interval, timeout, pre_wait_time, post_wait_time).wait_for(is_element_condition_occurred)
         except TimeoutException:
             raise ElementTimeoutException(
                 "Timed out waiting for <%s> to be <%s>." % (element_condition, self.__desired_occurrence))
@@ -75,13 +78,13 @@ class ElementWaitFor:
         """
             Wait for this element exists.
         """
-        self.__wait_for(ElementExistence(self.__element))
+        self.__wait_for(ElementExistence(self.__element), self.__interval, self.__timeout, self.__pre_wait_time, self.__post_wait_time)
 
     def visible(self):
         """
             Wait for this element visible.
         """
-        self.__wait_for(ElementVisible(self.__element))
+        self.__wait_for(ElementVisible(self.__element), self.__interval, self.__timeout, self.__pre_wait_time, self.__post_wait_time)
 
     def attribute_equals(self, attribute, value):
         """
@@ -93,7 +96,10 @@ class ElementWaitFor:
         :Usage:
             element.wait_for().attribute_equals("class", "foo bar")
         """
-        self.__wait_for(ElementAttributeEquals(self.__element, attribute, value))
+        start_time = time.time() * 1000.0
+        self.__element.wait_for(self.__interval, self.__timeout, self.__pre_wait_time, 0).exists()
+        rest_timeout = start_time + self.__timeout - time.time() * 1000.0
+        self.__wait_for(ElementAttributeEquals(self.__element, attribute, value), self.__interval, rest_timeout, 0, self.__post_wait_time)
 
     def attribute_contains_one(self, attribute, *values):
         """
@@ -107,7 +113,10 @@ class ElementWaitFor:
             element.wait_for().attribute_contains_one("class", ["foo", "bar"])
             element.wait_for().attribute_contains_one("class", ("foo", "bar"))
         """
-        self.__wait_for(ElementAttributeContainsOne(self.__element, attribute, *values))
+        start_time = time.time() * 1000.0
+        self.__element.wait_for(self.__interval, self.__timeout, self.__pre_wait_time, 0).exists()
+        rest_timeout = start_time + self.__timeout - time.time() * 1000.0
+        self.__wait_for(ElementAttributeContainsOne(self.__element, attribute, *values), self.__interval, rest_timeout, 0, self.__post_wait_time)
 
     def attribute_contains_all(self, attribute, *values):
         """
@@ -121,7 +130,10 @@ class ElementWaitFor:
             element.wait_for().attribute_contains_all("class", ["foo", "bar"])
             element.wait_for().attribute_contains_all("class", ("foo", "bar"))
         """
-        self.__wait_for(ElementAttributeContainsAll(self.__element, attribute, *values))
+        start_time = time.time() * 1000.0
+        self.__element.wait_for(self.__interval, self.__timeout, self.__pre_wait_time, 0).exists()
+        rest_timeout = start_time + self.__timeout - time.time() * 1000.0
+        self.__wait_for(ElementAttributeContainsAll(self.__element, attribute, *values), self.__interval, rest_timeout, 0, self.__post_wait_time)
 
 
 class ElementExistence:
@@ -152,7 +164,7 @@ class ElementAttributeEquals:
         self.__value = value
 
     def occurred(self):
-        return self.__element.exists() and self.__element._selenium_element().get_attribute(self.__attribute) == self.__value
+        return self.__element._selenium_element().get_attribute(self.__attribute) == self.__value
 
     def __str__(self):
         return "ElementAttributeEquals [element: \n%s\n][attribute: %s][value: %s]" % (
@@ -170,8 +182,6 @@ class ElementAttributeContainsOne:
                 self.__values.append(value)
 
     def occurred(self):
-        if not self.__element.exists():
-            return False
         attribute_value = self.__element._selenium_element().get_attribute(self.__attribute)
         for value in self.__values:
             if value in attribute_value:
@@ -195,8 +205,6 @@ class ElementAttributeContainsAll:
                 self.__values.append(value)
 
     def occurred(self):
-        if not self.__element.exists():
-            return False
         attribute_value = self.__element._selenium_element().get_attribute(self.__attribute)
         for value in self.__values:
             if value not in attribute_value:
