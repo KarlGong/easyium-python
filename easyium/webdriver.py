@@ -1,6 +1,7 @@
 from selenium.webdriver import Ie, Firefox, Chrome, Opera, Safari, PhantomJS, ActionChains
 from selenium.common.exceptions import NoAlertPresentException
 
+from .alert import Alert
 from .context import Context
 from .waiter import WebDriverWaitFor
 from .exceptions import UnsupportedWebDriverTypeException
@@ -303,6 +304,8 @@ class WebDriver(Context):
         """
         self.__selenium_web_driver.switch_to.default_content()
 
+    switch_to_default_frame = switch_to_default_content
+
     def get_alert(self):
         """
             Switches focus to an alert on the page.
@@ -310,7 +313,7 @@ class WebDriver(Context):
         :return: the Alert instance
         """
         self.wait_for().alert_present()
-        return self.__selenium_web_driver.switch_to.alert
+        return Alert(self.__selenium_web_driver.switch_to.alert)
 
     switch_to_alert = get_alert
 
