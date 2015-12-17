@@ -1,9 +1,14 @@
+import re
+
 __author__ = 'karl.gong'
+
+filter_msg_regex = re.compile(r"\n  \(Session info:.*?\)\n  \(Driver info:.*?\(.*?\).*?\)")
 
 
 class EasyiumException(Exception):
     def __init__(self, msg=None, context=None):
-        self.msg = msg
+        # Remove Session info and Driver info of the message.
+        self.msg = filter_msg_regex.sub("", msg)
         self.message = self.msg
         self.context = context
 
