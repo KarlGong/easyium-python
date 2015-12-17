@@ -76,11 +76,11 @@ class Context:
                 self._refresh()
                 return self._selenium_context().find_element(by, value)
         except InvalidSelectorException:
-            raise exceptions.InvalidLocatorException("The value <%s> of locator <%s> is not a valid expression.\n%s" % (value, locator, self))
+            raise exceptions.InvalidLocatorException("The value <%s> of locator <%s> is not a valid expression." % (value, locator), self)
         except NoSuchElementException:
-            raise exceptions.NoSuchElementException("Cannot find element by <%s> under:\n%s\n" % (locator, self))
+            raise exceptions.NoSuchElementException("Cannot find element by <%s> under:" % locator, self)
         except WebDriverException as wde:
-            raise exceptions.EasyiumException("%s\n%s" % (wde.msg, self))
+            raise exceptions.EasyiumException(wde.msg, self)
 
     def find_element(self, locator, identifier=Identifier.id):
         """
@@ -120,11 +120,11 @@ class Context:
                 self.wait_for().exists()
                 return DynamicElement(self, self._selenium_context().find_element(by, value), locator, identifier)
         except InvalidSelectorException:
-            raise exceptions.InvalidLocatorException("The value <%s> of locator <%s> is not a valid expression.\n%s" % (value, locator, self))
+            raise exceptions.InvalidLocatorException("The value <%s> of locator <%s> is not a valid expression." % (value, locator), self)
         except NoSuchElementException:
-            raise exceptions.NoSuchElementException("Cannot find element by <%s> under:\n%s\n" % (locator, self))
+            raise exceptions.NoSuchElementException("Cannot find element by <%s> under:" % locator, self)
         except WebDriverException as wde:
-            raise exceptions.EasyiumException("%s\n%s" % (wde.msg, self))
+            raise exceptions.EasyiumException(wde.msg, self)
 
     def find_elements(self, locator, identifier=Identifier.id):
         """
@@ -164,9 +164,9 @@ class Context:
                 self.wait_for().exists()
                 selenium_elements = self._selenium_context().find_elements(by, value)
         except InvalidSelectorException:
-            raise exceptions.InvalidLocatorException("The value <%s> of locator <%s> is not a valid expression.\n%s" % (value, locator, self))
+            raise exceptions.InvalidLocatorException("The value <%s> of locator <%s> is not a valid expression." % (value, locator), self)
         except WebDriverException as wde:
-            raise exceptions.EasyiumException("%s\n%s" % (wde.msg, self))
+            raise exceptions.EasyiumException(wde.msg, self)
 
         elements = []
         for selenium_element in selenium_elements:

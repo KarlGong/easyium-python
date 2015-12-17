@@ -14,7 +14,7 @@ class DynamicElement(Element):
 
     def _refresh(self):
         if self._locator is None:
-            raise NotPersistException("persist() was not invoked so this Element cannot auto-refresh.\n%s" % self)
+            raise NotPersistException("persist() was not invoked so this Element cannot auto-refresh.", self)
         self._inner_selenium_element = None
         self._inner_selenium_element = self.get_parent()._find_selenium_element(self._locator)
 
@@ -29,7 +29,7 @@ class DynamicElement(Element):
                 self._locator = self.__identifier(self)
         except NotPersistException:
             raise LatePersistException(
-                "Trying to persist() a stale element. Try invoking persist() earlier.\n%s" % self)
+                "Trying to persist() a stale element. Try invoking persist() earlier.", self)
 
     def __str__(self):
         if self._inner_selenium_element is None:

@@ -2,7 +2,18 @@ __author__ = 'karl.gong'
 
 
 class EasyiumException(Exception):
-    pass
+    def __init__(self, msg=None, context=None):
+        self.msg = msg
+        self.message = self.msg
+        self.context = context
+
+    def __str__(self):
+        exception_msg = ""
+        if self.msg is not None:
+            exception_msg = self.msg
+        if self.context is not None:
+            exception_msg += "\n" + str(self.context)
+        return exception_msg
 
 
 class TimeoutException(EasyiumException):
