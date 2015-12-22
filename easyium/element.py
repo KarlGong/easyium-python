@@ -450,9 +450,8 @@ class Element(Context):
             Do mouse over this element.
         """
         script = """
-            var evObj = document.createEvent('MouseEvents');
-            evObj.initMouseEvent("mouseover", true, false, window, 0, 0, 0, 0, 0, false, false, false, false, 0, null);
-            arguments[0].dispatchEvent(evObj);
+            var mouseoverEventObj = new MouseEvent('mouseover');
+            arguments[0].dispatchEvent(mouseoverEventObj);
         """
         try:
             try:
@@ -469,9 +468,8 @@ class Element(Context):
             Do mouse out this element.
         """
         script = """
-            var evObj = document.createEvent('MouseEvents');
-            evObj.initMouseEvent("mouseout", true, false, window, 0, 0, 0, 0, 0, false, false, false, false, 0, null);
-            arguments[0].dispatchEvent(evObj);
+            var mouseoutEventObj = new MouseEvent('mouseout');
+            arguments[0].dispatchEvent(mouseoutEventObj);
         """
         try:
             try:
