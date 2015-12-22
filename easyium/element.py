@@ -450,7 +450,7 @@ class Element(Context):
             Do mouse over this element.
         """
         script = """
-            var mouseoverEventObj = new MouseEvent('mouseover');
+            var mouseoverEventObj = new MouseEvent('mouseover', {'bubbles': true, 'cancelable': true});
             arguments[0].dispatchEvent(mouseoverEventObj);
         """
         try:
@@ -468,7 +468,7 @@ class Element(Context):
             Do mouse out this element.
         """
         script = """
-            var mouseoutEventObj = new MouseEvent('mouseout');
+            var mouseoutEventObj = new MouseEvent('mouseout', {'bubbles': true, 'cancelable': true});
             arguments[0].dispatchEvent(mouseoutEventObj);
         """
         try:
