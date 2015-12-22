@@ -57,6 +57,14 @@ For information and suggestions you can contact me at karl.gong@outlook.com
 
 Change Log
 ----------
+1.1.5 (compared to 1.1.4)
+
+- Add scroll(), switch_to_new_window() to WebDriver.
+
+- Add scroll(), scroll_into_view() to Element.
+
+- Raise InvalidLocatorException when the locator is invalid.
+
 1.1.4 (compared to 1.1.3)
 
 - Add get_screenshot_as_xxx() to Element.

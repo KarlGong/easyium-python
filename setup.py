@@ -22,7 +22,7 @@ def main():
         description="easy use of selenium and appium",
         long_description=long_description,
         install_requires = ['selenium>=2.48.0'],
-        version="1.1.4",
+        version="1.1.5",
         keywords="selenium appium test testing framework automation",
         author="Karl Gong",
         author_email="karl.gong@outlook.com",
