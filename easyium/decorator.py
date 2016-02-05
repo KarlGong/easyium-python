@@ -1,10 +1,13 @@
-__author__ = 'karl.gong'
+import functools
 
 from .exceptions import UnsupportedOperationException
+
+__author__ = 'karl.gong'
 
 
 def SupportedBy(*web_driver_types):
     def handle_func(func):
+        @functools.wraps(func)
         def handle_args(*args, **kwargs):
             wd_types = []
             for wd_type in web_driver_types:
