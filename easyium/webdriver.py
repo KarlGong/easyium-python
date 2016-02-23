@@ -1,4 +1,4 @@
-from selenium.webdriver import Ie, Firefox, Chrome, Opera, Safari, PhantomJS, ActionChains
+from selenium.webdriver import Ie, Firefox, Chrome, Opera, Safari, Edge, PhantomJS, ActionChains
 from selenium.common.exceptions import NoAlertPresentException
 
 from .alert import Alert
@@ -17,6 +17,7 @@ class WebDriverType:
     CHROME = "chrome"
     OPERA = "opera"
     SAFARI = "safari"
+    EDGE = "edge"
     PHANTOMJS = "phantomjs"
     ANDROID = "android"
     IOS = "ios"
@@ -53,6 +54,8 @@ class WebDriver(Context):
             self.__selenium_web_driver = Opera(**kwargs)
         elif self.__web_driver_type == WebDriverType.SAFARI:
             self.__selenium_web_driver = Safari(**kwargs)
+        elif self.__web_driver_type == WebDriverType.EDGE:
+            self.__selenium_web_driver = Edge(**kwargs)
         elif self.__web_driver_type == WebDriverType.PHANTOMJS:
             self.__selenium_web_driver = PhantomJS(**kwargs)
         elif self.__web_driver_type in WebDriverType._MOBILE:
