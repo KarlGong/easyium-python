@@ -1,4 +1,4 @@
-from selenium.common.exceptions import WebDriverException, StaleElementReferenceException
+from selenium.common.exceptions import WebDriverException, StaleElementReferenceException, ElementNotVisibleException
 
 from .config import DEFAULT
 from .context import Context
@@ -100,7 +100,7 @@ class Element(Context):
         try:
             try:
                 self._selenium_element().click()
-            except (NoSuchElementException, StaleElementReferenceException):
+            except (NoSuchElementException, StaleElementReferenceException, ElementNotVisibleException):
                 self.wait_for().visible()
                 self._selenium_element().click()
         except WebDriverException as wde:
@@ -156,7 +156,7 @@ class Element(Context):
         try:
             try:
                 self._selenium_element().send_keys(*value)
-            except (NoSuchElementException, StaleElementReferenceException):
+            except (NoSuchElementException, StaleElementReferenceException, ElementNotVisibleException):
                 self.wait_for().visible()
                 self._selenium_element().send_keys(*value)
         except WebDriverException as wde:
