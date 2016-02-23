@@ -82,12 +82,25 @@ class Context:
         except WebDriverException as wde:
             raise exceptions.EasyiumException(wde.msg, self)
 
+    def has_child(self, locator):
+        """
+            Return whether this context has a child element.
+
+        :param locator: the locator (relative to this context) of the child element
+        :return: whether this context has a child element.
+        """
+        try:
+            self.find_element(locator)
+            return True
+        except exceptions.NoSuchElementException:
+            return False
+
     def find_element(self, locator, identifier=Identifier.id):
         """
             Find a DynamicElement under this context immediately.
 
         :param locator:
-            the locator of this element (relative to parent context).
+            the locator (relative to this context) of the element to be found.
             The format of locator is: "by=value", the possible values of "by" are::
 
                 "id": By.ID
@@ -131,7 +144,7 @@ class Context:
             Find DynamicElement list under this context immediately.
 
         :param locator:
-            the locator of this element (relative to parent context).
+            the locator (relative to this context) of the elements to be found.
             The format of locator is: "by=value", the possible values of "by" are::
 
                 "id": By.ID
