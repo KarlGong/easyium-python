@@ -304,7 +304,7 @@ class URLChanged:
         self.__previous_url = previous_url
 
     def occurred(self):
-        return self.__web_driver.get_current_url() != self.__previous_url
+        return self.__web_driver._selenium_web_driver().current_url != self.__previous_url
 
     def __str__(self):
         return "URLChanged [\n%s\n]" % self.__web_driver
