@@ -288,11 +288,7 @@ class TextPresent:
         self.__text = text
 
     def occurred(self):
-        try:
-            self.__web_driver.find_element("xpath=//*[contains(text(), '%s')]" % self.__text)
-            return True
-        except NoSuchElementException:
-            return False
+        return self.__web_driver.has_child("xpath=//*[contains(text(), '%s')]" % self.__text)
 
     def __str__(self):
         return "TextPresent [webdriver: \n%s\n][text: %s]" % (self.__web_driver, self.__text)
