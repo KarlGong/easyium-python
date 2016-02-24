@@ -445,14 +445,16 @@ class WebDriver(Context):
             StaticElement(driver, "id=open-new-window").click() # open the new window
             driver.switch_to_new_window(previous_window_handles)
         """
+        new_window_handles = {"inner": []}
         def get_new_window_handles():
-            return [handle for handle in self.get_window_handles() if handle not in previous_window_handles]
+            new_window_handles["inner"] = [handle for handle in self.get_window_handles() if handle not in previous_window_handles]
+            return new_window_handles["inner"]
 
         def new_window_opened():
             return len(get_new_window_handles()) > 0
 
         self.waiter().wait_for(new_window_opened)
-        self.switch_to_window(get_new_window_handles()[0])
+        self.switch_to_window(new_window_handles["inner"][0])
 
     def close_window(self, window_reference="current"):
         """
