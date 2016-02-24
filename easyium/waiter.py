@@ -3,7 +3,7 @@ import time
 from selenium.common.exceptions import NoAlertPresentException
 
 from .config import DEFAULT, default_config
-from .exceptions import TimeoutException, ElementTimeoutException, WebDriverTimeoutException, NoSuchElementException
+from .exceptions import TimeoutException, ElementTimeoutException, WebDriverTimeoutException
 
 __author__ = 'karl.gong'
 
@@ -86,9 +86,24 @@ class ElementWaitFor:
         """
         self.__wait_for(ElementVisible(self.__element), self.__interval, self.__timeout, self.__pre_wait_time, self.__post_wait_time)
 
+    def text_equals(self, text):
+        """
+            Wait for this element's text equals the expected text.
+
+        :param text: the expected text
+
+        :Usage:
+            # wait for text not empty
+            StaticElement(driver, "id=change_text").wait_for().not_().text_equals("")
+        """
+        start_time = time.time() * 1000.0
+        self.__element.wait_for(self.__interval, self.__timeout, self.__pre_wait_time, 0).exists()
+        rest_timeout = start_time + self.__timeout - time.time() * 1000.0
+        self.__wait_for(ElementTextEquals(self.__element, text), self.__interval, rest_timeout, 0, self.__post_wait_time)
+
     def attribute_equals(self, attribute, value):
         """
-            Wait for this element's attribute value equals the value.
+            Wait for this element's attribute value equals the expected value.
 
         :param attribute: the attribute of this element.
         :param value: the expected value.
@@ -156,6 +171,17 @@ class ElementVisible:
 
     def __str__(self):
         return "ElementVisible [\n%s\n]" % self.__element
+
+class ElementTextEquals:
+    def __init__(self, element, text):
+        self.__element = element
+        self.__text = text
+
+    def occurred(self):
+        return self.__element._selenium_element().text == self.__text
+
+    def __str__(self):
+        return "ElementTextEquals [element: \n%s\n][text: %s]" % (self.__element, self.__text)
 
 class ElementAttributeEquals:
     def __init__(self, element, attribute, value):
@@ -253,18 +279,19 @@ class WebDriverWaitFor:
         """
         self.__wait_for(TextPresent(self.__web_driver, text))
 
-    def url_changed(self, previous_url):
+    def url_equals(self, url):
         """
-            Wait for the url changed.
+            Wait for the url equals expected url.
 
-        :param previous_url: the url before url changed
+        :param url: the expected url
 
         :Usage:
+            # wait for url changed
             previous_url = driver.get_current_url()
             StaticElement(driver, "id=change_url").click() # url changed
-            driver.wait_for().url_changed(previous_url)
+            driver.wait_for().not_.url_equals(previous_url)
         """
-        self.__wait_for(URLChanged(self.__web_driver, previous_url))
+        self.__wait_for(URLEquals(self.__web_driver, url))
 
 
 class AlertPresent:
@@ -288,19 +315,19 @@ class TextPresent:
         self.__text = text
 
     def occurred(self):
-        return self.__web_driver.has_child("xpath=//*[contains(text(), '%s')]" % self.__text)
+        return self.__web_driver.has_child("xpath=//*[contains(., '%s')]" % self.__text)
 
     def __str__(self):
         return "TextPresent [webdriver: \n%s\n][text: %s]" % (self.__web_driver, self.__text)
 
 
-class URLChanged:
-    def __init__(self, web_driver, previous_url):
+class URLEquals:
+    def __init__(self, web_driver, url):
         self.__web_driver = web_driver
-        self.__previous_url = previous_url
+        self.__url = url
 
     def occurred(self):
-        return self.__web_driver._selenium_web_driver().current_url != self.__previous_url
+        return self.__web_driver._selenium_web_driver().current_url == self.__url
 
     def __str__(self):
-        return "URLChanged [\n%s\n]" % self.__web_driver
+        return "URLEquals [webdriver: \n%s\n][url: %s]" % (self.__web_driver, self.__url)
