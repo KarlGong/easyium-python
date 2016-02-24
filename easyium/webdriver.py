@@ -932,6 +932,12 @@ class WebDriver(Context):
     def __str__(self):
         return "WebDriver <WebDriverType: %s><SessionId: %s>" % (self.__web_driver_type, self.__selenium_web_driver.session_id)
 
+    def __enter__(self):
+        return self
+
+    def __exit__(self, exc_type, exc_val, exc_tb):
+        self.quit()
+
 
 Browser = WebDriver
 BrowserType = WebDriverType
