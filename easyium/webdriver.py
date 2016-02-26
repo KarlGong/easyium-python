@@ -517,15 +517,18 @@ class WebDriver(Context):
         """
         return self.__selenium_web_driver.get_window_position(window_reference)
 
+    @SupportedBy(WebDriverType._MOBILE)
     def get_orientation(self):
         """
             Gets the current orientation of the device
         """
         return self.__selenium_web_driver.orientation
 
+    @SupportedBy(WebDriverType._MOBILE)
     def set_orientation(self, value):
         """
             Sets the current orientation of the device
+
         :param value: orientation to set it to, allowed_values: LANDSCAPE, PORTRAIT
         """
         self.__selenium_web_driver.orientation = value.upper()
@@ -699,7 +702,7 @@ class WebDriver(Context):
         self.__selenium_web_driver.push_file(path, base64data)
 
     @SupportedBy(WebDriverType._MOBILE)
-    def send_to_background(self, duration):
+    def background_app(self, duration):
         """
             Puts the application in the background on the device for a certain duration.
 
