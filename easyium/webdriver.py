@@ -344,20 +344,6 @@ class WebDriver(Context):
         """
         return self.__selenium_web_driver.get_cookie(name)
 
-    def delete_cookie(self, name):
-        """
-            Deletes a single cookie with the given name.
-
-        :param name: the cookie name
-        """
-        self.__selenium_web_driver.delete_cookie(name)
-
-    def delete_all_cookies(self):
-        """
-            Delete all cookies in the scope of the session.
-        """
-        self.__selenium_web_driver.delete_all_cookies()
-
     def add_cookie(self, cookie_dict):
         """
             Adds a cookie to your current session.
@@ -371,6 +357,20 @@ class WebDriver(Context):
             driver.add_cookie({'name' : 'foo', 'value' : 'bar', 'path' : '/', 'secure':True})
         """
         self.__selenium_web_driver.add_cookie(cookie_dict)
+
+    def delete_cookie(self, name):
+        """
+            Deletes a single cookie with the given name.
+
+        :param name: the cookie name
+        """
+        self.__selenium_web_driver.delete_cookie(name)
+
+    def delete_all_cookies(self):
+        """
+            Delete all cookies in the scope of the session.
+        """
+        self.__selenium_web_driver.delete_all_cookies()
 
     def get_desired_capabilities(self):
         """
@@ -605,23 +605,6 @@ class WebDriver(Context):
         self.execute_script("mobile: scroll", scroll_params)
 
     @SupportedBy(WebDriverType._MOBILE)
-    def app_strings(self, language=None, string_file=None):
-        """
-            Returns the application strings from the device for the specified language.
-
-        :param language: strings language code
-        :param string_file: the name of the string file to query
-        """
-        return self.__selenium_web_driver.app_strings(language, string_file)
-
-    @SupportedBy(WebDriverType._MOBILE)
-    def reset_current_app(self):
-        """
-            Resets the current application on the device.
-        """
-        self.__selenium_web_driver.reset()
-
-    @SupportedBy(WebDriverType._MOBILE)
     def hide_keyboard(self, key_name=None, key=None, strategy=None):
         """
             Hides the software keyboard on the device. In iOS, use `key_name` to press
@@ -666,13 +649,6 @@ class WebDriver(Context):
         """
         self.__selenium_web_driver.long_press_keycode(keycode, metastate)
 
-    @SupportedBy(WebDriverType.ANDROID)
-    def get_current_activity(self):
-        """
-            Retrieves the current activity on the device.
-        """
-        return self.__selenium_web_driver.current_activity
-
     @SupportedBy(WebDriverType._MOBILE)
     def pull_file(self, path):
         """
@@ -702,22 +678,14 @@ class WebDriver(Context):
         self.__selenium_web_driver.push_file(path, base64data)
 
     @SupportedBy(WebDriverType._MOBILE)
-    def background_app(self, duration):
+    def app_strings(self, language=None, string_file=None):
         """
-            Puts the application in the background on the device for a certain duration.
+            Returns the application strings from the device for the specified language.
 
-         :param duration: the duration for the application to remain in the background, in ms.
+        :param language: strings language code
+        :param string_file: the name of the string file to query
         """
-        self.__selenium_web_driver.background_app(duration / 1000.0)
-
-    @SupportedBy(WebDriverType._MOBILE)
-    def is_app_installed(self, bundle_id):
-        """
-            Checks whether the application specified by `bundle_id` is installed on the device.
-
-        :param bundle_id: the id of the application to query
-        """
-        return self.__selenium_web_driver.is_app_installed(bundle_id)
+        return self.__selenium_web_driver.app_strings(language, string_file)
 
     @SupportedBy(WebDriverType._MOBILE)
     def install_app(self, app_path):
@@ -729,11 +697,20 @@ class WebDriver(Context):
         self.__selenium_web_driver.install_app(app_path)
 
     @SupportedBy(WebDriverType._MOBILE)
+    def is_app_installed(self, bundle_id):
+        """
+            Checks whether the application specified by `bundle_id` is installed on the device.
+
+        :param bundle_id: the id of the application to query
+        """
+        return self.__selenium_web_driver.is_app_installed(bundle_id)
+
+    @SupportedBy(WebDriverType._MOBILE)
     def remove_app(self, app_id):
         """
             Remove the specified application from the device.
 
-         :param app_id: the application id to be removed
+        :param app_id: the application id to be removed
         """
         self.__selenium_web_driver.remove_app(app_id)
 
@@ -750,6 +727,29 @@ class WebDriver(Context):
             Stop the running application, specified in the desired capabilities, on the device.
         """
         self.__selenium_web_driver.close_app()
+
+    @SupportedBy(WebDriverType._MOBILE)
+    def reset_app(self):
+        """
+            Resets the current application on the device.
+        """
+        self.__selenium_web_driver.reset()
+
+    @SupportedBy(WebDriverType._MOBILE)
+    def background_app(self, duration):
+        """
+            Puts the application in the background on the device for a certain duration.
+
+         :param duration: the duration for the application to remain in the background, in ms.
+        """
+        self.__selenium_web_driver.background_app(duration / 1000.0)
+
+    @SupportedBy(WebDriverType.ANDROID)
+    def get_current_activity(self):
+        """
+            Retrieves the current activity on the device.
+        """
+        return self.__selenium_web_driver.current_activity
 
     @SupportedBy(WebDriverType.ANDROID)
     def start_activity(self, app_package, app_activity, app_wait_package=DEFAULT, app_wait_activity=DEFAULT,
