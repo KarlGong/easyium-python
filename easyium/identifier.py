@@ -1,6 +1,3 @@
-__author__ = 'karl.gong'
-
-
 class Identifier:
     @staticmethod
     def id(element):

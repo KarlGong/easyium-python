@@ -7,8 +7,6 @@ from .exceptions import EasyiumException, NoSuchElementException
 from .waiter import ElementWaitFor
 from .enumeration import WebDriverType
 
-__author__ = 'karl.gong'
-
 
 class Element(Context):
     def __init__(self, parent):
@@ -137,7 +135,8 @@ class Element(Context):
             Simulates typing into this element.
 
         :param value: A string for typing, or setting form fields.  For setting
-            file inputs, this could be a local file path.
+            file inputs, this could be a local file path. For special keys codes,
+            use enum selenium.webdriver.common.Keys.
 
         Use this to send simple key events or to fill out form fields::
 

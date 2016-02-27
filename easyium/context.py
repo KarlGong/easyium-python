@@ -6,8 +6,6 @@ from .waiter import Waiter
 from .config import DEFAULT
 from . import exceptions
 
-__author__ = 'karl.gong'
-
 
 class Context:
     def __init__(self):

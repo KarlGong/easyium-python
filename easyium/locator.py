@@ -3,8 +3,6 @@ from selenium.webdriver.common.by import By
 from .exceptions import InvalidLocatorException
 from . import appium_installed
 
-__author__ = 'karl.gong'
-
 locator_to_by_map = {
     "id": By.ID,
     "xpath": By.XPATH,

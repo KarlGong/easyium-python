@@ -1,5 +1,3 @@
-__author__ = 'karl.gong'
-
 # place holder for using default value
 DEFAULT = "DEFAULT"
 

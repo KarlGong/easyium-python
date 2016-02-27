@@ -1,7 +1,5 @@
 import re
 
-__author__ = 'karl.gong'
-
 filter_msg_regex = re.compile(r"\n  \(Session info:.*?\)\n  \(Driver info:.*?\(.*?\).*?\)")
 
 

@@ -1,8 +1,6 @@
 from .exceptions import NotPersistException, LatePersistException
 from .element import Element
 
-__author__ = 'karl.gong'
-
 
 class DynamicElement(Element):
     def __init__(self, parent, selenium_element, found_by, identifier):

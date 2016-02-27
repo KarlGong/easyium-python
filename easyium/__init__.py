@@ -13,5 +13,3 @@ from .identifier import Identifier
 from .staticelement import StaticElement
 from .waiter import Waiter
 from .webdriver import WebDriver, Browser
-
-__author__ = 'karl.gong'

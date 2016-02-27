@@ -2,8 +2,6 @@ import functools
 
 from .exceptions import UnsupportedOperationException
 
-__author__ = 'karl.gong'
-
 
 def SupportedBy(*web_driver_types):
     def handle_func(func):

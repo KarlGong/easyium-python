@@ -9,8 +9,6 @@ from .exceptions import UnsupportedWebDriverTypeException
 from .config import DEFAULT, default_config
 from .decorator import SupportedBy
 
-__author__ = 'karl.gong'
-
 
 class WebDriver(Context):
     def __init__(self, web_driver_type=WebDriverType.CHROME, page_load_timeout=DEFAULT, script_timeout=DEFAULT,
@@ -73,14 +71,14 @@ class WebDriver(Context):
 
     def create_action_chains(self):
         """
-            Create a new ActionChains instance.
+            Create a new selenium.webdriver.common.ActionChains instance.
         """
         return ActionChains(self._selenium_web_driver())
 
     @SupportedBy(WebDriverType._MOBILE)
     def create_touch_action(self):
         """
-            Create a new TouchAction instance.
+            Create a new appium.webdriver.common.TouchAction instance.
         """
         from appium.webdriver.common.touch_action import TouchAction
         return TouchAction(self._selenium_web_driver())
@@ -88,7 +86,7 @@ class WebDriver(Context):
     @SupportedBy(WebDriverType._MOBILE)
     def create_multi_action(self):
         """
-            Create a new MultiAction instance.
+            Create a new appium.webdriver.common.MultiAction instance.
         """
         from appium.webdriver.common.multi_action import MultiAction
         return MultiAction(self._selenium_web_driver())

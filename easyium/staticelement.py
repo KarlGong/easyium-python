@@ -1,7 +1,5 @@
 from .element import Element
 
-__author__ = 'karl.gong'
-
 
 class StaticElement(Element):
     def __init__(self, parent, locator):

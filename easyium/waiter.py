@@ -7,8 +7,6 @@ from .decorator import SupportedBy
 from .exceptions import TimeoutException, ElementTimeoutException, WebDriverTimeoutException
 from .enumeration import WebDriverType
 
-__author__ = 'karl.gong'
-
 
 class Waiter:
     def __init__(self, interval=DEFAULT, timeout=DEFAULT, pre_wait_time=DEFAULT, post_wait_time=DEFAULT):
