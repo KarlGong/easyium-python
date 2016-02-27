@@ -85,7 +85,7 @@ class Element(Context):
         try:
             try:
                 self._selenium_element().clear()
-            except (NoSuchElementException, StaleElementReferenceException):
+            except (NoSuchElementException, StaleElementReferenceException, ElementNotVisibleException):
                 self.wait_for().visible()
                 self._selenium_element().clear()
         except WebDriverException as wde:
@@ -111,7 +111,7 @@ class Element(Context):
         try:
             try:
                 self.get_web_driver().create_action_chains().double_click(self._selenium_element()).perform()
-            except (NoSuchElementException, StaleElementReferenceException):
+            except (NoSuchElementException, StaleElementReferenceException, ElementNotVisibleException):
                 self.wait_for().visible()
                 self.get_web_driver().create_action_chains().double_click(self._selenium_element()).perform()
         except WebDriverException as wde:
