@@ -3,28 +3,13 @@ from selenium.common.exceptions import NoAlertPresentException
 
 from .alert import Alert
 from .context import Context
+from .enumeration import WebDriverType
 from .waiter import WebDriverWaitFor
 from .exceptions import UnsupportedWebDriverTypeException
 from .config import DEFAULT, default_config
 from .decorator import SupportedBy
 
 __author__ = 'karl.gong'
-
-
-class WebDriverType:
-    IE = "ie"
-    FIREFOX = "firefox"
-    CHROME = "chrome"
-    OPERA = "opera"
-    SAFARI = "safari"
-    EDGE = "edge"
-    PHANTOMJS = "phantomjs"
-    ANDROID = "android"
-    IOS = "ios"
-
-    _BROWSER = [IE, FIREFOX, CHROME, OPERA, SAFARI, PHANTOMJS]
-    _MOBILE = [ANDROID, IOS]
-    _ALL = _BROWSER + _MOBILE
 
 
 class WebDriver(Context):
@@ -943,4 +928,3 @@ class WebDriver(Context):
 
 
 Browser = WebDriver
-BrowserType = WebDriverType

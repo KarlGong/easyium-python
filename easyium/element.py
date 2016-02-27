@@ -5,7 +5,7 @@ from .context import Context
 from .decorator import SupportedBy
 from .exceptions import EasyiumException, NoSuchElementException
 from .waiter import ElementWaitFor
-from .webdriver import WebDriverType
+from .enumeration import WebDriverType
 
 __author__ = 'karl.gong'
 

@@ -3,7 +3,9 @@ import time
 from selenium.common.exceptions import NoAlertPresentException
 
 from .config import DEFAULT, default_config
+from .decorator import SupportedBy
 from .exceptions import TimeoutException, ElementTimeoutException, WebDriverTimeoutException
+from .enumeration import WebDriverType
 
 __author__ = 'karl.gong'
 
@@ -51,6 +53,7 @@ class Waiter:
 class ElementWaitFor:
     def __init__(self, element, interval, timeout, pre_wait_time, post_wait_time):
         self.__element = element
+        self.__element__ = element
         self.__desired_occurrence = True
         self.__interval = interval
         self.__timeout = timeout
@@ -245,6 +248,7 @@ class ElementAttributeContainsAll:
 class WebDriverWaitFor:
     def __init__(self, web_driver, interval, timeout, pre_wait_time, post_wait_time):
         self.__web_driver = web_driver
+        self.__web_driver__ = web_driver
         self.__desired_occurrence = True
         self.__waiter = Waiter(interval, timeout, pre_wait_time, post_wait_time)
 
@@ -293,6 +297,15 @@ class WebDriverWaitFor:
         """
         self.__wait_for(URLEquals(self.__web_driver, url))
 
+    @SupportedBy(WebDriverType.ANDROID)
+    def activity_present(self, activity):
+        """
+            Wait for the activity present.
+
+        :param activity: the activity to wait
+        """
+        self.__wait_for(ActivityPresent(self.__web_driver, activity))
+
 
 class AlertPresent:
     def __init__(self, web_driver):
@@ -331,3 +344,15 @@ class URLEquals:
 
     def __str__(self):
         return "URLEquals [webdriver: \n%s\n][url: %s]" % (self.__web_driver, self.__url)
+
+
+class ActivityPresent:
+    def __init__(self, web_driver, activity):
+        self.__web_driver = web_driver
+        self.__activity = activity
+
+    def occurred(self):
+        return self.__web_driver._selenium_web_driver().current_activity == self.__activity
+
+    def __str__(self):
+        return "ActivityPresent [webdriver: \n%s\n][activity: %s]" % (self.__web_driver, self.__activity)
