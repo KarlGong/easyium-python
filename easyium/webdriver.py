@@ -23,7 +23,8 @@ class WebDriver(Context):
         :param wait_timeout: the wait timeout (in milliseconds), default value is from default_config.web_driver_wait_timeout
         :param pre_wait_time: the pre wait time (in milliseconds), default value is from default_config.web_driver_pre_wait_time
         :param post_wait_time: the post wait time (in milliseconds), default value is from default_config.web_driver_post_wait_time
-        :param kwargs: the keyword args for the web driver specified by web_driver_type
+        :param kwargs: the keyword args for the web driver specified by web_driver_type.
+            For the keyword args, please refer to the WebDriver classes in selenium.webdriver.*.webdriver or appium.webdriver.webdriver
         """
         Context.__init__(self)
         self.__web_driver_type = web_driver_type.lower()
