@@ -16,28 +16,63 @@ class Element(Context):
         self.__parent = parent
 
     def get_web_driver(self):
+        """
+            Get the web driver of this element.
+
+        :return: the web driver
+        """
         return self.get_parent().get_web_driver()
 
     get_browser = get_web_driver
 
     def get_web_driver_type(self):
+        """
+            Get the type of this element's web driver.
+
+        :return: the web driver type
+        """
         return self.get_web_driver().get_web_driver_type()
 
     get_browser_type = get_web_driver_type
 
     def get_wait_interval(self):
+        """
+            Get the wait interval of this element's web driver.
+
+        :return: the wait interval
+        """
         return self.get_web_driver().get_wait_interval()
 
     def get_wait_timeout(self):
+        """
+            Get the wait timeout of this element's web driver.
+
+        :return: the wait timeout
+        """
         return self.get_web_driver().get_wait_timeout()
 
     def get_pre_wait_time(self):
+        """
+            Get the pre-wait time of this element's web driver.
+
+        :return: the pre-wait time
+        """
         return self.get_web_driver().get_pre_wait_time()
 
     def get_post_wait_time(self):
+        """
+            Get the post-wait time of this element's web driver.
+
+        :return: the post-wait time
+        """
         return self.get_web_driver().get_post_wait_time()
 
     def get_parent(self):
+        """
+            Get the parent of this element.
+
+        :return: the parent of this element
+        """
         return self.__parent
 
     def _selenium_context(self):

@@ -16,7 +16,7 @@ class WebDriver(Context):
         """
             Creates a new instance of the WebDriver.
 
-        :param web_driver_type: the web driver type
+        :param web_driver_type: the web driver type, use values of enumeration easyium.WebDriverType
         :param page_load_timeout: the page load timeout (in milliseconds), default value is from default_config.web_driver_page_load_timeout
         :param script_timeout: the script timeout (in milliseconds), default value is from default_config.web_driver_script_timeout
         :param wait_interval: the wait interval (in milliseconds), default value is from default_config.web_driver_wait_interval
@@ -61,11 +61,21 @@ class WebDriver(Context):
         return self.__selenium_web_driver
 
     def get_web_driver(self):
+        """
+            Get self.
+
+        :return: self
+        """
         return self
 
     get_browser = get_web_driver
 
     def get_web_driver_type(self):
+        """
+            Get type of this web driver.
+
+        :return: the web driver type
+        """
         return self.__web_driver_type
 
     get_browser_type = get_web_driver_type
@@ -93,15 +103,35 @@ class WebDriver(Context):
         return MultiAction(self._selenium_web_driver())
 
     def get_wait_interval(self):
+        """
+            Get the wait interval of this web driver.
+
+        :return: the wait interval
+        """
         return self.__wait_interval
 
     def get_wait_timeout(self):
+        """
+            Get the wait timeout of this web driver.
+
+        :return: the wait timeout
+        """
         return self.__wait_timeout
 
     def get_pre_wait_time(self):
+        """
+            Get the pre-wait time of this web driver.
+
+        :return: the pre-wait time
+        """
         return self.__pre_wait_time
 
     def get_post_wait_time(self):
+        """
+            Get the post-wait time of this web driver.
+
+        :return: the post-wait time
+        """
         return self.__post_wait_time
 
     def wait_for(self, interval=DEFAULT, timeout=DEFAULT, pre_wait_time=DEFAULT, post_wait_time=DEFAULT):
