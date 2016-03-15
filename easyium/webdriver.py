@@ -961,7 +961,7 @@ class WebDriver(Context):
 
 class Ie(WebDriver):
     def __init__(self, executable_path='IEDriverServer.exe', capabilities=None,
-                port=0, timeout=30, host=None,
+                port=0, timeout=30000, host=None,
                 log_level=None, log_file=None,
                 page_load_timeout=DEFAULT, script_timeout=DEFAULT,
                 wait_interval=DEFAULT, wait_timeout=DEFAULT,
@@ -972,7 +972,7 @@ class Ie(WebDriver):
         :param executable_path: path to the IEDriver
         :param capabilities: a dictionary of capabilities to request when starting the browser session
         :param port: port you would like the service to run, if left as 0, a free port will be found.
-        :param timeout: connection timeout for IEDriver
+        :param timeout: connection timeout for IEDriver, in milliseconds
         :param host: IP address the service port is bound
         :param log_level: Level of logging of service, may be "FATAL", "ERROR", "WARN", "INFO", "DEBUG", "TRACE". Default is "FATAL".
         :param log_file: Target of logging of service, may be "stdout", "stderr" or file path. Default is "stdout".
@@ -983,6 +983,7 @@ class Ie(WebDriver):
         :param pre_wait_time: the pre wait time (in milliseconds), default value is from default_config.web_driver_pre_wait_time
         :param post_wait_time: the post wait time (in milliseconds), default value is from default_config.web_driver_post_wait_time
         """
+        timeout /= 1000.0
         WebDriver.__init__(self, web_driver_type=WebDriverType.IE,
                         executable_path=executable_path, capabilities=capabilities,
                         port=port, timeout=timeout, host=host,
@@ -993,7 +994,7 @@ class Ie(WebDriver):
 
 
 class Firefox(WebDriver):
-    def __init__(self, firefox_profile=None, firefox_binary=None, timeout=30,
+    def __init__(self, firefox_profile=None, firefox_binary=None, timeout=30000,
                  capabilities=None, proxy=None, executable_path="wires",
                  page_load_timeout=DEFAULT, script_timeout=DEFAULT,
                  wait_interval=DEFAULT, wait_timeout=DEFAULT,
@@ -1003,7 +1004,7 @@ class Firefox(WebDriver):
 
         :param firefox_profile: the firefox profile
         :param firefox_binary: the firefox binary
-        :param timeout: connection timeout for firefox extension
+        :param timeout: connection timeout for firefox extension, in milliseconds
         :param capabilities: a dictionary of capabilities to request when starting the browser session
         :param proxy: the firefox proxy
         :param executable_path: path to the GeckoDriver binary
@@ -1014,6 +1015,7 @@ class Firefox(WebDriver):
         :param pre_wait_time: the pre wait time (in milliseconds), default value is from default_config.web_driver_pre_wait_time
         :param post_wait_time: the post wait time (in milliseconds), default value is from default_config.web_driver_post_wait_time
         """
+        timeout /= 1000.0
         WebDriver.__init__(self, web_driver_type=WebDriverType.FIREFOX,
                         firefox_profile=firefox_profile, firefox_binary=firefox_binary, timeout=timeout,
                         capabilities=capabilities, proxy=proxy, executable_path=executable_path,
