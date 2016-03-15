@@ -5,11 +5,11 @@ except ImportError:
     appium_installed = False
 
 from .config import default_config
-from .enumeration import WebDriverType, BrowserType
+from .enumeration import WebDriverType
 from .exceptions import EasyiumException, TimeoutException, ElementTimeoutException, WebDriverTimeoutException, \
     NoSuchElementException, NotPersistException, LatePersistException, UnsupportedWebDriverTypeException, \
     InvalidLocatorException, UnsupportedOperationException
 from .identifier import Identifier
 from .staticelement import StaticElement
 from .waiter import Waiter
-from .webdriver import WebDriver, Browser
+from .webdriver import WebDriver, Ie, Firefox, Chrome, Opera, Safari, Edge, PhantomJS, Ios, Android

@@ -12,5 +12,3 @@ class WebDriverType:
     _BROWSER = [IE, FIREFOX, CHROME, OPERA, SAFARI, PHANTOMJS]
     _MOBILE = [ANDROID, IOS]
     _ALL = _BROWSER + _MOBILE
-
-BrowserType = WebDriverType

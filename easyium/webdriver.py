@@ -1,4 +1,4 @@
-from selenium.webdriver import Ie, Firefox, Chrome, Opera, Safari, Edge, PhantomJS, ActionChains
+from selenium.webdriver import ActionChains
 from selenium.common.exceptions import NoAlertPresentException
 
 from .alert import Alert
@@ -12,7 +12,7 @@ from .decorator import SupportedBy
 
 class WebDriver(Context):
     def __init__(self, web_driver_type=WebDriverType.CHROME, page_load_timeout=DEFAULT, script_timeout=DEFAULT,
-                 wait_interval=DEFAULT, wait_timeout=DEFAULT, pre_wait_time=DEFAULT, post_wait_time=DEFAULT, **kwargs):
+                wait_interval=DEFAULT, wait_timeout=DEFAULT, pre_wait_time=DEFAULT, post_wait_time=DEFAULT, **kwargs):
         """
             Creates a new instance of the WebDriver.
 
@@ -29,18 +29,25 @@ class WebDriver(Context):
         Context.__init__(self)
         self.__web_driver_type = web_driver_type.lower()
         if self.__web_driver_type == WebDriverType.IE:
+            from selenium.webdriver import Ie
             self.__selenium_web_driver = Ie(**kwargs)
         elif self.__web_driver_type == WebDriverType.FIREFOX:
+            from selenium.webdriver import Firefox
             self.__selenium_web_driver = Firefox(**kwargs)
         elif self.__web_driver_type == WebDriverType.CHROME:
+            from selenium.webdriver import Chrome
             self.__selenium_web_driver = Chrome(**kwargs)
         elif self.__web_driver_type == WebDriverType.OPERA:
+            from selenium.webdriver import Opera
             self.__selenium_web_driver = Opera(**kwargs)
         elif self.__web_driver_type == WebDriverType.SAFARI:
+            from selenium.webdriver import Safari
             self.__selenium_web_driver = Safari(**kwargs)
         elif self.__web_driver_type == WebDriverType.EDGE:
+            from selenium.webdriver import Edge
             self.__selenium_web_driver = Edge(**kwargs)
         elif self.__web_driver_type == WebDriverType.PHANTOMJS:
+            from selenium.webdriver import PhantomJS
             self.__selenium_web_driver = PhantomJS(**kwargs)
         elif self.__web_driver_type in WebDriverType._MOBILE:
             from appium.webdriver.webdriver import WebDriver as Mobile
@@ -68,8 +75,6 @@ class WebDriver(Context):
         """
         return self
 
-    get_browser = get_web_driver
-
     def get_web_driver_type(self):
         """
             Get type of this web driver.
@@ -77,8 +82,6 @@ class WebDriver(Context):
         :return: the web driver type
         """
         return self.__web_driver_type
-
-    get_browser_type = get_web_driver_type
 
     def create_action_chains(self):
         """
@@ -956,4 +959,278 @@ class WebDriver(Context):
         self.quit()
 
 
-Browser = WebDriver
+class Ie(WebDriver):
+    def __init__(self, executable_path='IEDriverServer.exe', capabilities=None,
+                port=0, timeout=30, host=None,
+                log_level=None, log_file=None,
+                page_load_timeout=DEFAULT, script_timeout=DEFAULT,
+                wait_interval=DEFAULT, wait_timeout=DEFAULT,
+                pre_wait_time=DEFAULT, post_wait_time=DEFAULT):
+        """
+            Creates a new instance of Ie.
+
+        :param executable_path: path to the IEDriver
+        :param capabilities: a dictionary of capabilities to request when starting the browser session
+        :param port: port you would like the service to run, if left as 0, a free port will be found.
+        :param timeout: connection timeout for IEDriver
+        :param host: IP address the service port is bound
+        :param log_level: Level of logging of service, may be "FATAL", "ERROR", "WARN", "INFO", "DEBUG", "TRACE". Default is "FATAL".
+        :param log_file: Target of logging of service, may be "stdout", "stderr" or file path. Default is "stdout".
+        :param page_load_timeout: the page load timeout (in milliseconds), default value is from default_config.web_driver_page_load_timeout
+        :param script_timeout: the script timeout (in milliseconds), default value is from default_config.web_driver_script_timeout
+        :param wait_interval: the wait interval (in milliseconds), default value is from default_config.web_driver_wait_interval
+        :param wait_timeout: the wait timeout (in milliseconds), default value is from default_config.web_driver_wait_timeout
+        :param pre_wait_time: the pre wait time (in milliseconds), default value is from default_config.web_driver_pre_wait_time
+        :param post_wait_time: the post wait time (in milliseconds), default value is from default_config.web_driver_post_wait_time
+        """
+        WebDriver.__init__(self, web_driver_type=WebDriverType.IE,
+                        executable_path=executable_path, capabilities=capabilities,
+                        port=port, timeout=timeout, host=host,
+                        log_level=log_level, log_file=log_file,
+                        page_load_timeout=page_load_timeout, script_timeout=script_timeout,
+                        wait_interval=wait_interval, wait_timeout=wait_timeout,
+                        pre_wait_time=pre_wait_time, post_wait_time=post_wait_time)
+
+
+class Firefox(WebDriver):
+    def __init__(self, firefox_profile=None, firefox_binary=None, timeout=30,
+                 capabilities=None, proxy=None, executable_path="wires",
+                 page_load_timeout=DEFAULT, script_timeout=DEFAULT,
+                 wait_interval=DEFAULT, wait_timeout=DEFAULT,
+                 pre_wait_time=DEFAULT, post_wait_time=DEFAULT):
+        """
+            Creates a new instance of Firefox.
+
+        :param firefox_profile: the firefox profile
+        :param firefox_binary: the firefox binary
+        :param timeout: connection timeout for firefox extension
+        :param capabilities: a dictionary of capabilities to request when starting the browser session
+        :param proxy: the firefox proxy
+        :param executable_path: path to the GeckoDriver binary
+        :param page_load_timeout: the page load timeout (in milliseconds), default value is from default_config.web_driver_page_load_timeout
+        :param script_timeout: the script timeout (in milliseconds), default value is from default_config.web_driver_script_timeout
+        :param wait_interval: the wait interval (in milliseconds), default value is from default_config.web_driver_wait_interval
+        :param wait_timeout: the wait timeout (in milliseconds), default value is from default_config.web_driver_wait_timeout
+        :param pre_wait_time: the pre wait time (in milliseconds), default value is from default_config.web_driver_pre_wait_time
+        :param post_wait_time: the post wait time (in milliseconds), default value is from default_config.web_driver_post_wait_time
+        """
+        WebDriver.__init__(self, web_driver_type=WebDriverType.FIREFOX,
+                        firefox_profile=firefox_profile, firefox_binary=firefox_binary, timeout=timeout,
+                        capabilities=capabilities, proxy=proxy, executable_path=executable_path,
+                        page_load_timeout=page_load_timeout, script_timeout=script_timeout,
+                        wait_interval=wait_interval, wait_timeout=wait_timeout,
+                        pre_wait_time=pre_wait_time, post_wait_time=post_wait_time)
+
+
+class Chrome(WebDriver):
+    def __init__(self, executable_path="chromedriver", port=0,
+                 chrome_options=None, service_args=None,
+                 desired_capabilities=None, service_log_path=None,
+                 page_load_timeout=DEFAULT, script_timeout=DEFAULT,
+                 wait_interval=DEFAULT, wait_timeout=DEFAULT,
+                 pre_wait_time=DEFAULT, post_wait_time=DEFAULT):
+        """
+            Creates a new instance of Chrome.
+
+        :param executable_path: path to the executable. If the default is used it assumes the executable is in the $PATH
+        :param port: port you would like the service to run, if left as 0, a free port will be found.
+        :param chrome_options: this takes an instance of ChromeOptions
+        :param service_args: list of args to pass to the chromedriver service
+        :param desired_capabilities: Dictionary object with non-browser specific capabilities only, such as "proxy" or "loggingPref".
+        :param service_log_path: path for the chromedriver service to log to
+        :param page_load_timeout: the page load timeout (in milliseconds), default value is from default_config.web_driver_page_load_timeout
+        :param script_timeout: the script timeout (in milliseconds), default value is from default_config.web_driver_script_timeout
+        :param wait_interval: the wait interval (in milliseconds), default value is from default_config.web_driver_wait_interval
+        :param wait_timeout: the wait timeout (in milliseconds), default value is from default_config.web_driver_wait_timeout
+        :param pre_wait_time: the pre wait time (in milliseconds), default value is from default_config.web_driver_pre_wait_time
+        :param post_wait_time: the post wait time (in milliseconds), default value is from default_config.web_driver_post_wait_time
+        """
+        WebDriver.__init__(self, web_driver_type=WebDriverType.CHROME,
+                        executable_path=executable_path, port=port,
+                        chrome_options=chrome_options, service_args=service_args,
+                        desired_capabilities=desired_capabilities, service_log_path=service_log_path,
+                        page_load_timeout=page_load_timeout, script_timeout=script_timeout,
+                        wait_interval=wait_interval, wait_timeout=wait_timeout,
+                        pre_wait_time=pre_wait_time, post_wait_time=post_wait_time)
+
+
+class Opera(WebDriver):
+    def __init__(self, executable_path=None, port=0,
+                 opera_options=None, service_args=None,
+                 desired_capabilities=None, service_log_path=None,
+                 page_load_timeout=DEFAULT, script_timeout=DEFAULT,
+                 wait_interval=DEFAULT, wait_timeout=DEFAULT,
+                 pre_wait_time=DEFAULT, post_wait_time=DEFAULT):
+        """
+            Creates a new instance of Opera.
+
+        :param executable_path: path to the executable. If the default is used, it assumes the executable is in the $PATH
+        :param port: port you would like the service to run, if left as 0, a free port will be found.
+        :param opera_options: this takes an instance of ChromeOptions
+        :param service_args: list of args to pass to the chromedriver service
+        :param desired_capabilities: Dictionary object with non-browser specific capabilities only, such as "proxy" or "loggingPref".
+        :param service_log_path: path for the chromedriver service to log to
+        :param page_load_timeout: the page load timeout (in milliseconds), default value is from default_config.web_driver_page_load_timeout
+        :param script_timeout: the script timeout (in milliseconds), default value is from default_config.web_driver_script_timeout
+        :param wait_interval: the wait interval (in milliseconds), default value is from default_config.web_driver_wait_interval
+        :param wait_timeout: the wait timeout (in milliseconds), default value is from default_config.web_driver_wait_timeout
+        :param pre_wait_time: the pre wait time (in milliseconds), default value is from default_config.web_driver_pre_wait_time
+        :param post_wait_time: the post wait time (in milliseconds), default value is from default_config.web_driver_post_wait_time
+        """
+        WebDriver.__init__(self, web_driver_type=WebDriverType.OPERA,
+                        executable_path=executable_path, port=port,
+                        opera_options=opera_options, service_args=service_args,
+                        desired_capabilities=desired_capabilities, service_log_path=service_log_path,
+                        page_load_timeout=page_load_timeout, script_timeout=script_timeout,
+                        wait_interval=wait_interval, wait_timeout=wait_timeout,
+                        pre_wait_time=pre_wait_time, post_wait_time=post_wait_time)
+
+
+class Safari(WebDriver):
+    def __init__(self, executable_path=None, port=0,
+                 desired_capabilities=None, quiet=False,
+                 page_load_timeout=DEFAULT, script_timeout=DEFAULT,
+                 wait_interval=DEFAULT, wait_timeout=DEFAULT,
+                 pre_wait_time=DEFAULT, post_wait_time=DEFAULT):
+        """
+            Creates a new instance of Safari.
+
+        :param executable_path: path to the executable. If the default is used it assumes the executable is in the Environment Variable SELENIUM_SERVER_JAR
+        :param port: port you would like the service to run, if left as 0, a free port will be found.
+        :param desired_capabilities: a dictionary of capabilities to request when starting the browser session
+        :param quiet: whether the service runs quietly
+        :param page_load_timeout: the page load timeout (in milliseconds), default value is from default_config.web_driver_page_load_timeout
+        :param script_timeout: the script timeout (in milliseconds), default value is from default_config.web_driver_script_timeout
+        :param wait_interval: the wait interval (in milliseconds), default value is from default_config.web_driver_wait_interval
+        :param wait_timeout: the wait timeout (in milliseconds), default value is from default_config.web_driver_wait_timeout
+        :param pre_wait_time: the pre wait time (in milliseconds), default value is from default_config.web_driver_pre_wait_time
+        :param post_wait_time: the post wait time (in milliseconds), default value is from default_config.web_driver_post_wait_time
+        """
+        if desired_capabilities is None:
+            from selenium.webdriver.common.desired_capabilities import DesiredCapabilities
+            desired_capabilities = DesiredCapabilities.SAFARI
+        WebDriver.__init__(self, web_driver_type=WebDriverType.SAFARI,
+                        executable_path=executable_path, port=port,
+                        desired_capabilities=desired_capabilities, quiet=quiet,
+                        page_load_timeout=page_load_timeout, script_timeout=script_timeout,
+                        wait_interval=wait_interval, wait_timeout=wait_timeout,
+                        pre_wait_time=pre_wait_time, post_wait_time=post_wait_time)
+
+
+class Edge(WebDriver):
+    def __init__(self, executable_path='MicrosoftWebDriver.exe',
+                 capabilities=None, port=0,
+                 page_load_timeout=DEFAULT, script_timeout=DEFAULT,
+                 wait_interval=DEFAULT, wait_timeout=DEFAULT,
+                 pre_wait_time=DEFAULT, post_wait_time=DEFAULT):
+        """
+            Creates a new instance of Edge.
+
+        :param executable_path: path to the executable
+        :param capabilities: a dictionary of capabilities to request when starting the browser session
+        :param port: port you would like the service to run, if left as 0, a free port will be found.
+        :param page_load_timeout: the page load timeout (in milliseconds), default value is from default_config.web_driver_page_load_timeout
+        :param script_timeout: the script timeout (in milliseconds), default value is from default_config.web_driver_script_timeout
+        :param wait_interval: the wait interval (in milliseconds), default value is from default_config.web_driver_wait_interval
+        :param wait_timeout: the wait timeout (in milliseconds), default value is from default_config.web_driver_wait_timeout
+        :param pre_wait_time: the pre wait time (in milliseconds), default value is from default_config.web_driver_pre_wait_time
+        :param post_wait_time: the post wait time (in milliseconds), default value is from default_config.web_driver_post_wait_time
+        """
+        WebDriver.__init__(self, web_driver_type=WebDriverType.EDGE,
+                        executable_path=executable_path,
+                        capabilities=capabilities, port=port,
+                        page_load_timeout=page_load_timeout, script_timeout=script_timeout,
+                        wait_interval=wait_interval, wait_timeout=wait_timeout,
+                        pre_wait_time=pre_wait_time, post_wait_time=post_wait_time)
+
+
+class PhantomJS(WebDriver):
+    def __init__(self, executable_path="phantomjs",
+                 port=0, desired_capabilities=None,
+                 service_args=None, service_log_path=None,
+                 page_load_timeout=DEFAULT, script_timeout=DEFAULT,
+                 wait_interval=DEFAULT, wait_timeout=DEFAULT,
+                 pre_wait_time=DEFAULT, post_wait_time=DEFAULT):
+        """
+            Creates a new instance of PhantomJS.
+
+        :param executable_path: path to the executable. If the default is used it assumes the executable is in the $PATH
+        :param port: port you would like the service to run, if left as 0, a free port will be found.
+        :param desired_capabilities: a dictionary of capabilities to request when starting the browser session
+        :param service_args: a list of command line arguments to pass to PhantomJS
+        :param service_log_path: path for phantomjs service to log to
+        :param page_load_timeout: the page load timeout (in milliseconds), default value is from default_config.web_driver_page_load_timeout
+        :param script_timeout: the script timeout (in milliseconds), default value is from default_config.web_driver_script_timeout
+        :param wait_interval: the wait interval (in milliseconds), default value is from default_config.web_driver_wait_interval
+        :param wait_timeout: the wait timeout (in milliseconds), default value is from default_config.web_driver_wait_timeout
+        :param pre_wait_time: the pre wait time (in milliseconds), default value is from default_config.web_driver_pre_wait_time
+        :param post_wait_time: the post wait time (in milliseconds), default value is from default_config.web_driver_post_wait_time
+        """
+        if desired_capabilities is None:
+            from selenium.webdriver.common.desired_capabilities import DesiredCapabilities
+            desired_capabilities = DesiredCapabilities.PHANTOMJS
+        WebDriver.__init__(self, web_driver_type=WebDriverType.PHANTOMJS,
+                        executable_path=executable_path,
+                        port=port, desired_capabilities=desired_capabilities,
+                        service_args=service_args, service_log_path=service_log_path,
+                        page_load_timeout=page_load_timeout, script_timeout=script_timeout,
+                        wait_interval=wait_interval, wait_timeout=wait_timeout,
+                        pre_wait_time=pre_wait_time, post_wait_time=post_wait_time)
+
+
+class Ios(WebDriver):
+    def __init__(self, command_executor='http://127.0.0.1:4444/wd/hub',
+                 desired_capabilities=None, browser_profile=None, proxy=None, keep_alive=False,
+                 page_load_timeout=DEFAULT, script_timeout=DEFAULT,
+                 wait_interval=DEFAULT, wait_timeout=DEFAULT,
+                 pre_wait_time=DEFAULT, post_wait_time=DEFAULT):
+        """
+            Creates a new instance of IOS.
+
+        :param command_executor: Either a string representing URL of the remote server or a custom remote_connection.RemoteConnection object. Defaults to 'http://127.0.0.1:4444/wd/hub'.
+        :param desired_capabilities: a dictionary of capabilities to request when starting the browser session
+        :param browser_profile: A selenium.webdriver.firefox.firefox_profile.FirefoxProfile object. Only used if Firefox is requested. Optional.
+        :param proxy: A selenium.webdriver.common.proxy.Proxy object. The browser session will be started with given proxy settings, if possible. Optional.
+        :param keep_alive: Whether to configure remote_connection.RemoteConnection to use HTTP keep-alive. Defaults to False.
+        :param page_load_timeout: the page load timeout (in milliseconds), default value is from default_config.web_driver_page_load_timeout
+        :param script_timeout: the script timeout (in milliseconds), default value is from default_config.web_driver_script_timeout
+        :param wait_interval: the wait interval (in milliseconds), default value is from default_config.web_driver_wait_interval
+        :param wait_timeout: the wait timeout (in milliseconds), default value is from default_config.web_driver_wait_timeout
+        :param pre_wait_time: the pre wait time (in milliseconds), default value is from default_config.web_driver_pre_wait_time
+        :param post_wait_time: the post wait time (in milliseconds), default value is from default_config.web_driver_post_wait_time
+        """
+        WebDriver.__init__(self, web_driver_type=WebDriverType.IOS,
+                        command_executor=command_executor,
+                        desired_capabilities=desired_capabilities, browser_profile=browser_profile, proxy=proxy, keep_alive=keep_alive,
+                        page_load_timeout=page_load_timeout, script_timeout=script_timeout,
+                        wait_interval=wait_interval, wait_timeout=wait_timeout,
+                        pre_wait_time=pre_wait_time, post_wait_time=post_wait_time)
+
+
+class Android(WebDriver):
+    def __init__(self, command_executor='http://127.0.0.1:4444/wd/hub',
+                 desired_capabilities=None, browser_profile=None, proxy=None, keep_alive=False,
+                 page_load_timeout=DEFAULT, script_timeout=DEFAULT,
+                 wait_interval=DEFAULT, wait_timeout=DEFAULT,
+                 pre_wait_time=DEFAULT, post_wait_time=DEFAULT):
+        """
+            Creates a new instance of Android.
+
+        :param command_executor: Either a string representing URL of the remote server or a custom remote_connection.RemoteConnection object. Defaults to 'http://127.0.0.1:4444/wd/hub'.
+        :param desired_capabilities: a dictionary of capabilities to request when starting the browser session
+        :param browser_profile: A selenium.webdriver.firefox.firefox_profile.FirefoxProfile object. Only used if Firefox is requested. Optional.
+        :param proxy: A selenium.webdriver.common.proxy.Proxy object. The browser session will be started with given proxy settings, if possible. Optional.
+        :param keep_alive: Whether to configure remote_connection.RemoteConnection to use HTTP keep-alive. Defaults to False.
+        :param page_load_timeout: the page load timeout (in milliseconds), default value is from default_config.web_driver_page_load_timeout
+        :param script_timeout: the script timeout (in milliseconds), default value is from default_config.web_driver_script_timeout
+        :param wait_interval: the wait interval (in milliseconds), default value is from default_config.web_driver_wait_interval
+        :param wait_timeout: the wait timeout (in milliseconds), default value is from default_config.web_driver_wait_timeout
+        :param pre_wait_time: the pre wait time (in milliseconds), default value is from default_config.web_driver_pre_wait_time
+        :param post_wait_time: the post wait time (in milliseconds), default value is from default_config.web_driver_post_wait_time
+        """
+        WebDriver.__init__(self, web_driver_type=WebDriverType.ANDROID,
+                        command_executor=command_executor,
+                        desired_capabilities=desired_capabilities, browser_profile=browser_profile, proxy=proxy, keep_alive=keep_alive,
+                        page_load_timeout=page_load_timeout, script_timeout=script_timeout,
+                        wait_interval=wait_interval, wait_timeout=wait_timeout,
+                        pre_wait_time=pre_wait_time, post_wait_time=post_wait_time)
