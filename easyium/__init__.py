@@ -1,9 +1,3 @@
-try:
-    import appium
-    appium_installed = True
-except ImportError:
-    appium_installed = False
-
 from .config import default_config
 from .enumeration import WebDriverType
 from .exceptions import EasyiumException, TimeoutException, ElementTimeoutException, WebDriverTimeoutException, \

@@ -1,3 +1,5 @@
+from appium.webdriver.common.multi_action import MultiAction
+from appium.webdriver.common.touch_action import TouchAction
 from selenium.webdriver import ActionChains
 from selenium.common.exceptions import NoAlertPresentException
 
@@ -94,7 +96,6 @@ class WebDriver(Context):
         """
             Create a new appium.webdriver.common.TouchAction instance.
         """
-        from appium.webdriver.common.touch_action import TouchAction
         return TouchAction(self._selenium_web_driver())
 
     @SupportedBy(WebDriverType._MOBILE)
@@ -102,7 +103,6 @@ class WebDriver(Context):
         """
             Create a new appium.webdriver.common.MultiAction instance.
         """
-        from appium.webdriver.common.multi_action import MultiAction
         return MultiAction(self._selenium_web_driver())
 
     def get_wait_interval(self):
