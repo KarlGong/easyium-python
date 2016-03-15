@@ -3,7 +3,7 @@ easyium
 =======
 easyium is an easy-to-use wrapper for selenium&appium and it can make you more focus on business not the element.
 
-Find the latest version on github: https://github.com/KarlGong/easyium or PyPI: https://pypi.python.org/pypi/easyium
+Find the latest version on github: https://github.com/KarlGong/easyium-python or PyPI: https://pypi.python.org/pypi/easyium
 
 Advantages
 ----------

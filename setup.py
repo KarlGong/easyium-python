@@ -26,7 +26,7 @@ def main():
         keywords="selenium appium test testing framework automation",
         author="Karl Gong",
         author_email="karl.gong@outlook.com",
-        url="https://github.com/KarlGong/easyium",
+        url="https://github.com/KarlGong/easyium-python",
         license="Apache",
         classifiers=classifiers,
         packages=["easyium"],
