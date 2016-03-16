@@ -11,8 +11,8 @@ class Element(Context):
     def __init__(self, parent):
         Context.__init__(self)
         # self
-        self.__inner_selenium_element = None
-        self.__locator = None
+        self._inner_selenium_element = None
+        self._locator = None
         self.__parent = parent
 
     def get_web_driver(self):
@@ -40,14 +40,14 @@ class Element(Context):
         return self.__parent
 
     def _selenium_context(self):
-        if self.__inner_selenium_element is None:
+        if self._inner_selenium_element is None:
             self._refresh()
-        return self.__inner_selenium_element
+        return self._inner_selenium_element
 
     def _selenium_element(self):
-        if self.__inner_selenium_element is None:
+        if self._inner_selenium_element is None:
             self._refresh()
-        return self.__inner_selenium_element
+        return self._inner_selenium_element
 
     def wait_for(self, interval=None, timeout=None):
         """

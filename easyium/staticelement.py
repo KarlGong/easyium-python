@@ -25,20 +25,20 @@ class StaticElement(Element):
         """
         Element.__init__(self, parent)
         # from element
-        self.__inner_selenium_element = None
-        self.__locator = locator
+        self._inner_selenium_element = None
+        self._locator = locator
 
     def _refresh(self):
-        self.__inner_selenium_element = None
-        self.__inner_selenium_element = self.get_parent()._find_selenium_element(self.__locator)
+        self._inner_selenium_element = None
+        self._inner_selenium_element = self.get_parent()._find_selenium_element(self._locator)
 
     def persist(self):
         self.get_parent().persist()
 
     def __str__(self):
-        if self.__inner_selenium_element is None:
+        if self._inner_selenium_element is None:
             return "%s\n|- StaticElement <SeleniumElement: %s><Locator: %s>" % (
-                self.get_parent(), None, self.__locator)
+                self.get_parent(), None, self._locator)
         else:
             return "%s\n|- StaticElement <SeleniumElementId: %s><Locator: %s>" % (
-                self.get_parent(), self.__inner_selenium_element.id, self.__locator)
+                self.get_parent(), self._inner_selenium_element.id, self._locator)
