@@ -38,10 +38,13 @@ class Context:
     def get_wait_interval(self):
         """
             Get the wait interval of this context.
+            If the wait interval for element is not set, return the driver's wait interval.
 
         :return: the wait interval
         """
-        return self.__wait_interval
+        if self.__wait_interval is not None:
+            return self.__wait_interval
+        return self.get_web_driver().get_wait_interval()
 
     def set_wait_interval(self, interval):
         """
@@ -54,10 +57,13 @@ class Context:
     def get_wait_timeout(self):
         """
             Get the wait timeout of this context.
+            If the wait timeout for element is not set, return the driver's wait timeout.
 
         :return: the wait timeout
         """
-        return self.__wait_timeout
+        if self.__wait_timeout is not None:
+            return self.__wait_timeout
+        return self.get_web_driver().get_wait_timeout()
 
     def set_wait_timeout(self, timeout):
         """
@@ -77,8 +83,8 @@ class Context:
         :param interval: the wait interval (in milliseconds). If None, use context's wait interval.
         :param timeout: the wait timeout (in milliseconds). If None, use context's wait interval.
         """
-        _interval = interval if interval else self.get_wait_interval()
-        _timeout = timeout if timeout else self.get_wait_timeout()
+        _interval = self.get_wait_interval() if interval is None else interval
+        _timeout = self.get_wait_timeout() if timeout is None else timeout
         return Waiter(_interval, _timeout)
 
     def _find_selenium_element(self, locator):

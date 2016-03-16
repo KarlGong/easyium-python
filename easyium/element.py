@@ -14,8 +14,6 @@ class Element(Context):
         self.__inner_selenium_element = None
         self.__locator = None
         self.__parent = parent
-        self.set_wait_interval(self.get_web_driver().get_wait_interval())
-        self.set_wait_timeout(self.get_web_driver().get_wait_timeout())
 
     def get_web_driver(self):
         """
@@ -58,8 +56,8 @@ class Element(Context):
         :param interval: the wait interval (in milliseconds). If None, use element's wait interval.
         :param timeout: the wait timeout (in milliseconds). If None, use element's wait timeout.
         """
-        _interval = interval if interval else self.get_wait_interval()
-        _timeout = timeout if timeout else self.get_wait_timeout()
+        _interval = self.get_wait_interval() if interval is None else interval
+        _timeout = self.get_wait_timeout() if timeout is None else timeout
         return ElementWaitFor(self, _interval, _timeout)
 
     def blur(self):

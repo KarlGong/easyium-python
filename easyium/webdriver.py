@@ -107,8 +107,8 @@ class WebDriver(Context):
         :param interval: the wait interval (in milliseconds). If None, use driver's wait interval.
         :param timeout: the wait timeout (in milliseconds). If None, use driver's wait interval.
         """
-        _interval = interval if interval else self.get_wait_interval()
-        _timeout = timeout if timeout else self.get_wait_timeout()
+        _interval = self.get_wait_interval() if interval is None else interval
+        _timeout = self.get_wait_timeout() if timeout is None else timeout
         return WebDriverWaitFor(self, _interval, _timeout)
 
     @SupportedBy(WebDriverType._BROWSER)
@@ -748,19 +748,19 @@ class WebDriver(Context):
         :param stop_app_on_reset: Whether the app should be stopped on reset or not
         """
         options = {}
-        if app_wait_package:
+        if app_wait_package is not None:
             options["app_wait_package"] = app_wait_package
-        if app_wait_activity:
+        if app_wait_activity is not None:
             options["app_wait_activity"] = app_wait_activity
-        if intent_action:
+        if intent_action is not None:
             options["intent_action"] = intent_action
-        if intent_category:
+        if intent_category is not None:
             options["intent_category"] = intent_category
-        if intent_flags:
+        if intent_flags is not None:
             options["intent_flags"] = intent_flags
-        if optional_intent_arguments:
+        if optional_intent_arguments is not None:
             options["optional_intent_arguments"] = optional_intent_arguments
-        if stop_app_on_reset:
+        if stop_app_on_reset is not None:
             options["stop_app_on_reset"] = stop_app_on_reset
 
         self.__selenium_web_driver.start_activity(app_package, app_activity, **options)
