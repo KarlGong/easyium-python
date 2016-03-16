@@ -1,6 +1,5 @@
 from selenium.common.exceptions import WebDriverException, StaleElementReferenceException, ElementNotVisibleException
 
-from .config import DEFAULT
 from .context import Context
 from .decorator import SupportedBy
 from .exceptions import EasyiumException, NoSuchElementException
@@ -11,9 +10,12 @@ from .enumeration import WebDriverType
 class Element(Context):
     def __init__(self, parent):
         Context.__init__(self)
-        self._inner_selenium_element = None
-        self._locator = None
+        # self
+        self.__inner_selenium_element = None
+        self.__locator = None
         self.__parent = parent
+        self.set_wait_interval(self.get_web_driver().get_wait_interval())
+        self.set_wait_timeout(self.get_web_driver().get_wait_timeout())
 
     def get_web_driver(self):
         """
@@ -31,38 +33,6 @@ class Element(Context):
         """
         return self.get_web_driver().get_web_driver_type()
 
-    def get_wait_interval(self):
-        """
-            Get the wait interval of this element's web driver.
-
-        :return: the wait interval
-        """
-        return self.get_web_driver().get_wait_interval()
-
-    def get_wait_timeout(self):
-        """
-            Get the wait timeout of this element's web driver.
-
-        :return: the wait timeout
-        """
-        return self.get_web_driver().get_wait_timeout()
-
-    def get_pre_wait_time(self):
-        """
-            Get the pre-wait time of this element's web driver.
-
-        :return: the pre-wait time
-        """
-        return self.get_web_driver().get_pre_wait_time()
-
-    def get_post_wait_time(self):
-        """
-            Get the post-wait time of this element's web driver.
-
-        :return: the post-wait time
-        """
-        return self.get_web_driver().get_post_wait_time()
-
     def get_parent(self):
         """
             Get the parent of this element.
@@ -72,29 +42,25 @@ class Element(Context):
         return self.__parent
 
     def _selenium_context(self):
-        if self._inner_selenium_element is None:
+        if self.__inner_selenium_element is None:
             self._refresh()
-        return self._inner_selenium_element
+        return self.__inner_selenium_element
 
     def _selenium_element(self):
-        if self._inner_selenium_element is None:
+        if self.__inner_selenium_element is None:
             self._refresh()
-        return self._inner_selenium_element
+        return self.__inner_selenium_element
 
-    def wait_for(self, interval=DEFAULT, timeout=DEFAULT, pre_wait_time=DEFAULT, post_wait_time=DEFAULT):
+    def wait_for(self, interval=None, timeout=None):
         """
             Get a ElementWaitFor instance.
 
-        :param interval: the wait interval (in milliseconds), default value is web driver's wait interval
-        :param timeout: the wait timeout (in milliseconds), default value is web driver's wait timeout
-        :param pre_wait_time: the pre wait time (in milliseconds), default value is web driver's pre wait time
-        :param post_wait_time: the post wait time (in milliseconds), default value is web driver's post wait time
+        :param interval: the wait interval (in milliseconds). If None, use element's wait interval.
+        :param timeout: the wait timeout (in milliseconds). If None, use element's wait timeout.
         """
-        _interval = self.get_wait_interval() if interval == DEFAULT else interval
-        _timeout = self.get_wait_timeout() if timeout == DEFAULT else timeout
-        _pre_wait_time = self.get_pre_wait_time() if pre_wait_time == DEFAULT else pre_wait_time
-        _post_wait_time = self.get_post_wait_time() if post_wait_time == DEFAULT else post_wait_time
-        return ElementWaitFor(self, _interval, _timeout, _pre_wait_time, _post_wait_time)
+        _interval = interval if interval else self.get_wait_interval()
+        _timeout = timeout if timeout else self.get_wait_timeout()
+        return ElementWaitFor(self, _interval, _timeout)
 
     def blur(self):
         """

@@ -3,30 +3,18 @@ from selenium.common.exceptions import StaleElementReferenceException, NoSuchEle
 from .locator import locator_to_by_value
 from .identifier import Identifier
 from .waiter import Waiter
-from .config import DEFAULT
 from . import exceptions
 
 
 class Context:
     def __init__(self):
-        pass
+        self.__wait_interval = None
+        self.__wait_timeout = None
 
     def get_web_driver(self):
         pass
 
     def get_web_driver_type(self):
-        pass
-
-    def get_wait_interval(self):
-        pass
-
-    def get_wait_timeout(self):
-        pass
-
-    def get_pre_wait_time(self):
-        pass
-
-    def get_post_wait_time(self):
         pass
 
     def _selenium_context(self):
@@ -47,23 +35,51 @@ class Context:
     def get_screenshot_as_base64(self):
         pass
 
-    def wait_for(self, interval=DEFAULT, timeout=DEFAULT, pre_wait_time=DEFAULT, post_wait_time=DEFAULT):
+    def get_wait_interval(self):
+        """
+            Get the wait interval of this context.
+
+        :return: the wait interval
+        """
+        return self.__wait_interval
+
+    def set_wait_interval(self, interval):
+        """
+            Set the wait interval of this context.
+
+        :param interval: the new wait interval (in milliseconds)
+        """
+        self.__wait_interval = interval
+
+    def get_wait_timeout(self):
+        """
+            Get the wait timeout of this context.
+
+        :return: the wait timeout
+        """
+        return self.__wait_timeout
+
+    def set_wait_timeout(self, timeout):
+        """
+            Set the wait timeout of this context.
+
+        :param timeout: the new wait timeout (in milliseconds)
+        """
+        self.__wait_timeout = timeout
+
+    def wait_for(self, interval=None, timeout=None):
         pass
 
-    def waiter(self, interval=DEFAULT, timeout=DEFAULT, pre_wait_time=DEFAULT, post_wait_time=DEFAULT):
+    def waiter(self, interval=None, timeout=None):
         """
             Get a Waiter instance.
 
-        :param interval: the wait interval (in milliseconds), default value is web driver's wait interval
-        :param timeout: the wait timeout (in milliseconds), default value is web driver's wait timeout
-        :param pre_wait_time: the pre wait time (in milliseconds), default value is web driver's pre wait time
-        :param post_wait_time: the post wait time (in milliseconds), default value is web driver's post wait time
+        :param interval: the wait interval (in milliseconds). If None, use context's wait interval.
+        :param timeout: the wait timeout (in milliseconds). If None, use context's wait interval.
         """
-        _interval = self.get_wait_interval() if interval == DEFAULT else interval
-        _timeout = self.get_wait_timeout() if timeout == DEFAULT else timeout
-        _pre_wait_time = self.get_pre_wait_time() if pre_wait_time == DEFAULT else pre_wait_time
-        _post_wait_time = self.get_post_wait_time() if post_wait_time == DEFAULT else post_wait_time
-        return Waiter(_interval, _timeout, _pre_wait_time, _post_wait_time)
+        _interval = interval if interval else self.get_wait_interval()
+        _timeout = timeout if timeout else self.get_wait_timeout()
+        return Waiter(_interval, _timeout)
 
     def _find_selenium_element(self, locator):
         by, value = locator_to_by_value(locator)

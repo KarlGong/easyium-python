@@ -1,4 +1,3 @@
-from .config import default_config
 from .enumeration import WebDriverType
 from .exceptions import EasyiumException, TimeoutException, ElementTimeoutException, WebDriverTimeoutException, \
     NoSuchElementException, NotPersistException, LatePersistException, UnsupportedWebDriverTypeException, \

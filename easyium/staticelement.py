@@ -24,20 +24,21 @@ class StaticElement(Element):
                 "accessibility_id": MobileBy.ACCESSIBILITY_ID
         """
         Element.__init__(self, parent)
-        self._inner_selenium_element = None
-        self._locator = locator
+        # from element
+        self.__inner_selenium_element = None
+        self.__locator = locator
 
     def _refresh(self):
-        self._inner_selenium_element = None
-        self._inner_selenium_element = self.get_parent()._find_selenium_element(self._locator)
+        self.__inner_selenium_element = None
+        self.__inner_selenium_element = self.get_parent()._find_selenium_element(self.__locator)
 
     def persist(self):
         self.get_parent().persist()
 
     def __str__(self):
-        if self._inner_selenium_element is None:
+        if self.__inner_selenium_element is None:
             return "%s\n|- StaticElement <SeleniumElement: %s><Locator: %s>" % (
-                self.get_parent(), None, self._locator)
+                self.get_parent(), None, self.__locator)
         else:
             return "%s\n|- StaticElement <SeleniumElementId: %s><Locator: %s>" % (
-                self.get_parent(), self._inner_selenium_element.id, self._locator)
+                self.get_parent(), self.__inner_selenium_element.id, self.__locator)

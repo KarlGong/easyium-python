@@ -2,26 +2,21 @@ import time
 
 from selenium.common.exceptions import NoAlertPresentException
 
-from .config import DEFAULT, default_config
 from .decorator import SupportedBy
 from .exceptions import TimeoutException, ElementTimeoutException, WebDriverTimeoutException
 from .enumeration import WebDriverType
 
 
 class Waiter:
-    def __init__(self, interval=DEFAULT, timeout=DEFAULT, pre_wait_time=DEFAULT, post_wait_time=DEFAULT):
+    def __init__(self, interval=1000, timeout=30000):
         """
             Create a Waiter instance.
 
-        :param interval: the wait interval (in milliseconds), default value is from default_config.waiter_wait_interval
-        :param timeout: the wait timeout (in milliseconds), default value is from default_config.waiter_wait_timeout
-        :param pre_wait_time: the pre wait time (in milliseconds), default value is from default_config.waiter_pre_wait_time
-        :param post_wait_time: the post wait time (in milliseconds), default value is from default_config.waiter_post_wait_time
+        :param interval: the wait interval (in milliseconds)
+        :param timeout: the wait timeout (in milliseconds)
         """
-        self.__interval = default_config.waiter_wait_interval if interval == DEFAULT else interval
-        self.__timeout = default_config.waiter_wait_timeout if timeout == DEFAULT else timeout
-        self.__pre_wait_time = default_config.waiter_pre_wait_time if pre_wait_time == DEFAULT else pre_wait_time
-        self.__post_wait_time = default_config.waiter_post_wait_time if post_wait_time == DEFAULT else post_wait_time
+        self.__interval = interval
+        self.__timeout = timeout
 
     def wait_for(self, condition_function, *function_args, **function_kwargs):
         """
@@ -31,39 +26,33 @@ class Waiter:
         :param function_args: the args for condition_function
         :param function_kwargs: the kwargs for condition_function
         """
-        time.sleep(self.__pre_wait_time / 1000.0)
-
         start_time = time.time() * 1000.0
 
         if condition_function(*function_args, **function_kwargs):
-            time.sleep(self.__post_wait_time / 1000.0)
             return
 
         while (time.time() * 1000.0 - start_time) <= self.__timeout:
             time.sleep(self.__interval / 1000.0)
             if condition_function(*function_args, **function_kwargs):
-                time.sleep(self.__post_wait_time / 1000.0)
                 return
 
         raise TimeoutException("Timed out waiting for <%s>." % condition_function.__name__)
 
 
 class ElementWaitFor:
-    def __init__(self, element, interval, timeout, pre_wait_time, post_wait_time):
+    def __init__(self, element, interval, timeout):
         self.__element = element
         self.__element__ = element
         self.__desired_occurrence = True
         self.__interval = interval
         self.__timeout = timeout
-        self.__pre_wait_time = pre_wait_time
-        self.__post_wait_time = post_wait_time
 
-    def __wait_for(self, element_condition, interval, timeout, pre_wait_time, post_wait_time):
+    def __wait_for(self, element_condition, interval, timeout):
         def is_element_condition_occurred():
             return element_condition.occurred() == self.__desired_occurrence
 
         try:
-            Waiter(interval, timeout, pre_wait_time, post_wait_time).wait_for(is_element_condition_occurred)
+            Waiter(interval, timeout).wait_for(is_element_condition_occurred)
         except TimeoutException:
             raise ElementTimeoutException(
                 "Timed out waiting for <%s> to be <%s>." % (element_condition, self.__desired_occurrence))
@@ -79,13 +68,13 @@ class ElementWaitFor:
         """
             Wait for this element exists.
         """
-        self.__wait_for(ElementExistence(self.__element), self.__interval, self.__timeout, self.__pre_wait_time, self.__post_wait_time)
+        self.__wait_for(ElementExistence(self.__element), self.__interval, self.__timeout)
 
     def visible(self):
         """
             Wait for this element visible.
         """
-        self.__wait_for(ElementVisible(self.__element), self.__interval, self.__timeout, self.__pre_wait_time, self.__post_wait_time)
+        self.__wait_for(ElementVisible(self.__element), self.__interval, self.__timeout)
 
     def text_equals(self, text):
         """
@@ -98,9 +87,9 @@ class ElementWaitFor:
             StaticElement(driver, "id=change_text").wait_for().not_().text_equals("")
         """
         start_time = time.time() * 1000.0
-        self.__element.wait_for(self.__interval, self.__timeout, self.__pre_wait_time, 0).exists()
+        self.__element.wait_for(self.__interval, self.__timeout).exists()
         rest_timeout = start_time + self.__timeout - time.time() * 1000.0
-        self.__wait_for(ElementTextEquals(self.__element, text), self.__interval, rest_timeout, 0, self.__post_wait_time)
+        self.__wait_for(ElementTextEquals(self.__element, text), self.__interval, rest_timeout)
 
     def attribute_equals(self, attribute, value):
         """
@@ -113,9 +102,9 @@ class ElementWaitFor:
             element.wait_for().attribute_equals("class", "foo bar")
         """
         start_time = time.time() * 1000.0
-        self.__element.wait_for(self.__interval, self.__timeout, self.__pre_wait_time, 0).exists()
+        self.__element.wait_for(self.__interval, self.__timeout).exists()
         rest_timeout = start_time + self.__timeout - time.time() * 1000.0
-        self.__wait_for(ElementAttributeEquals(self.__element, attribute, value), self.__interval, rest_timeout, 0, self.__post_wait_time)
+        self.__wait_for(ElementAttributeEquals(self.__element, attribute, value), self.__interval, rest_timeout)
 
     def attribute_contains_one(self, attribute, *values):
         """
@@ -130,9 +119,9 @@ class ElementWaitFor:
             element.wait_for().attribute_contains_one("class", ("foo", "bar"))
         """
         start_time = time.time() * 1000.0
-        self.__element.wait_for(self.__interval, self.__timeout, self.__pre_wait_time, 0).exists()
+        self.__element.wait_for(self.__interval, self.__timeout).exists()
         rest_timeout = start_time + self.__timeout - time.time() * 1000.0
-        self.__wait_for(ElementAttributeContainsOne(self.__element, attribute, *values), self.__interval, rest_timeout, 0, self.__post_wait_time)
+        self.__wait_for(ElementAttributeContainsOne(self.__element, attribute, *values), self.__interval, rest_timeout)
 
     def attribute_contains_all(self, attribute, *values):
         """
@@ -147,9 +136,9 @@ class ElementWaitFor:
             element.wait_for().attribute_contains_all("class", ("foo", "bar"))
         """
         start_time = time.time() * 1000.0
-        self.__element.wait_for(self.__interval, self.__timeout, self.__pre_wait_time, 0).exists()
+        self.__element.wait_for(self.__interval, self.__timeout).exists()
         rest_timeout = start_time + self.__timeout - time.time() * 1000.0
-        self.__wait_for(ElementAttributeContainsAll(self.__element, attribute, *values), self.__interval, rest_timeout, 0, self.__post_wait_time)
+        self.__wait_for(ElementAttributeContainsAll(self.__element, attribute, *values), self.__interval, rest_timeout)
 
 
 class ElementExistence:
@@ -244,11 +233,11 @@ class ElementAttributeContainsAll:
 
 
 class WebDriverWaitFor:
-    def __init__(self, web_driver, interval, timeout, pre_wait_time, post_wait_time):
+    def __init__(self, web_driver, interval, timeout):
         self.__web_driver = web_driver
         self.__web_driver__ = web_driver
         self.__desired_occurrence = True
-        self.__waiter = Waiter(interval, timeout, pre_wait_time, post_wait_time)
+        self.__waiter = Waiter(interval, timeout)
 
     def __wait_for(self, web_driver_condition):
         def is_web_driver_condition_occurred():
