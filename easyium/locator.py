@@ -20,6 +20,8 @@ locator_to_by_map = {
 
 def locator_to_by_value(locator):
     separator_index = locator.find("=")
+    if separator_index == -1:
+        raise InvalidLocatorException("Separator '=' is not found.")
     by = locator[:separator_index]
     value = locator[separator_index + 1:]
     try:
