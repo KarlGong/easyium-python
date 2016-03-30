@@ -12,5 +12,5 @@ class Identifier:
         return "name=" + element.get_attribute("name")
 
     @staticmethod
-    def link_text(element):
-        return "link=" + element.get_text()
+    def text(element):
+        return "xpath=.//*[.='%s')]" % element.get_text()
