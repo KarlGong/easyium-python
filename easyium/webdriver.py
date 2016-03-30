@@ -147,6 +147,7 @@ class WebDriver(Context):
         converted_args = []
         for arg in args:
             if isinstance(arg, Element):
+                arg.wait_for().exists()
                 converted_args.append(arg._selenium_element())
             else:
                 converted_args.append(arg)
@@ -166,6 +167,7 @@ class WebDriver(Context):
         converted_args = []
         for arg in args:
             if isinstance(arg, Element):
+                arg.wait_for().exists()
                 converted_args.append(arg._selenium_element())
             else:
                 converted_args.append(arg)
