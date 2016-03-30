@@ -13,7 +13,7 @@ locator_to_by_map = {
     "class": By.CLASS_NAME,
     "css": By.CSS_SELECTOR,
     "ios_uiautomation": MobileBy.IOS_UIAUTOMATION,
-    "android_uiautomation": MobileBy.ANDROID_UIAUTOMATOR,
+    "android_uiautomator": MobileBy.ANDROID_UIAUTOMATOR,
     "accessibility_id": MobileBy.ACCESSIBILITY_ID
 }
 
