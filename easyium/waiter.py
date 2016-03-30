@@ -1,6 +1,7 @@
 import time
 
-from selenium.common.exceptions import NoAlertPresentException
+from selenium.common.exceptions import NoAlertPresentException, NoSuchElementException
+from selenium.webdriver.common.by import By
 
 from .decorator import SupportedBy
 from .exceptions import TimeoutException, ElementTimeoutException, WebDriverTimeoutException
@@ -315,7 +316,11 @@ class TextPresent:
         self.__text = text
 
     def occurred(self):
-        return self.__web_driver.has_child("xpath=//*[contains(., '%s')]" % self.__text)
+        try:
+            self.__web_driver._selenium_web_driver().find_element(By.XPATH, "//*[contains(., '%s')]" % self.__text)
+            return True
+        except NoSuchElementException:
+            return False
 
     def __str__(self):
         return "TextPresent [webdriver: \n%s\n][text: %s]" % (self.__web_driver, self.__text)
