@@ -656,7 +656,7 @@ class WebDriver(Context):
         self.__selenium_web_driver.push_file(path, base64data)
 
     @SupportedBy(WebDriverType._MOBILE)
-    def app_strings(self, language=None, string_file=None):
+    def get_app_strings(self, language=None, string_file=None):
         """
             Returns the application strings from the device for the specified language.
 
