@@ -116,7 +116,7 @@ class WebDriver(Context):
         """
             Maximizes the current window that webdriver is using
         """
-        self.__selenium_web_driver.maximize_window()
+        self._selenium_web_driver().maximize_window()
 
     def set_page_load_timeout(self, timeout):
         """
@@ -124,7 +124,7 @@ class WebDriver(Context):
 
         :param timeout: The amount of time to wait (in milliseconds)
         """
-        self.__selenium_web_driver.set_page_load_timeout(timeout / 1000.0)
+        self._selenium_web_driver().set_page_load_timeout(timeout / 1000.0)
 
     def set_script_timeout(self, timeout):
         """
@@ -132,7 +132,7 @@ class WebDriver(Context):
 
         :param timeout: The amount of time to wait (in milliseconds)
         """
-        self.__selenium_web_driver.set_script_timeout(timeout / 1000.0)
+        self._selenium_web_driver().set_script_timeout(timeout / 1000.0)
 
     def execute_script(self, script, *args):
         """
@@ -152,7 +152,7 @@ class WebDriver(Context):
             else:
                 converted_args.append(arg)
 
-        return self.__selenium_web_driver.execute_script(script, *converted_args)
+        return self._selenium_web_driver().execute_script(script, *converted_args)
 
     def execute_async_script(self, script, *args):
         """
@@ -172,7 +172,7 @@ class WebDriver(Context):
             else:
                 converted_args.append(arg)
 
-        return self.__selenium_web_driver.execute_async_script(script, *converted_args)
+        return self._selenium_web_driver().execute_async_script(script, *converted_args)
 
     def open(self, url):
         """
@@ -180,7 +180,7 @@ class WebDriver(Context):
 
         :param url: the url to be open
         """
-        self.__selenium_web_driver.get(url)
+        self._selenium_web_driver().get(url)
 
     get = open
 
@@ -188,57 +188,57 @@ class WebDriver(Context):
         """
             Returns the title of the current page.
         """
-        return self.__selenium_web_driver.title
+        return self._selenium_web_driver().title
 
     def refresh(self):
         """
             Refreshes the current page.
         """
-        self.__selenium_web_driver.refresh()
+        self._selenium_web_driver().refresh()
 
     def back(self):
         """
             Goes one step backward in the browser history.
         """
-        self.__selenium_web_driver.back()
+        self._selenium_web_driver().back()
 
     def forward(self):
         """
             Goes one step forward in the browser history.
         """
-        self.__selenium_web_driver.forward()
+        self._selenium_web_driver().forward()
 
     def quit(self):
         """
             Quits the driver and closes every associated window.
         """
-        self.__selenium_web_driver.quit()
+        self._selenium_web_driver().quit()
 
     def get_current_url(self):
         """
             Gets the URL of the current page.
         """
-        return self.__selenium_web_driver.current_url
+        return self._selenium_web_driver().current_url
 
     def get_page_source(self):
         """
             Gets the source of the current page.
         """
-        return self.__selenium_web_driver.page_source
+        return self._selenium_web_driver().page_source
 
     @SupportedBy(WebDriverType._MOBILE)
     def get_contexts(self):
         """
             Returns the contexts within the current session.
         """
-        return self.__selenium_web_driver.contexts
+        return self._selenium_web_driver().contexts
 
     @SupportedBy(WebDriverType._MOBILE)
     def get_current_context(self):
         """
             Returns the current context of the current session.
         """
-        return self.__selenium_web_driver.current_context
+        return self._selenium_web_driver().current_context
 
     @SupportedBy(WebDriverType._MOBILE)
     def switch_to_context(self, context_name):
@@ -250,7 +250,7 @@ class WebDriver(Context):
         :Usage:
             driver.switch_to.context('WEBVIEW_1')
         """
-        self.__selenium_web_driver.switch_to.context(context_name)
+        self._selenium_web_driver().switch_to.context(context_name)
 
     def switch_to_frame(self, frame_reference):
         """
@@ -268,22 +268,22 @@ class WebDriver(Context):
 
         if isinstance(frame_reference, Element):
             frame_reference.wait_for().exists()
-            self.__selenium_web_driver.switch_to.frame(frame_reference._selenium_element())
+            self._selenium_web_driver().switch_to.frame(frame_reference._selenium_element())
         else:
-            self.__selenium_web_driver.switch_to.frame(frame_reference)
+            self._selenium_web_driver().switch_to.frame(frame_reference)
 
     def switch_to_parent_frame(self):
         """
             Switches focus to the parent context. If the current context is the top
             level browsing context, the context remains unchanged.
         """
-        self.__selenium_web_driver.switch_to.parent_frame()
+        self._selenium_web_driver().switch_to.parent_frame()
 
     def switch_to_default_content(self):
         """
             Switch focus to the default frame.
         """
-        self.__selenium_web_driver.switch_to.default_content()
+        self._selenium_web_driver().switch_to.default_content()
 
     switch_to_default_frame = switch_to_default_content
 
@@ -294,7 +294,7 @@ class WebDriver(Context):
         :return: the Alert instance
         """
         self.wait_for().alert_present()
-        return Alert(self.__selenium_web_driver.switch_to.alert)
+        return Alert(self._selenium_web_driver().switch_to.alert)
 
     switch_to_alert = get_alert
 
@@ -303,7 +303,7 @@ class WebDriver(Context):
             Return whether the alert is present on the page or not.
         """
         try:
-            alert_text = self.__selenium_web_driver.switch_to.alert.text
+            alert_text = self._selenium_web_driver().switch_to.alert.text
             return True
         except NoAlertPresentException:
             return False
@@ -312,7 +312,7 @@ class WebDriver(Context):
         """
             Returns a set of dictionaries, corresponding to cookies visible in the current session.
         """
-        return self.__selenium_web_driver.get_cookies()
+        return self._selenium_web_driver().get_cookies()
 
     def get_cookie(self, name):
         """
@@ -320,7 +320,7 @@ class WebDriver(Context):
 
         :param name: the cookie name
         """
-        return self.__selenium_web_driver.get_cookie(name)
+        return self._selenium_web_driver().get_cookie(name)
 
     def add_cookie(self, cookie_dict):
         """
@@ -334,7 +334,7 @@ class WebDriver(Context):
             driver.add_cookie({'name' : 'foo', 'value' : 'bar', 'path' : '/'})
             driver.add_cookie({'name' : 'foo', 'value' : 'bar', 'path' : '/', 'secure':True})
         """
-        self.__selenium_web_driver.add_cookie(cookie_dict)
+        self._selenium_web_driver().add_cookie(cookie_dict)
 
     def delete_cookie(self, name):
         """
@@ -342,19 +342,19 @@ class WebDriver(Context):
 
         :param name: the cookie name
         """
-        self.__selenium_web_driver.delete_cookie(name)
+        self._selenium_web_driver().delete_cookie(name)
 
     def delete_all_cookies(self):
         """
             Delete all cookies in the scope of the session.
         """
-        self.__selenium_web_driver.delete_all_cookies()
+        self._selenium_web_driver().delete_all_cookies()
 
     def get_desired_capabilities(self):
         """
             Returns the drivers current desired capabilities being used.
         """
-        return self.__selenium_web_driver.desired_capabilities
+        return self._selenium_web_driver().desired_capabilities
 
     def get_screenshot_as_file(self, filename):
         """
@@ -366,7 +366,7 @@ class WebDriver(Context):
         :Usage:
             driver.get_screenshot_as_file('/Screenshots/foo.png')
         """
-        return self.__selenium_web_driver.get_screenshot_as_file(filename)
+        return self._selenium_web_driver().get_screenshot_as_file(filename)
 
     def get_screenshot_as_png(self):
         """
@@ -375,7 +375,7 @@ class WebDriver(Context):
         :Usage:
             driver.get_screenshot_as_png()
         """
-        return self.__selenium_web_driver.get_screenshot_as_png()
+        return self._selenium_web_driver().get_screenshot_as_png()
 
     def get_screenshot_as_base64(self):
         """
@@ -385,7 +385,7 @@ class WebDriver(Context):
         :Usage:
             driver.get_screenshot_as_base64()
         """
-        return self.__selenium_web_driver.get_screenshot_as_base64()
+        return self._selenium_web_driver().get_screenshot_as_base64()
 
     save_screenshot = get_screenshot_as_file
 
@@ -393,13 +393,13 @@ class WebDriver(Context):
         """
             Returns the handle of the current window.
         """
-        return self.__selenium_web_driver.current_window_handle
+        return self._selenium_web_driver().current_window_handle
 
     def get_window_handles(self):
         """
             Returns the handles of all windows within the current session.
         """
-        return self.__selenium_web_driver.window_handles
+        return self._selenium_web_driver().window_handles
 
     def switch_to_window(self, window_reference):
         """
@@ -410,7 +410,7 @@ class WebDriver(Context):
         :Usage:
             driver.switch_to_window('main')
         """
-        self.__selenium_web_driver.switch_to.window(window_reference)
+        self._selenium_web_driver().switch_to.window(window_reference)
 
     def switch_to_new_window(self, previous_window_handles):
         """
@@ -442,11 +442,11 @@ class WebDriver(Context):
                     default is current window.
         """
         if window_reference == "current" or window_reference == self.get_current_window_handle():
-            self.__selenium_web_driver.close()
+            self._selenium_web_driver().close()
         else:
             current_window_handle = self.get_current_window_handle()
             self.switch_to_window(window_reference)
-            self.__selenium_web_driver.close()
+            self._selenium_web_driver().close()
             self.switch_to_window(current_window_handle)
 
     def set_window_size(self, width, height, window_reference="current"):
@@ -461,7 +461,7 @@ class WebDriver(Context):
         :Usage:
             driver.set_window_size(800,600)
         """
-        self.__selenium_web_driver.set_window_size(width, height, window_reference)
+        self._selenium_web_driver().set_window_size(width, height, window_reference)
 
     def get_window_size(self, window_reference="current"):
         """
@@ -470,7 +470,7 @@ class WebDriver(Context):
         :param window_reference: The name or window handle of the window to get,
                     default is current window.
         """
-        return self.__selenium_web_driver.get_window_size(window_reference)
+        return self._selenium_web_driver().get_window_size(window_reference)
 
     def set_window_position(self, x, y, window_reference="current"):
         """
@@ -484,7 +484,7 @@ class WebDriver(Context):
         :Usage:
             driver.set_window_position(0,0)
         """
-        self.__selenium_web_driver.set_window_position(x, y, window_reference)
+        self._selenium_web_driver().set_window_position(x, y, window_reference)
 
     def get_window_position(self, window_reference="current"):
         """
@@ -493,14 +493,14 @@ class WebDriver(Context):
         :param window_reference: The name or window handle of the window to get,
                     default is current window.
         """
-        return self.__selenium_web_driver.get_window_position(window_reference)
+        return self._selenium_web_driver().get_window_position(window_reference)
 
     @SupportedBy(WebDriverType._MOBILE)
     def get_orientation(self):
         """
             Gets the current orientation of the device
         """
-        return self.__selenium_web_driver.orientation
+        return self._selenium_web_driver().orientation
 
     @SupportedBy(WebDriverType._MOBILE)
     def set_orientation(self, value):
@@ -509,19 +509,19 @@ class WebDriver(Context):
 
         :param value: orientation to set it to, allowed_values: LANDSCAPE, PORTRAIT
         """
-        self.__selenium_web_driver.orientation = value.upper()
+        self._selenium_web_driver().orientation = value.upper()
 
     def get_application_cache(self):
         """
             Returns a ApplicationCache Object to interact with the browser app cache.
         """
-        return self.__selenium_web_driver.application_cache
+        return self._selenium_web_driver().application_cache
 
     def get_log_types(self):
         """
             Gets a list of the available log types.
         """
-        return self.__selenium_web_driver.log_types
+        return self._selenium_web_driver().log_types
 
     def get_log(self, log_type):
         """
@@ -535,7 +535,7 @@ class WebDriver(Context):
             driver.get_log('client')
             driver.get_log('server')
         """
-        return self.__selenium_web_driver.get_log(log_type)
+        return self._selenium_web_driver().get_log(log_type)
 
     @SupportedBy(WebDriverType._MOBILE)
     def swipe(self, start_x, start_y, end_x, end_y, duration=None):
@@ -551,7 +551,7 @@ class WebDriver(Context):
         :Usage:
             driver.swipe(100, 100, 100, 400)
         """
-        self.__selenium_web_driver.swipe(start_x, start_y, end_x, end_y, duration)
+        self._selenium_web_driver().swipe(start_x, start_y, end_x, end_y, duration)
 
     @SupportedBy(WebDriverType._MOBILE)
     def flick(self, start_x, start_y, end_x, end_y):
@@ -566,7 +566,7 @@ class WebDriver(Context):
         :Usage:
             driver.flick(100, 100, 100, 400)
         """
-        self.__selenium_web_driver.flick(start_x, start_y, end_x, end_y)
+        self._selenium_web_driver().flick(start_x, start_y, end_x, end_y)
 
     @SupportedBy(WebDriverType._MOBILE)
     def scroll(self, direction):
@@ -592,7 +592,7 @@ class WebDriver(Context):
         :param key: key to press
         :param strategy: strategy for closing the keyboard (e.g., `tapOutside`)
         """
-        self.__selenium_web_driver.hide_keyboard(key_name, key, strategy)
+        self._selenium_web_driver().hide_keyboard(key_name, key, strategy)
 
     @SupportedBy(WebDriverType.ANDROID)
     def key_event(self, keycode, metastate=None):
@@ -603,7 +603,7 @@ class WebDriver(Context):
         :param keycode: the keycode to be sent to the device
         :param metastate: meta information about the keycode being sent
         """
-        self.__selenium_web_driver.keyevent(keycode, metastate)
+        self._selenium_web_driver().keyevent(keycode, metastate)
 
     @SupportedBy(WebDriverType.ANDROID)
     def press_keycode(self, keycode, metastate=None):
@@ -614,7 +614,7 @@ class WebDriver(Context):
         :param keycode: the keycode to be sent to the device
         :param metastate: meta information about the keycode being sent
         """
-        self.__selenium_web_driver.press_keycode(keycode, metastate)
+        self._selenium_web_driver().press_keycode(keycode, metastate)
 
     @SupportedBy(WebDriverType.ANDROID)
     def long_press_keycode(self, keycode, metastate=None):
@@ -625,7 +625,7 @@ class WebDriver(Context):
         :param keycode: the keycode to be sent to the device
         :param metastate: meta information about the keycode being sent
         """
-        self.__selenium_web_driver.long_press_keycode(keycode, metastate)
+        self._selenium_web_driver().long_press_keycode(keycode, metastate)
 
     @SupportedBy(WebDriverType._MOBILE)
     def pull_file(self, path):
@@ -634,7 +634,7 @@ class WebDriver(Context):
 
         :param path: the path to the file on the device
         """
-        return self.__selenium_web_driver.pull_file(path)
+        return self._selenium_web_driver().pull_file(path)
 
     @SupportedBy(WebDriverType._MOBILE)
     def pull_folder(self, path):
@@ -643,7 +643,7 @@ class WebDriver(Context):
 
          :param path: the path to the folder on the device
         """
-        return self.__selenium_web_driver.pull_folder(path)
+        return self._selenium_web_driver().pull_folder(path)
 
     @SupportedBy(WebDriverType._MOBILE)
     def push_file(self, path, base64data):
@@ -653,7 +653,7 @@ class WebDriver(Context):
         :param path: the path on the device
         :param base64data: data, encoded as Base64, to be written to the file
         """
-        self.__selenium_web_driver.push_file(path, base64data)
+        self._selenium_web_driver().push_file(path, base64data)
 
     @SupportedBy(WebDriverType._MOBILE)
     def get_app_strings(self, language=None, string_file=None):
@@ -663,7 +663,7 @@ class WebDriver(Context):
         :param language: strings language code
         :param string_file: the name of the string file to query
         """
-        return self.__selenium_web_driver.app_strings(language, string_file)
+        return self._selenium_web_driver().app_strings(language, string_file)
 
     @SupportedBy(WebDriverType._MOBILE)
     def install_app(self, app_path):
@@ -672,7 +672,7 @@ class WebDriver(Context):
 
         :param app_path: the local or remote path to the application to install
         """
-        self.__selenium_web_driver.install_app(app_path)
+        self._selenium_web_driver().install_app(app_path)
 
     @SupportedBy(WebDriverType._MOBILE)
     def is_app_installed(self, bundle_id):
@@ -681,7 +681,7 @@ class WebDriver(Context):
 
         :param bundle_id: the id of the application to query
         """
-        return self.__selenium_web_driver.is_app_installed(bundle_id)
+        return self._selenium_web_driver().is_app_installed(bundle_id)
 
     @SupportedBy(WebDriverType._MOBILE)
     def remove_app(self, app_id):
@@ -690,28 +690,28 @@ class WebDriver(Context):
 
         :param app_id: the application id to be removed
         """
-        self.__selenium_web_driver.remove_app(app_id)
+        self._selenium_web_driver().remove_app(app_id)
 
     @SupportedBy(WebDriverType._MOBILE)
     def launch_app(self):
         """
             Start on the device the application specified in the desired capabilities.
         """
-        self.__selenium_web_driver.launch_app()
+        self._selenium_web_driver().launch_app()
 
     @SupportedBy(WebDriverType._MOBILE)
     def close_app(self):
         """
             Stop the running application, specified in the desired capabilities, on the device.
         """
-        self.__selenium_web_driver.close_app()
+        self._selenium_web_driver().close_app()
 
     @SupportedBy(WebDriverType._MOBILE)
     def reset_app(self):
         """
             Resets the current application on the device.
         """
-        self.__selenium_web_driver.reset()
+        self._selenium_web_driver().reset()
 
     @SupportedBy(WebDriverType._MOBILE)
     def background_app(self, duration):
@@ -720,14 +720,14 @@ class WebDriver(Context):
 
          :param duration: the duration for the application to remain in the background, in ms.
         """
-        self.__selenium_web_driver.background_app(duration / 1000.0)
+        self._selenium_web_driver().background_app(duration / 1000.0)
 
     @SupportedBy(WebDriverType.ANDROID)
     def get_current_activity(self):
         """
             Retrieves the current activity on the device.
         """
-        return self.__selenium_web_driver.current_activity
+        return self._selenium_web_driver().current_activity
 
     @SupportedBy(WebDriverType.ANDROID)
     def start_activity(self, app_package, app_activity, app_wait_package=None, app_wait_activity=None,
@@ -765,7 +765,7 @@ class WebDriver(Context):
         if stop_app_on_reset is not None:
             options["stop_app_on_reset"] = stop_app_on_reset
 
-        self.__selenium_web_driver.start_activity(app_package, app_activity, **options)
+        self._selenium_web_driver().start_activity(app_package, app_activity, **options)
 
     @SupportedBy(WebDriverType.ANDROID)
     def end_test_coverage(self, intent, path):
@@ -778,7 +778,7 @@ class WebDriver(Context):
          :param intent: description of operation to be performed
          :param path: path to coverage.ec file to be pulled from the device
         """
-        self.__selenium_web_driver.end_test_coverage(intent, path)
+        self._selenium_web_driver().end_test_coverage(intent, path)
 
     @SupportedBy(WebDriverType.IOS)
     def lock(self, duration):
@@ -787,21 +787,21 @@ class WebDriver(Context):
 
         :param duration: the duration to lock the device, in ms.
         """
-        self.__selenium_web_driver.lock(duration / 1000.0)
+        self._selenium_web_driver().lock(duration / 1000.0)
 
     @SupportedBy(WebDriverType._MOBILE)
     def shake(self):
         """
             Shake the device.
         """
-        self.__selenium_web_driver.shake()
+        self._selenium_web_driver().shake()
 
     @SupportedBy(WebDriverType.ANDROID)
     def open_notifications(self):
         """
             Open notification shade in Android (API Level 18 and above)
         """
-        self.__selenium_web_driver.open_notifications()
+        self._selenium_web_driver().open_notifications()
 
     @SupportedBy(WebDriverType.ANDROID)
     def get_network_connection(self):
@@ -810,7 +810,7 @@ class WebDriver(Context):
             Android only.
             Possible values are available through the enumeration `appium.webdriver.ConnectionType`
         """
-        return self.__selenium_web_driver.network_connection
+        return self._selenium_web_driver().network_connection
 
     @SupportedBy(WebDriverType.ANDROID)
     def set_network_connection(self, connection_type):
@@ -828,7 +828,7 @@ class WebDriver(Context):
 
          :param connection_type: a member of the enum appium.webdriver.ConnectionType
         """
-        self.__selenium_web_driver.set_network_connection(connection_type)
+        self._selenium_web_driver().set_network_connection(connection_type)
 
     @SupportedBy(WebDriverType.ANDROID)
     def get_available_ime_engines(self):
@@ -837,7 +837,7 @@ class WebDriver(Context):
             activity are returned (e.g., ['com.android.inputmethod.latin/.LatinIME'])
             Android only.
         """
-        return self.__selenium_web_driver.available_ime_engines
+        return self._selenium_web_driver().available_ime_engines
 
     @SupportedBy(WebDriverType.ANDROID)
     def is_ime_service_active(self):
@@ -845,7 +845,7 @@ class WebDriver(Context):
             Checks whether the device has IME service active. Returns True/False.
             Android only.
         """
-        return self.__selenium_web_driver.is_ime_active()
+        return self._selenium_web_driver().is_ime_active()
 
     @SupportedBy(WebDriverType.ANDROID)
     def active_ime_engine(self, engine):
@@ -855,7 +855,7 @@ class WebDriver(Context):
 
         :param engine: the package and activity of the IME engine to activate (e.g., 'com.android.inputmethod.latin/.LatinIME')
         """
-        self.__selenium_web_driver.activate_ime_engine(engine)
+        self._selenium_web_driver().activate_ime_engine(engine)
 
     @SupportedBy(WebDriverType.ANDROID)
     def deactivate_current_ime_engine(self):
@@ -863,7 +863,7 @@ class WebDriver(Context):
             Deactivates the currently active IME engine on the device.
             Android only.
         """
-        self.__selenium_web_driver.deactivate_ime_engine()
+        self._selenium_web_driver().deactivate_ime_engine()
 
     @SupportedBy(WebDriverType.ANDROID)
     def get_current_ime_engine(self):
@@ -871,7 +871,7 @@ class WebDriver(Context):
             Returns the activity and package of the currently active IME engine (e.g., 'com.android.inputmethod.latin/.LatinIME').
             Android only.
         """
-        return self.__selenium_web_driver.active_ime_engine
+        return self._selenium_web_driver().active_ime_engine
 
     @SupportedBy(WebDriverType._MOBILE)
     def get_settings(self):
@@ -880,7 +880,7 @@ class WebDriver(Context):
             Do not get Settings confused with Desired Capabilities, they are
             separate concepts. See https://github.com/appium/appium/blob/master/docs/en/advanced-concepts/settings.md
         """
-        return self.__selenium_web_driver.get_settings()
+        return self._selenium_web_driver().get_settings()
 
     @SupportedBy(WebDriverType._MOBILE)
     def update_settings(self, settings):
@@ -890,14 +890,14 @@ class WebDriver(Context):
 
         :param settings: dictionary of settings to apply to the current test session
         """
-        self.__selenium_web_driver.update_settings(settings)
+        self._selenium_web_driver().update_settings(settings)
 
     @SupportedBy(WebDriverType.ANDROID)
     def toggle_location_services(self):
         """
             Toggle the location services on the device. Android only.
         """
-        self.__selenium_web_driver.toggle_location_services()
+        self._selenium_web_driver().toggle_location_services()
 
     @SupportedBy(WebDriverType._MOBILE)
     def set_location(self, latitude, longitude, altitude):
@@ -908,10 +908,10 @@ class WebDriver(Context):
         :param longitude: String or numeric value between -180.0 and 180.0
         :param altitude: String or numeric value
         """
-        self.__selenium_web_driver.set_location(latitude, longitude, altitude)
+        self._selenium_web_driver().set_location(latitude, longitude, altitude)
 
     def __str__(self):
-        return "WebDriver <WebDriverType: %s><SessionId: %s>" % (self.__web_driver_type, self.__selenium_web_driver.session_id)
+        return "WebDriver <WebDriverType: %s><SessionId: %s>" % (self.__web_driver_type, self._selenium_web_driver().session_id)
 
     def __enter__(self):
         return self
