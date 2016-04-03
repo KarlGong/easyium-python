@@ -486,7 +486,6 @@ class Element(Context):
         except WebDriverException as wde:
             raise EasyiumException(wde.msg, self)
 
-    @SupportedBy(WebDriverType._BROWSER)
     def drag_and_drop_by_offset(self, x_offset, y_offset):
         """
             Drag and drop to target offset.
@@ -494,12 +493,23 @@ class Element(Context):
         :param x_offset: X offset to drop
         :param y_offset: Y offset to drop
         """
+        web_driver_type = self.get_web_driver_type()
         try:
             try:
-                self.get_web_driver().create_action_chains().click_and_hold(self._selenium_element()).move_by_offset(x_offset, y_offset).release().perform()
+                if web_driver_type in WebDriverType._MOBILE:
+                    self.get_web_driver().create_touch_action().long_press(self._selenium_element()).move_to(
+                        x=x_offset, y=y_offset).release().perform()
+                else:
+                    self.get_web_driver().create_action_chains().click_and_hold(self._selenium_element()).move_by_offset(
+                        x_offset, y_offset).release().perform()
             except (NoSuchElementException, StaleElementReferenceException):
                 self.wait_for().visible()
-                self.get_web_driver().create_action_chains().click_and_hold(self._selenium_element()).move_by_offset(x_offset, y_offset).release().perform()
+                if web_driver_type in WebDriverType._MOBILE:
+                    self.get_web_driver().create_touch_action().long_press(self._selenium_element()).move_to(
+                        x=x_offset, y=y_offset).release().perform()
+                else:
+                    self.get_web_driver().create_action_chains().click_and_hold(self._selenium_element()).move_by_offset(
+                        x_offset, y_offset).release().perform()
         except WebDriverException as wde:
             raise EasyiumException(wde.msg, self)
 
@@ -530,7 +540,6 @@ class Element(Context):
         except WebDriverException as wde:
             raise EasyiumException(wde.msg, self)
 
-    @SupportedBy(WebDriverType._BROWSER)
     def drag_and_drop_to_with_offset(self, target_element, x_offset, y_offset):
         """
             Drag and drop to target element with offset.
@@ -540,15 +549,24 @@ class Element(Context):
         :param x_offset: X offset to drop
         :param y_offset: Y offset to drop
         """
+        web_driver_type = self.get_web_driver_type()
         try:
             try:
-                self.get_web_driver().create_action_chains().click_and_hold(self._selenium_element()).move_to_element_with_offset(
-                    target_element._selenium_element(), x_offset, y_offset).release().perform()
+                if web_driver_type in WebDriverType._MOBILE:
+                    self.get_web_driver().create_touch_action().long_press(self._selenium_element()).move_to(
+                        target_element._selenium_element(), x_offset, y_offset).release().perform()
+                else:
+                    self.get_web_driver().create_action_chains().click_and_hold(self._selenium_element()).move_to_element_with_offset(
+                        target_element._selenium_element(), x_offset, y_offset).release().perform()
             except (NoSuchElementException, StaleElementReferenceException):
                 self.wait_for().visible()
                 target_element.wait_for().visible()
-                self.get_web_driver().create_action_chains().click_and_hold(self._selenium_element()).move_to_element_with_offset(
-                    target_element._selenium_element(), x_offset, y_offset).release().perform()
+                if web_driver_type in WebDriverType._MOBILE:
+                    self.get_web_driver().create_touch_action().long_press(self._selenium_element()).move_to(
+                        target_element._selenium_element(), x_offset, y_offset).release().perform()
+                else:
+                    self.get_web_driver().create_action_chains().click_and_hold(self._selenium_element()).move_to_element_with_offset(
+                        target_element._selenium_element(), x_offset, y_offset).release().perform()
         except WebDriverException as wde:
             raise EasyiumException(wde.msg, self)
 
