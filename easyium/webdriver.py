@@ -582,6 +582,14 @@ class WebDriver(Context):
         }
         self.execute_script("mobile: scroll", scroll_params)
 
+    def scroll_to(self, element):
+        """
+            Scrolls to the given element.
+
+        :param element: the element to be scrolled to
+        """
+        element.scroll_into_view()
+
     @SupportedBy(WebDriverType._MOBILE)
     def hide_keyboard(self, key_name=None, key=None, strategy=None):
         """
