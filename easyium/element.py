@@ -228,6 +228,30 @@ class Element(Context):
         except WebDriverException as wde:
             raise EasyiumException(wde.msg, self)
 
+    def get_location_in_view(self):
+        """
+            Use this to discover where on the screen this element is.
+            THIS METHOD SHOULD CAUSE THE ELEMENT TO BE SCROLLED INTO VIEW.
+
+            Returns the top-left corner location on the screen, or ``None`` if
+            this element is not visible.
+        """
+        web_driver_type = self.get_web_driver_type()
+        try:
+            try:
+                if web_driver_type in WebDriverType._MOBILE:
+                    return self._selenium_element().location_in_view
+                else:
+                    return self._selenium_element().location_once_scrolled_into_view
+            except (NoSuchElementException, StaleElementReferenceException):
+                self.wait_for().exists()
+                if web_driver_type in WebDriverType._MOBILE:
+                    return self._selenium_element().location_in_view
+                else:
+                    return self._selenium_element().location_once_scrolled_into_view
+        except WebDriverException as wde:
+            raise EasyiumException(wde.msg, self)
+
     def get_size(self):
         """
             Gets the size (including border) of this element.
@@ -630,20 +654,6 @@ class Element(Context):
             except (NoSuchElementException, StaleElementReferenceException):
                 self.wait_for().exists()
                 self._selenium_element().set_text(text)
-        except WebDriverException as wde:
-            raise EasyiumException(wde.msg, self)
-
-    @SupportedBy(WebDriverType._MOBILE)
-    def get_location_in_view(self):
-        """
-            Gets the location of an element relative to the view.
-        """
-        try:
-            try:
-                return self._selenium_element().location_in_view
-            except (NoSuchElementException, StaleElementReferenceException):
-                self.wait_for().exists()
-                return self._selenium_element().location_in_view
         except WebDriverException as wde:
             raise EasyiumException(wde.msg, self)
 
