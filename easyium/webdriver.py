@@ -960,7 +960,7 @@ class Ie(WebDriver):
 
 class Firefox(WebDriver):
     def __init__(self, firefox_profile=None, firefox_binary=None, timeout=30000,
-                capabilities=None, proxy=None, executable_path="wires",
+                capabilities=None, proxy=None, executable_path="wires", firefox_options=None,
                 wait_interval=1000, wait_timeout=30000,
                 page_load_timeout=30000, script_timeout=30000):
         """
@@ -980,7 +980,7 @@ class Firefox(WebDriver):
         timeout /= 1000.0
         WebDriver.__init__(self, web_driver_type=WebDriverType.FIREFOX,
                         firefox_profile=firefox_profile, firefox_binary=firefox_binary, timeout=timeout,
-                        capabilities=capabilities, proxy=proxy, executable_path=executable_path,
+                        capabilities=capabilities, proxy=proxy, executable_path=executable_path, firefox_options=firefox_options,
                         wait_interval=wait_interval, wait_timeout=wait_timeout,
                         page_load_timeout=page_load_timeout, script_timeout=script_timeout)
 
