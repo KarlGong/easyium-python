@@ -242,7 +242,7 @@ class Element(Context):
                 if web_driver_type in WebDriverType._MOBILE:
                     return self._selenium_element().location_in_view
                 else:
-                    return self._selenium_element().location_once_scrolled_into_view
+                    return self._selenium_element().location_once_scrolled_into_view # todo: use the javascript?
             except (NoSuchElementException, StaleElementReferenceException):
                 self.wait_for().exists()
                 if web_driver_type in WebDriverType._MOBILE:
@@ -271,12 +271,29 @@ class Element(Context):
         """
         try:
             try:
-                return self._selenium_element().rect
+                if self.get_web_driver_type() == WebDriverType.FIREFOX:
+                    return self._selenium_element().rect
+                else:
+                    rect = {}
+                    rect.update(self._selenium_element().location)
+                    rect.update(self._selenium_element().size)
+                    return rect
             except (NoSuchElementException, StaleElementReferenceException):
                 self.wait_for().exists()
-                return self._selenium_element().rect
+                if self.get_web_driver_type() == WebDriverType.FIREFOX:
+                    return self._selenium_element().rect
+                else:
+                    rect = {}
+                    rect.update(self._selenium_element().location)
+                    rect.update(self._selenium_element().size)
+                    return rect
         except WebDriverException as wde:
             raise EasyiumException(wde.msg, self)
+
+    def get_center(self):
+        rect = self.get_rect()
+        return {"x": rect["x"] + rect["width"] / 2,
+                "y": rect["y"] + rect["height"] / 2}
 
     def get_tag_name(self):
         """
