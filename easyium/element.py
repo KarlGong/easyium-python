@@ -242,7 +242,7 @@ class Element(Context):
                 if web_driver_type in WebDriverType._MOBILE:
                     return self._selenium_element().location_in_view
                 else:
-                    return self._selenium_element().location_once_scrolled_into_view # todo: use the javascript?
+                    return self._selenium_element().location_once_scrolled_into_view
             except (NoSuchElementException, StaleElementReferenceException):
                 self.wait_for().exists()
                 if web_driver_type in WebDriverType._MOBILE:
