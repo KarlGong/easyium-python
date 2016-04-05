@@ -174,7 +174,7 @@ class WebDriver(Context):
 
         return self._selenium_web_driver().execute_async_script(script, *converted_args)
 
-    def open(self, url):
+    def get(self, url):
         """
             Loads a web page in the current browser session.
 
@@ -182,7 +182,7 @@ class WebDriver(Context):
         """
         self._selenium_web_driver().get(url)
 
-    get = open
+    open = get
 
     def get_title(self):
         """
