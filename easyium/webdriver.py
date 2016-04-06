@@ -287,7 +287,7 @@ class WebDriver(Context):
 
     switch_to_default_frame = switch_to_default_content
 
-    def get_alert(self):
+    def switch_to_alert(self):
         """
             Switches focus to an alert on the page.
 
@@ -296,7 +296,7 @@ class WebDriver(Context):
         self.wait_for().alert_present()
         return Alert(self._selenium_web_driver().switch_to.alert)
 
-    switch_to_alert = get_alert
+    get_alert = switch_to_alert
 
     def is_alert_present(self):
         """
