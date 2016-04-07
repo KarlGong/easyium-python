@@ -281,11 +281,9 @@ class WebDriver(Context):
 
     def switch_to_default_content(self):
         """
-            Switch focus to the default frame.
+            Selects either the first frame on the page, or the main document when a page contains iframes.
         """
         self._selenium_web_driver().switch_to.default_content()
-
-    switch_to_default_frame = switch_to_default_content
 
     def switch_to_alert(self):
         """
