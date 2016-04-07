@@ -106,7 +106,21 @@ class Context:
         """
             Return whether this context has a child element.
 
-        :param locator: the locator (relative to this context) of the child element
+        :param locator:
+            the locator (relative to this context) of the child element.
+            The format of locator is: "by=value", the possible values of "by" are::
+
+                "id": By.ID
+                "xpath": By.XPATH
+                "link": By.LINK_TEXT
+                "partial_link": By.PARTIAL_LINK_TEXT
+                "name": By.NAME
+                "tag": By.TAG_NAME
+                "class": By.CLASS_NAME
+                "css": By.CSS_SELECTOR
+                "ios_uiautomation": MobileBy.IOS_UIAUTOMATION
+                "android_uiautomation": MobileBy.ANDROID_UIAUTOMATOR
+                "accessibility_id": MobileBy.ACCESSIBILITY_ID
         :return: whether this context has a child element.
         """
         try:
