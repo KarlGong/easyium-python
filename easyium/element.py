@@ -291,6 +291,9 @@ class Element(Context):
             raise EasyiumException(wde.msg, self)
 
     def get_center(self):
+        """
+            Gets the location for the center of this element.
+        """
         rect = self.get_rect()
         return {"x": rect["x"] + rect["width"] / 2,
                 "y": rect["y"] + rect["height"] / 2}
@@ -312,6 +315,7 @@ class Element(Context):
         """
             Gets the value of this element.
             Can be used to get the text of a text entry element.
+            Text entry elements are INPUT and TEXTAREA elements.
         """
         try:
             try:

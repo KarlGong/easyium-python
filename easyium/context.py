@@ -152,7 +152,7 @@ class Context:
             the identifier is a function to generate the locator of the found element, you can get the standard ones in class Identifier.
             Otherwise, you can create one like this::
 
-                context.find_element("class=food", lambda e: "xpath=.//*[@attr='%s']" % e.get_attribute("attr"))
+                context.find_element("class=foo", lambda e: "xpath=.//*[@bar='%s']" % e.get_attribute("bar"))
         :return: the DynamicElement found by locator
         """
         # import the DynamicElement here to avoid cyclic dependency
@@ -196,7 +196,7 @@ class Context:
             the identifier is a function to generate the locator of the found elements, you can get the standard ones in class Identifier.
             Otherwise, you can create one like this::
 
-                context.find_elements("class=food", lambda e: "xpath=.//*[@attr='%s']" % e.get_attribute("attr"))
+                context.find_elements("class=foo", lambda e: "xpath=.//*[@bar='%s']" % e.get_attribute("bar"))
         :param at_least: end finding elements when the number of found elements is at least the given number.
         :return: the DynamicElement list found by locator
         """
