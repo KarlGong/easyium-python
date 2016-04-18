@@ -11,7 +11,7 @@ Advantages
 
 - easyium adds a global implicit wait for elements and you rarely need to consider waiting a element to be visible or existing.
 
-- easyium introduces a simple and clear way to build classes for UI.
+- easyium introduces a simple and clear way to build model objects for UI.
 
 - easyium has a better performance, the element stores webelement reference and reuses it if necessary.
 
