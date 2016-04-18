@@ -13,7 +13,7 @@ Advantages
 
 - easyium introduces a simple and clear way to build model objects for UI.
 
-- easyium has a better performance, the element stores webelement reference and reuses it if necessary.
+- easyium has a better performance, the element will lazily load WebElement reference and reuses it if necessary.
 
 - easyium provides easy-to-use wait method for element. e.g., my_element.wait_for().not_().exists()
 
