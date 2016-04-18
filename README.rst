@@ -49,7 +49,7 @@ You can create a new instance by providing parent and locator.
 
 Example
 -------
-For detailed examples, please refer to the ``examples`` folder in source distribution.
+For detailed examples, please refer to the ``examples`` folder in source distribution or visit https://github.com/KarlGong/easyium-python/tree/master/examples
 
 Contact me
 ----------
