@@ -15,7 +15,7 @@ class Google:
         # This list is always in the page, although it is invisible, it is StaticElement.
         self.__google_apps_list = StaticElement(self.__web_driver, "class=gb_ha")
 
-        # Currently the StaticElement does not refer to webelement in Browser,
+        # Currently the StaticElement does not refer to WebElement in Browser,
         # so open url here is fine.
         self.__web_driver.open("https://www.google.com")
 
@@ -41,7 +41,7 @@ class GoogleAppsList:
 
         # In most cases we should wait for the mask not existing here .
         # But in this case, no mask here.
-        # self.__loading_mask.wait_for().not_().existing
+        # self.__loading_mask.wait_for().not_().exists()
 
     def get_all_apps(self):
         # We should wait this control until ready.
