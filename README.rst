@@ -57,6 +57,28 @@ For information and suggestions you can contact me at karl.gong@outlook.com
 
 Change Log
 ----------
+1.2.0 (compared to 1.1.5)
+
+- Add WebDriver Ie, Firefox, Chrome, Opera, Safari, Edge, PhantomJS, Ios and Android.
+
+- Add scroll_to() in WebDriver.
+
+- Add has_child() in Context.
+
+- Add get_center() in Element.
+
+- Add wait_for_server_started() in utils.
+
+- Support WebDriver.wait_for().text_equals(), WebDriver.wait_for().activity_present().
+
+- Support with statement for WebDriver.
+
+- Support at_least in Context.find_elements().
+
+- Support drag_and_drop_to_with_offset, drag_and_drop_by_offset for mobile.
+
+- Remove pre and post wait time.
+
 1.1.5 (compared to 1.1.4)
 
 - Add scroll(), switch_to_new_window() to WebDriver.
