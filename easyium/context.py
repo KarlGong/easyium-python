@@ -188,7 +188,7 @@ class Context:
                     # raised by self.wait_for().exists() in _find_element()
                     raise
                 raise exceptions.TimeoutException(
-                    "Timed out waiting for the found element by <%s> under:\n%s\ncondition <%s>." % (locator, self, condition.__name__))
+                    "Timed out waiting for the found element by <%s> under:\n%s\nmatches condition <%s>." % (locator, self, condition.__name__))
         else:
             _find_element()
 
@@ -256,7 +256,7 @@ class Context:
                 if e.__class__ == exceptions.ElementTimeoutException:
                     # raised by self.wait_for().exists() in _find_elements()
                     raise
-                raise exceptions.TimeoutException("Timed out waiting for the found elements by <%s> under:\n%s\ncondition <%s>." % (locator, self, condition.__name__))
+                raise exceptions.TimeoutException("Timed out waiting for the found elements by <%s> under:\n%s\nmatch condition <%s>." % (locator, self, condition.__name__))
         else:
             _find_elements()
 
