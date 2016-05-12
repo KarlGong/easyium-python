@@ -123,13 +123,9 @@ class Context:
                 "accessibility_id": MobileBy.ACCESSIBILITY_ID
         :return: whether this context has a child element.
         """
-        try:
-            self.find_element(locator)
-            return True
-        except exceptions.NoSuchElementException:
-            return False
+        return self.find_element(locator) is not None
 
-    def find_element(self, locator, identifier=Identifier.id):
+    def find_element(self, locator, identifier=Identifier.id, condition=None):
         """
             Find a DynamicElement under this context immediately.
 
@@ -153,27 +149,53 @@ class Context:
             Otherwise, you can create one like this::
 
                 context.find_element("class=foo", lambda e: "xpath=.//*[@bar='%s']" % e.get_attribute("bar"))
+        :param condition:
+            end finding element when the found element match the condition function.
+            e.g., end finding element when the found element is not None
+
+                context.find_element("class=foo", condition=lambda element: element is not None)
         :return: the DynamicElement found by locator
         """
         # import the DynamicElement here to avoid cyclic dependency
         from .dynamicelement import DynamicElement
 
         by, value = locator_to_by_value(locator)
-        try:
-            try:
-                return DynamicElement(self, self._selenium_context().find_element(by, value), locator, identifier)
-            except (exceptions.NoSuchElementException, StaleElementReferenceException):
-                # Only Element can reach here
-                self.wait_for().exists()
-                return DynamicElement(self, self._selenium_context().find_element(by, value), locator, identifier)
-        except InvalidSelectorException:
-            raise exceptions.InvalidLocatorException("The value <%s> of locator <%s> is not a valid expression." % (value, locator), self)
-        except NoSuchElementException:
-            raise exceptions.NoSuchElementException("Cannot find element by <%s> under:" % locator, self)
-        except WebDriverException as wde:
-            raise exceptions.EasyiumException(wde.msg, self)
+        element = {"inner": None}
 
-    def find_elements(self, locator, identifier=Identifier.id, at_least=0):
+        def _find_element():
+            try:
+                try:
+                    element["inner"] = DynamicElement(self, self._selenium_context().find_element(by, value), locator, identifier)
+                    return element["inner"]
+                except (exceptions.NoSuchElementException, StaleElementReferenceException):
+                    # Only Element can reach here
+                    self.wait_for().exists()
+                    element["inner"] = DynamicElement(self, self._selenium_context().find_element(by, value), locator, identifier)
+                    return element["inner"]
+            except InvalidSelectorException:
+                raise exceptions.InvalidLocatorException("The value <%s> of locator <%s> is not a valid expression." % (value, locator), self)
+            except NoSuchElementException:
+                element["inner"] = None
+                return element["inner"]
+            except WebDriverException as wde:
+                raise exceptions.EasyiumException(wde.msg, self)
+
+        if condition:
+            try:
+                self.waiter().wait_for(lambda: condition(_find_element()))
+            except exceptions.TimeoutException as e:
+                if e.__class__ == exceptions.ElementTimeoutException:
+                    # raised by self.wait_for().exists() in _find_element()
+                    raise
+                raise exceptions.TimeoutException(
+                    "Timed out waiting for the found element by <%s> under:\n%s\ncondition <%s>." % (locator, self, condition.__name__))
+        else:
+            _find_element()
+
+        return element["inner"]
+
+
+    def find_elements(self, locator, identifier=Identifier.id, condition=None):
         """
             Find DynamicElement list under this context immediately.
 
@@ -196,37 +218,46 @@ class Context:
             the identifier is a function to generate the locator of the found elements, you can get the standard ones in class Identifier.
             Otherwise, you can create one like this::
 
-                context.find_elements("class=foo", lambda e: "xpath=.//*[@bar='%s']" % e.get_attribute("bar"))
-        :param at_least: end finding elements when the number of found elements is at least the given number.
+                context.find_elements("class=foo", identifier=lambda element: "xpath=.//*[@bar='%s']" % element.get_attribute("bar"))
+        :param condition:
+            end finding elements when the found elements match the condition function.
+            e.g., end finding elements when the number of found elements is at least 1
+
+                context.find_elements("class=foo", condition=lambda elements: len(elements) >=1)
         :return: the DynamicElement list found by locator
         """
         # import the DynamicElement here to avoid cyclic dependency
         from .dynamicelement import DynamicElement
 
         by, value = locator_to_by_value(locator)
-        selenium_elements = {"inner": []}
+        elements = {"inner": []}
 
-        def find_selenium_elements():
+        def _find_elements():
             try:
                 try:
-                    selenium_elements["inner"] = self._selenium_context().find_elements(by, value)
-                    return selenium_elements["inner"]
+                    selenium_elements = self._selenium_context().find_elements(by, value)
+                    elements["inner"] = [DynamicElement(self, selenium_element, locator, identifier) for selenium_element in selenium_elements]
+                    return elements["inner"]
                 except (exceptions.NoSuchElementException, StaleElementReferenceException):
                     # Only Element can reach here
                     self.wait_for().exists()
-                    selenium_elements["inner"] = self._selenium_context().find_elements(by, value)
-                    return selenium_elements["inner"]
+                    selenium_elements = self._selenium_context().find_elements(by, value)
+                    elements["inner"] = [DynamicElement(self, selenium_element, locator, identifier) for selenium_element in selenium_elements]
+                    return elements["inner"]
             except InvalidSelectorException:
                 raise exceptions.InvalidLocatorException("The value <%s> of locator <%s> is not a valid expression." % (value, locator), self)
             except WebDriverException as wde:
                 raise exceptions.EasyiumException(wde.msg, self)
 
-        try:
-            self.waiter().wait_for(lambda : len(find_selenium_elements()) >= at_least)
-        except exceptions.TimeoutException as e:
-            if e.__class__ == exceptions.ElementTimeoutException:
-                # raised by self.wait_for().exists() in find_selenium_elements()
-                raise
-            raise exceptions.TimeoutException("Timed out waiting for the number of found elements by <%s> under:\n%s\nto be at least <%s>." % (locator, self, at_least))
+        if condition:
+            try:
+                self.waiter().wait_for(lambda : condition(_find_elements()))
+            except exceptions.TimeoutException as e:
+                if e.__class__ == exceptions.ElementTimeoutException:
+                    # raised by self.wait_for().exists() in _find_elements()
+                    raise
+                raise exceptions.TimeoutException("Timed out waiting for the found elements by <%s> under:\n%s\ncondition <%s>." % (locator, self, condition.__name__))
+        else:
+            _find_elements()
 
-        return [DynamicElement(self, selenium_element, locator, identifier) for selenium_element in selenium_elements["inner"]]
+        return elements["inner"]
