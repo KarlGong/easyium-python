@@ -104,7 +104,7 @@ class Context:
 
     def has_child(self, locator):
         """
-            Return whether this context has a child element.
+            Whether this context has a child element.
 
         :param locator:
             the locator (relative to this context) of the child element.
@@ -127,7 +127,9 @@ class Context:
 
     def find_element(self, locator, identifier=Identifier.id, condition=None):
         """
-            Find a DynamicElement under this context immediately.
+            Find a DynamicElement under this context.
+            Note: 1. If no condition is specified, the result will be returned immediately.
+            2. if no element is found, None will be returned.
 
         :param locator:
             the locator (relative to this context) of the element to be found.
@@ -153,7 +155,7 @@ class Context:
             end finding element when the found element match the condition function.
             e.g., end finding element when the found element is not None
 
-                context.find_element("class=foo", condition=lambda element: element is not None)
+                context.find_element("class=foo", condition=lambda element: element)
         :return: the DynamicElement found by locator
         """
         # import the DynamicElement here to avoid cyclic dependency
@@ -182,7 +184,7 @@ class Context:
 
         if condition:
             try:
-                self.waiter().wait_for(lambda: condition(_find_element()))
+                self.waiter().wait_for(lambda : condition(_find_element()))
             except exceptions.TimeoutException as e:
                 if e.__class__ == exceptions.ElementTimeoutException:
                     # raised by self.wait_for().exists() in _find_element()
@@ -197,7 +199,9 @@ class Context:
 
     def find_elements(self, locator, identifier=Identifier.id, condition=None):
         """
-            Find DynamicElement list under this context immediately.
+            Find DynamicElement list under this context.
+            Note: 1. If no condition is specified, the result will be returned immediately.
+            2. if no elements is found, empty list will be returned.
 
         :param locator:
             the locator (relative to this context) of the elements to be found.
@@ -220,10 +224,10 @@ class Context:
 
                 context.find_elements("class=foo", identifier=lambda element: "xpath=.//*[@bar='%s']" % element.get_attribute("bar"))
         :param condition:
-            end finding elements when the found elements match the condition function.
-            e.g., end finding elements when the number of found elements is at least 1
+            end finding elements when the found element list match the condition function.
+            e.g., end finding elements when the found element list is not empty
 
-                context.find_elements("class=foo", condition=lambda elements: len(elements) >=1)
+                context.find_elements("class=foo", condition=lambda elements: elements)
         :return: the DynamicElement list found by locator
         """
         # import the DynamicElement here to avoid cyclic dependency
@@ -256,7 +260,8 @@ class Context:
                 if e.__class__ == exceptions.ElementTimeoutException:
                     # raised by self.wait_for().exists() in _find_elements()
                     raise
-                raise exceptions.TimeoutException("Timed out waiting for the found elements by <%s> under:\n%s\nmatch condition <%s>." % (locator, self, condition.__name__))
+                raise exceptions.TimeoutException(
+                    "Timed out waiting for the found element list by <%s> under:\n%s\nmatches condition <%s>." % (locator, self, condition.__name__))
         else:
             _find_elements()
 
