@@ -57,6 +57,12 @@ For information and suggestions you can contact me at karl.gong@outlook.com
 
 Change Log
 ----------
+1.2.1 (compared to 1.2.0)
+
+- Remove at_least argument in context.find_elements.
+
+- Support find element(s) condition in Context.find_element(s).
+
 1.2.0 (compared to 1.1.5)
 
 - Add WebDriver Ie, Firefox, Chrome, Opera, Safari, Edge, PhantomJS, Ios and Android.
