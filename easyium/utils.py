@@ -1,3 +1,9 @@
+try:
+    StringTypes = (str, unicode)
+except NameError:
+    StringTypes = (str,)
+
+# for other utils
 import socket
 try:
     from urlparse import urlparse

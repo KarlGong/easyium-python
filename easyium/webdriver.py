@@ -3,6 +3,7 @@ from appium.webdriver.common.touch_action import TouchAction
 from selenium.webdriver import ActionChains
 from selenium.common.exceptions import NoAlertPresentException
 
+from .utils import StringTypes
 from .alert import Alert
 from .context import Context
 from .enumeration import WebDriverType
@@ -254,23 +255,29 @@ class WebDriver(Context):
 
     def switch_to_frame(self, frame_reference):
         """
-            Switches focus to the specified frame, by index, name, or element.
+            Switches focus to the specified frame, by index (zero-based), locator, or element.
 
-        :param frame_reference: the name of the window to switch to, an integer representing the index,
+        :param frame_reference: an integer representing the index, the locator of the frame to switch to,
                             or a element that is an (i)frame to switch to.
 
         :Usage:
-            driver.switch_to_frame('frame_name')
             driver.switch_to_frame(1)
+            driver.switch_to_frame("name=myIframe")
             driver.switch_to_frame(StaticElement(driver, "tag=iframe"))
         """
         from .element import Element
+        from .staticelement import StaticElement
 
-        if isinstance(frame_reference, Element):
-            frame_reference.wait_for().exists()
-            self._selenium_web_driver().switch_to.frame(frame_reference._selenium_element())
+        if isinstance(frame_reference, int):
+            frame_element = StaticElement(self, "xpath=(.//iframe)[%s]" % (frame_reference + 1))
+        elif isinstance(frame_reference, StringTypes):
+            frame_element = StaticElement(self, frame_reference)
+        elif isinstance(frame_reference, Element):
+            frame_element = frame_reference
         else:
-            self._selenium_web_driver().switch_to.frame(frame_reference)
+            raise ValueError("Frame reference type %s is not supported." % type(frame_reference))
+        frame_element.wait_for().exists()
+        self._selenium_web_driver().switch_to.frame(frame_element._selenium_element())
 
     def switch_to_parent_frame(self):
         """
