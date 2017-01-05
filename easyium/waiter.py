@@ -1,6 +1,6 @@
 import time
 
-from selenium.common.exceptions import NoAlertPresentException, NoSuchElementException
+from selenium.common.exceptions import NoAlertPresentException, NoSuchElementException, StaleElementReferenceException
 from selenium.webdriver.common.by import By
 
 from .decorator import SupportedBy
@@ -281,9 +281,23 @@ class WebDriverWaitFor:
             # wait for url changed
             previous_url = driver.get_current_url()
             StaticElement(driver, "id=change_url").click() # url changed
-            driver.wait_for().not_.url_equals(previous_url)
+            driver.wait_for().not_().url_equals(previous_url)
         """
         self.__wait_for(URLEquals(self.__web_driver, url))
+
+    def reloaded(self, indicator):
+        """
+            Wait for the page to be refreshed / redirected.
+
+        :param indicator: the indicator element, it should be a DynamicElement
+
+        :Usage:
+            # usually we use body as indicator, the indicator should be DynamicElement
+            indicator = driver.find_element("tag=body")
+            StaticElement(driver, "id=reload_after_2_seconds").click() # reload after 2 seconds
+            driver.wait_for().reloaded(indicator)
+        """
+        self.__wait_for(Reloaded(self.__web_driver, indicator))
 
     @SupportedBy(WebDriverType.ANDROID)
     def activity_present(self, activity):
@@ -336,6 +350,22 @@ class URLEquals:
 
     def __str__(self):
         return "URLEquals [webdriver: \n%s\n][url: %s]" % (self.__web_driver, self.__url)
+
+
+class Reloaded:
+    def __init__(self, web_driver, indicator):
+        self.__web_driver = web_driver
+        self.__indicator = indicator
+
+    def occurred(self):
+        try:
+            self.__indicator._selenium_element().is_displayed()
+            return False
+        except StaleElementReferenceException:
+            return True
+
+    def __str__(self):
+        return "Reloaded [\n%s\n]" % self.__web_driver
 
 
 class ActivityPresent:
