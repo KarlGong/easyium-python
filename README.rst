@@ -57,6 +57,12 @@ For information and suggestions you can contact me at karl.gong@outlook.com
 
 Change Log
 ----------
+1.2.2 (compared to 1.2.1)
+
+- Add waiting for WebDriver.switch_to_frame().
+
+- Add WebDriver.wait_for().reloaded().
+
 1.2.1 (compared to 1.2.0)
 
 - Remove at_least argument in context.find_elements.
