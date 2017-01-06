@@ -965,7 +965,8 @@ class Ie(WebDriver):
 
 class Firefox(WebDriver):
     def __init__(self, firefox_profile=None, firefox_binary=None, timeout=30000,
-                capabilities=None, proxy=None, executable_path="wires", firefox_options=None,
+                capabilities=None, proxy=None, executable_path="geckodriver",
+                firefox_options=None, log_path="geckodriver.log",
                 wait_interval=1000, wait_timeout=30000,
                 page_load_timeout=30000, script_timeout=30000):
         """
@@ -977,6 +978,8 @@ class Firefox(WebDriver):
         :param capabilities: a dictionary of capabilities to request when starting the browser session
         :param proxy: the firefox proxy
         :param executable_path: path to the GeckoDriver binary
+        :param firefox_options: Instance of options.Options
+        :param log_path: Where to log information from the driver
         :param wait_interval: the wait interval (in milliseconds)
         :param wait_timeout: the wait timeout (in milliseconds)
         :param page_load_timeout: the page load timeout (in milliseconds)
@@ -985,7 +988,8 @@ class Firefox(WebDriver):
         timeout /= 1000.0
         WebDriver.__init__(self, web_driver_type=WebDriverType.FIREFOX,
                         firefox_profile=firefox_profile, firefox_binary=firefox_binary, timeout=timeout,
-                        capabilities=capabilities, proxy=proxy, executable_path=executable_path, firefox_options=firefox_options,
+                        capabilities=capabilities, proxy=proxy, executable_path=executable_path,
+                        firefox_options=firefox_options, log_path=log_path,
                         wait_interval=wait_interval, wait_timeout=wait_timeout,
                         page_load_timeout=page_load_timeout, script_timeout=script_timeout)
 
@@ -1047,15 +1051,15 @@ class Opera(WebDriver):
 
 
 class Safari(WebDriver):
-    def __init__(self, executable_path=None, port=0,
+    def __init__(self, port=0, executable_path="/usr/bin/safaridriver",
                 desired_capabilities=None, quiet=False,
                 wait_interval=1000, wait_timeout=30000,
                 page_load_timeout=30000, script_timeout=30000):
         """
             Creates a new instance of Safari.
 
-        :param executable_path: path to the executable. If the default is used it assumes the executable is in the Environment Variable SELENIUM_SERVER_JAR
         :param port: port you would like the service to run, if left as 0, a free port will be found.
+        :param executable_path: path to the executable. If the default is used it assumes the executable is in the Environment Variable SELENIUM_SERVER_JAR
         :param desired_capabilities: a dictionary of capabilities to request when starting the browser session
         :param quiet: whether the service runs quietly
         :param wait_interval: the wait interval (in milliseconds)
@@ -1067,7 +1071,7 @@ class Safari(WebDriver):
             from selenium.webdriver.common.desired_capabilities import DesiredCapabilities
             desired_capabilities = DesiredCapabilities.SAFARI
         WebDriver.__init__(self, web_driver_type=WebDriverType.SAFARI,
-                        executable_path=executable_path, port=port,
+                        port=port, executable_path=executable_path,
                         desired_capabilities=desired_capabilities, quiet=quiet,
                         wait_interval=wait_interval, wait_timeout=wait_timeout,
                         page_load_timeout=page_load_timeout, script_timeout=script_timeout)
