@@ -60,6 +60,19 @@ class Element(Context):
         _timeout = self.get_wait_timeout() if timeout is None else timeout
         return ElementWaitFor(self, _interval, _timeout)
 
+    def focus(self):
+        """
+            Focus this element.
+        """
+        try:
+            try:
+                self.get_web_driver().execute_script("arguments[0].focus()", self)
+            except (NoSuchElementException, StaleElementReferenceException):
+                self.wait_for().visible()
+                self.get_web_driver().execute_script("arguments[0].focus()", self)
+        except WebDriverException as wde:
+            raise EasyiumException(wde.msg, self)
+
     def blur(self):
         """
             Removes keyboard focus from this element.
