@@ -65,11 +65,7 @@ class Element(Context):
             Focus this element.
         """
         try:
-            try:
-                self.get_web_driver().execute_script("arguments[0].focus()", self)
-            except (NoSuchElementException, StaleElementReferenceException):
-                self.wait_for().visible()
-                self.get_web_driver().execute_script("arguments[0].focus()", self)
+            self.get_web_driver().execute_script("arguments[0].focus()", self)
         except WebDriverException as wde:
             raise EasyiumException(wde.msg, self)
 
@@ -78,11 +74,7 @@ class Element(Context):
             Removes keyboard focus from this element.
         """
         try:
-            try:
-                self.get_web_driver().execute_script("arguments[0].blur()", self)
-            except (NoSuchElementException, StaleElementReferenceException):
-                self.wait_for().visible()
-                self.get_web_driver().execute_script("arguments[0].blur()", self)
+            self.get_web_driver().execute_script("arguments[0].blur()", self)
         except WebDriverException as wde:
             raise EasyiumException(wde.msg, self)
 
@@ -361,13 +353,8 @@ class Element(Context):
         :return: the content of the text node in this element.
         """
         try:
-            try:
-                content = self.get_web_driver().execute_script(
-                    "return arguments[0].childNodes[%s].nodeValue" % text_node_index, self)
-            except (NoSuchElementException, StaleElementReferenceException):
-                self.wait_for().exists()
-                content = self.get_web_driver().execute_script(
-                    "return arguments[0].childNodes[%s].nodeValue" % text_node_index, self)
+            content = self.get_web_driver().execute_script(
+                "return arguments[0].childNodes[%s].nodeValue" % text_node_index, self)
         except WebDriverException as wde:
             raise EasyiumException(wde.msg, self)
 
@@ -448,11 +435,7 @@ class Element(Context):
             setSelectionRange(arguments[0], %s, %s);
         """
         try:
-            try:
-                self.get_web_driver().execute_script(script % (start, end), self)
-            except (NoSuchElementException, StaleElementReferenceException):
-                self.wait_for().visible()
-                self.get_web_driver().execute_script(script % (start, end), self)
+            self.get_web_driver().execute_script(script % (start, end), self)
         except WebDriverException as wde:
             raise EasyiumException(wde.msg, self)
 
@@ -461,11 +444,7 @@ class Element(Context):
             Get the inner html of this element.
         """
         try:
-            try:
-                return self.get_web_driver().execute_script("return arguments[0].innerHTML", self)
-            except (NoSuchElementException, StaleElementReferenceException):
-                self.wait_for().exists()
-                return self.get_web_driver().execute_script("return arguments[0].innerHTML", self)
+            return self.get_web_driver().execute_script("return arguments[0].innerHTML", self)
         except WebDriverException as wde:
             raise EasyiumException(wde.msg, self)
 
@@ -512,11 +491,7 @@ class Element(Context):
             arguments[0].dispatchEvent(mouseoverEventObj);
         """
         try:
-            try:
-                self.get_web_driver().execute_script(script, self)
-            except (NoSuchElementException, StaleElementReferenceException):
-                self.wait_for().exists()
-                self.get_web_driver().execute_script(script, self)
+            self.get_web_driver().execute_script(script, self)
         except WebDriverException as wde:
             raise EasyiumException(wde.msg, self)
 
@@ -536,11 +511,7 @@ class Element(Context):
             arguments[0].dispatchEvent(mouseoutEventObj);
         """
         try:
-            try:
-                self.get_web_driver().execute_script(script, self)
-            except (NoSuchElementException, StaleElementReferenceException):
-                self.wait_for().exists()
-                self.get_web_driver().execute_script(script, self)
+            self.get_web_driver().execute_script(script, self)
         except WebDriverException as wde:
             raise EasyiumException(wde.msg, self)
 
