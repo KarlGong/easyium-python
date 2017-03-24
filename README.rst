@@ -57,6 +57,12 @@ For information and suggestions you can contact me at karl.gong@outlook.com
 
 Change Log
 ----------
+1.2.3 (compared to 1.2.2)
+
+- Support selenium>=3.0.2, appium>=0.24
+
+- Add focus() for element.
+
 1.2.2 (compared to 1.2.1)
 
 - Add waiting for WebDriver.switch_to_frame().
