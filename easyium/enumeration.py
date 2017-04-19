@@ -6,9 +6,10 @@ class WebDriverType:
     SAFARI = "safari"
     EDGE = "edge"
     PHANTOMJS = "phantomjs"
+    REMOTE = "remote"
     ANDROID = "android"
     IOS = "ios"
 
-    _BROWSER = [IE, FIREFOX, CHROME, OPERA, SAFARI, PHANTOMJS]
+    _BROWSER = [IE, FIREFOX, CHROME, OPERA, SAFARI, EDGE, PHANTOMJS, REMOTE]
     _MOBILE = [ANDROID, IOS]
     _ALL = _BROWSER + _MOBILE
