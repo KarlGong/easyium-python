@@ -492,6 +492,20 @@ class WebDriver(Context):
         """
         return self._selenium_web_driver().get_window_position(window_reference)
 
+    def get_window_rect(self):
+        """
+            Gets the x, y coordinates of the window as well as height and width of
+            the current window.
+        """
+        return self._selenium_web_driver().get_window_rect()
+
+    def set_window_rect(self, x=None, y=None, width=None, height=None):
+        """
+            Sets the x, y coordinates of the window as well as height and width of
+            the current window.
+        """
+        self._selenium_web_driver().set_window_rect(x, y, width, height)
+
     @SupportedBy(WebDriverType._MOBILE)
     def get_orientation(self):
         """
