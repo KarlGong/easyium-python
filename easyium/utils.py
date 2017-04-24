@@ -15,9 +15,9 @@ from .waiter import Waiter
 
 def wait_for_server_started(server_url, interval=1000, timeout=30000):
     """
-        Wait for the appium server to be started.
+        Wait for the remote server to be started.
 
-    :param server_url: the url of the appium server, e.g.,"http://127.0.0.1:4728/wd/hub"
+    :param server_url: the url of the remote server, e.g.,"http://127.0.0.1:4728/wd/hub"
     :param interval: the wait interval (in milliseconds)
     :param timeout: the wait timeout (in milliseconds)
     """
