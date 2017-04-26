@@ -2,7 +2,7 @@ from appium.webdriver.common.multi_action import MultiAction
 from appium.webdriver.common.touch_action import TouchAction
 from appium.webdriver.webdriver import WebDriver as _Mobile
 from selenium.webdriver import ActionChains, Ie as _Ie , Firefox as _Firefox, Chrome as _Chrome, Opera as _Opera, \
-    Safari as _Safari, Edge as _Edge, PhantomJS as _PhantomJS, Remote as _Remote
+    Safari as _Safari, Edge as _Edge, PhantomJS as _PhantomJS
 from selenium.common.exceptions import NoAlertPresentException
 
 from .utils import StringTypes
@@ -38,7 +38,6 @@ class WebDriver(Context):
             WebDriverType.SAFARI: _Safari,
             WebDriverType.EDGE: _Edge,
             WebDriverType.PHANTOMJS: _PhantomJS,
-            WebDriverType.REMOTE: _Remote,
             WebDriverType.ANDROID: _Mobile,
             WebDriverType.IOS: _Mobile
         }.get(self.__web_driver_type, None)
@@ -1132,40 +1131,6 @@ class PhantomJS(WebDriver):
                         executable_path=executable_path,
                         port=port, desired_capabilities=desired_capabilities,
                         service_args=service_args, service_log_path=service_log_path,
-                        wait_interval=wait_interval, wait_timeout=wait_timeout,
-                        page_load_timeout=page_load_timeout, script_timeout=script_timeout)
-
-
-class Remote(WebDriver):
-    def __init__(self, command_executor='http://127.0.0.1:4444/wd/hub',
-                desired_capabilities=None, browser_profile=None, proxy=None,
-                keep_alive=False, file_detector=None,
-                wait_interval=1000, wait_timeout=30000,
-                page_load_timeout=30000, script_timeout=30000):
-        """
-            Create a new instance of remote driver.
-
-        :param command_executor: Either a string representing URL of the remote server or a custom
-             remote_connection.RemoteConnection object. Defaults to 'http://127.0.0.1:4444/wd/hub'.
-        :param desired_capabilities: A dictionary of capabilities to request when
-             starting the browser session. Required parameter.
-        :param browser_profile: A selenium.webdriver.firefox.firefox_profile.FirefoxProfile object.
-             Only used if Firefox is requested. Optional.
-        :param proxy: A selenium.webdriver.common.proxy.Proxy object. The browser session will
-             be started with given proxy settings, if possible. Optional.
-        :param keep_alive: Whether to configure remote_connection.RemoteConnection to use
-             HTTP keep-alive. Defaults to False.
-        :param file_detector: Pass custom file detector object during instantiation. If None,
-             then default LocalFileDetector() will be used.
-        :param wait_interval: the wait interval (in milliseconds)
-        :param wait_timeout: the wait timeout (in milliseconds)
-        :param page_load_timeout: the page load timeout (in milliseconds)
-        :param script_timeout: the script timeout (in milliseconds)
-        """
-        WebDriver.__init__(self, web_driver_type=WebDriverType.REMOTE,
-                        command_executor=command_executor,
-                        desired_capabilities=desired_capabilities, browser_profile=browser_profile, proxy=proxy,
-                        keep_alive=keep_alive, file_detector=file_detector,
                         wait_interval=wait_interval, wait_timeout=wait_timeout,
                         page_load_timeout=page_load_timeout, script_timeout=script_timeout)
 
