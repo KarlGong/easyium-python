@@ -57,6 +57,10 @@ For information and suggestions you can contact me at karl.gong@outlook.com
 
 Change Log
 ----------
+1.2.5 (compared to 1.2.4)
+
+- Enhance element actions.
+
 1.2.4 (compared to 1.2.3)
 
 - Support selenium>=3.4.0
