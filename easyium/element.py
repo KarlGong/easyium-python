@@ -176,7 +176,7 @@ class Element(Context):
 
     def get_attribute(self, name):
         """
-            Gets the given attribute or property of the element.
+            Gets the given attribute or property of this element.
 
             This method will first try to return the value of a property with the
             given name. If a property with that name doesn't exist, it returns the
@@ -188,7 +188,7 @@ class Element(Context):
             as strings.  For attributes or properties which do not exist, ``None``
             is returned.
 
-        :param name: Name of the attribute/property to retrieve.
+        :param name: name of the attribute/property to retrieve.
 
         :Usage:
             # Check if the "active" CSS class is applied to an element.
@@ -200,6 +200,18 @@ class Element(Context):
             except (NoSuchElementException, StaleElementReferenceException):
                 self.wait_for().exists()
                 return self._selenium_element().get_attribute(name)
+        except WebDriverException as wde:
+            raise EasyiumException(wde.msg, self)
+
+    def set_attribute(self, name, value):
+        """
+            Set the attribute of this element to value.
+            
+        :param name: the attribute name
+        :param value: the value to be set
+        """
+        try:
+            self.get_web_driver().execute_script("arguments[0].setAttribute('%s', '%s')" % (name, value), self)
         except WebDriverException as wde:
             raise EasyiumException(wde.msg, self)
 
@@ -218,7 +230,13 @@ class Element(Context):
         except WebDriverException as wde:
             raise EasyiumException(wde.msg, self)
 
-    get_value_of_css_property = get_css_value
+    def get_value_of_css_property(self, property_name):
+        """
+            Gets the value of a CSS property.
+
+        :param property_name: the property name
+        """
+        return self.get_css_value(property_name)
 
     def get_location(self):
         """
@@ -331,6 +349,28 @@ class Element(Context):
         except WebDriverException as wde:
             raise EasyiumException(wde.msg, self)
 
+    def set_value(self, value):
+        """
+            Set the value on this element.
+
+        :param value: the value to be set on this element
+        """
+        web_driver_type = self.get_web_driver_type()
+        try:
+            try:
+                if web_driver_type in WebDriverType._MOBILE:
+                    self._selenium_element().set_value(value)
+                else:
+                    self.get_web_driver().execute_script("arguments[0].setAttribute('value', '%s')" % value, self)
+            except (NoSuchElementException, StaleElementReferenceException):
+                self.wait_for().exists()
+                if web_driver_type in WebDriverType._MOBILE:
+                    self._selenium_element().set_value(value)
+                else:
+                    self.get_web_driver().execute_script("arguments[0].setAttribute('value', '%s')" % value, self)
+        except WebDriverException as wde:
+            raise EasyiumException(wde.msg, self)
+
     def get_text(self):
         """
             Gets the text of this element(including the text of its children).
@@ -341,6 +381,28 @@ class Element(Context):
             except (NoSuchElementException, StaleElementReferenceException):
                 self.wait_for().exists()
                 return self._selenium_element().text
+        except WebDriverException as wde:
+            raise EasyiumException(wde.msg, self)
+
+    def set_text(self, text):
+        """
+            Sends text to this element. Previous text is removed.
+
+        :param text: the text to be sent to this element
+        """
+        web_driver_type = self.get_web_driver_type()
+        try:
+            try:
+                if web_driver_type in WebDriverType._MOBILE:
+                    self._selenium_element().set_text(text)
+                else:
+                    self.get_web_driver().execute_script("arguments[0].innerText = '%s'" % text, self)
+            except (NoSuchElementException, StaleElementReferenceException):
+                self.wait_for().exists()
+                if web_driver_type in WebDriverType._MOBILE:
+                    self._selenium_element().set_text(text)
+                else:
+                    self.get_web_driver().execute_script("arguments[0].innerText = '%s'" % text, self)
         except WebDriverException as wde:
             raise EasyiumException(wde.msg, self)
 
@@ -476,9 +538,11 @@ class Element(Context):
             raise EasyiumException(wde.msg, self)
 
     @SupportedBy(WebDriverType._BROWSER)
-    def mouse_over(self):
+    def mouse_over(self, native=False):
         """
             Do mouse over this element.
+        
+        :param native: use the selenium native implementation
         """
         script = """
             var mouseoverEventObj = null;
@@ -491,14 +555,26 @@ class Element(Context):
             arguments[0].dispatchEvent(mouseoverEventObj);
         """
         try:
-            self.get_web_driver().execute_script(script, self)
+            try:
+                if native:
+                    self.get_web_driver().create_action_chains().move_to_element(self._selenium_element()).perform()
+                else:
+                    self.get_web_driver().execute_script(script, self)
+            except (NoSuchElementException, StaleElementReferenceException):
+                self.wait_for().exists()
+                if native:
+                    self.get_web_driver().create_action_chains().move_to_element(self._selenium_element()).perform()
+                else:
+                    self.get_web_driver().execute_script(script, self)
         except WebDriverException as wde:
             raise EasyiumException(wde.msg, self)
 
     @SupportedBy(WebDriverType._BROWSER)
-    def mouse_out(self):
+    def mouse_out(self, native=False):
         """
             Do mouse out this element.
+            
+        :param native: use the selenium native implementation
         """
         script = """
             var mouseoutEventObj = null;
@@ -511,7 +587,17 @@ class Element(Context):
             arguments[0].dispatchEvent(mouseoutEventObj);
         """
         try:
-            self.get_web_driver().execute_script(script, self)
+            try:
+                if native:
+                    self.get_web_driver().create_action_chains().move_by_offset(-99999, -99999).perform()
+                else:
+                    self.get_web_driver().execute_script(script, self)
+            except (NoSuchElementException, StaleElementReferenceException):
+                self.wait_for().exists()
+                if native:
+                    self.get_web_driver().create_action_chains().move_by_offset(-99999, -99999).perform()
+                else:
+                    self.get_web_driver().execute_script(script, self)
         except WebDriverException as wde:
             raise EasyiumException(wde.msg, self)
 
@@ -642,39 +728,6 @@ class Element(Context):
             except (NoSuchElementException, StaleElementReferenceException):
                 self.wait_for().visible()
                 self.get_web_driver().create_touch_action().long_press(self._selenium_element(), None, None, duration).release().perform()
-        except WebDriverException as wde:
-            raise EasyiumException(wde.msg, self)
-
-    @SupportedBy(WebDriverType.ANDROID)
-    def set_text(self, text):
-        """
-            Sends text to this element. Previous text is removed.
-            Android only.
-
-        :param text: the text to be sent to this element
-        """
-        try:
-            try:
-                self._selenium_element().set_text(text)
-            except (NoSuchElementException, StaleElementReferenceException):
-                self.wait_for().exists()
-                self._selenium_element().set_text(text)
-        except WebDriverException as wde:
-            raise EasyiumException(wde.msg, self)
-
-    @SupportedBy(WebDriverType._MOBILE)
-    def set_value(self, value):
-        """
-            Set the value on this element in the application
-
-        :param value: the value to be set on this element
-        """
-        try:
-            try:
-                self._selenium_element().set_value(value)
-            except (NoSuchElementException, StaleElementReferenceException):
-                self.wait_for().exists()
-                self._selenium_element().set_value(value)
         except WebDriverException as wde:
             raise EasyiumException(wde.msg, self)
 
