@@ -118,6 +118,7 @@ class Context:
                 "tag": By.TAG_NAME
                 "class": By.CLASS_NAME
                 "css": By.CSS_SELECTOR
+                "ios_predicate": MobileBy.IOS_PREDICATE
                 "ios_uiautomation": MobileBy.IOS_UIAUTOMATION
                 "android_uiautomation": MobileBy.ANDROID_UIAUTOMATOR
                 "accessibility_id": MobileBy.ACCESSIBILITY_ID
@@ -143,6 +144,7 @@ class Context:
                 "tag": By.TAG_NAME
                 "class": By.CLASS_NAME
                 "css": By.CSS_SELECTOR
+                "ios_predicate": MobileBy.IOS_PREDICATE
                 "ios_uiautomation": MobileBy.IOS_UIAUTOMATION
                 "android_uiautomation": MobileBy.ANDROID_UIAUTOMATOR
                 "accessibility_id": MobileBy.ACCESSIBILITY_ID
@@ -215,6 +217,7 @@ class Context:
                 "tag": By.TAG_NAME
                 "class": By.CLASS_NAME
                 "css": By.CSS_SELECTOR
+                "ios_predicate": MobileBy.IOS_PREDICATE
                 "ios_uiautomation": MobileBy.IOS_UIAUTOMATION
                 "android_uiautomation": MobileBy.ANDROID_UIAUTOMATOR
                 "accessibility_id": MobileBy.ACCESSIBILITY_ID

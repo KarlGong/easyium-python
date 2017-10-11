@@ -12,6 +12,7 @@ locator_to_by_map = {
     "tag": By.TAG_NAME,
     "class": By.CLASS_NAME,
     "css": By.CSS_SELECTOR,
+    "ios_predicate": MobileBy.IOS_PREDICATE,
     "ios_uiautomation": MobileBy.IOS_UIAUTOMATION,
     "android_uiautomator": MobileBy.ANDROID_UIAUTOMATOR,
     "accessibility_id": MobileBy.ACCESSIBILITY_ID
