@@ -43,10 +43,6 @@ class LatePersistException(EasyiumException):
     pass
 
 
-class UnsupportedWebDriverTypeException(EasyiumException):
-    pass
-
-
 class InvalidLocatorException(EasyiumException):
     pass
 

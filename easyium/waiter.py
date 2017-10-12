@@ -5,7 +5,7 @@ from selenium.webdriver.common.by import By
 
 from .decorator import SupportedBy
 from .exceptions import TimeoutException, ElementTimeoutException, WebDriverTimeoutException
-from .enumeration import WebDriverType
+from .enumeration import WebDriverPlatform
 
 
 class Waiter:
@@ -43,10 +43,12 @@ class Waiter:
 class ElementWaitFor:
     def __init__(self, element, interval, timeout):
         self.__element = element
-        self.__element__ = element
         self.__desired_occurrence = True
         self.__interval = interval
         self.__timeout = timeout
+
+    def _get_element(self):
+        return self.__element
 
     def __wait_for(self, element_condition, interval, timeout):
         def is_element_condition_occurred():
@@ -236,9 +238,11 @@ class ElementAttributeContainsAll:
 class WebDriverWaitFor:
     def __init__(self, web_driver, interval, timeout):
         self.__web_driver = web_driver
-        self.__web_driver__ = web_driver
         self.__desired_occurrence = True
         self.__waiter = Waiter(interval, timeout)
+
+    def _get_web_driver(self):
+        return self.__web_driver
 
     def __wait_for(self, web_driver_condition):
         def is_web_driver_condition_occurred():
@@ -299,7 +303,7 @@ class WebDriverWaitFor:
         """
         self.__wait_for(Reloaded(self.__web_driver, indicator))
 
-    @SupportedBy(WebDriverType.ANDROID)
+    @SupportedBy(WebDriverPlatform.ANDROID)
     def activity_present(self, activity):
         """
             Wait for the activity present.

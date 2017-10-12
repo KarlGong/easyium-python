@@ -4,7 +4,7 @@ from .context import Context
 from .decorator import SupportedBy
 from .exceptions import EasyiumException, NoSuchElementException
 from .waiter import ElementWaitFor
-from .enumeration import WebDriverType
+from .enumeration import WebDriverContext, WebDriverPlatform
 
 
 class Element(Context):
@@ -23,13 +23,13 @@ class Element(Context):
         """
         return self.get_parent().get_web_driver()
 
-    def get_web_driver_type(self):
+    def get_web_driver_info(self):
         """
-            Get the type of this element's web driver.
+            Get current info of this web driver.
 
-        :return: the web driver type
+        :return: the web driver info
         """
-        return self.get_web_driver().get_web_driver_type()
+        return self.get_web_driver().get_web_driver_info()
 
     def get_parent(self):
         """
@@ -259,16 +259,16 @@ class Element(Context):
             Returns the top-left corner location on the screen, or ``None`` if
             this element is not visible.
         """
-        web_driver_type = self.get_web_driver_type()
+        context = self.get_web_driver_info().context
         try:
             try:
-                if web_driver_type in WebDriverType._MOBILE:
+                if context == WebDriverContext.NATIVE_APP:
                     return self._selenium_element().location_in_view
                 else:
                     return self._selenium_element().location_once_scrolled_into_view
             except (NoSuchElementException, StaleElementReferenceException):
                 self.wait_for().exists()
-                if web_driver_type in WebDriverType._MOBILE:
+                if context == WebDriverContext.NATIVE_APP:
                     return self._selenium_element().location_in_view
                 else:
                     return self._selenium_element().location_once_scrolled_into_view
@@ -294,7 +294,8 @@ class Element(Context):
         """
         try:
             try:
-                if self.get_web_driver_type() == WebDriverType.FIREFOX:
+                if self.get_web_driver_info().context == WebDriverContext.FIREFOX \
+                        and self.get_web_driver_info().platform == WebDriverPlatform.PC:
                     return self._selenium_element().rect
                 else:
                     rect = {}
@@ -303,7 +304,8 @@ class Element(Context):
                     return rect
             except (NoSuchElementException, StaleElementReferenceException):
                 self.wait_for().exists()
-                if self.get_web_driver_type() == WebDriverType.FIREFOX:
+                if self.get_web_driver_info().context == WebDriverContext.FIREFOX \
+                        and self.get_web_driver_info().platform == WebDriverPlatform.PC:
                     return self._selenium_element().rect
                 else:
                     rect = {}
@@ -355,16 +357,16 @@ class Element(Context):
 
         :param value: the value to be set on this element
         """
-        web_driver_type = self.get_web_driver_type()
+        context = self.get_web_driver_info().context
         try:
             try:
-                if web_driver_type in WebDriverType._MOBILE:
+                if context == WebDriverContext.NATIVE_APP:
                     self._selenium_element().set_value(value)
                 else:
                     self.get_web_driver().execute_script("arguments[0].setAttribute('value', '%s')" % value, self)
             except (NoSuchElementException, StaleElementReferenceException):
                 self.wait_for().exists()
-                if web_driver_type in WebDriverType._MOBILE:
+                if context == WebDriverContext.NATIVE_APP:
                     self._selenium_element().set_value(value)
                 else:
                     self.get_web_driver().execute_script("arguments[0].setAttribute('value', '%s')" % value, self)
@@ -390,16 +392,16 @@ class Element(Context):
 
         :param text: the text to be sent to this element
         """
-        web_driver_type = self.get_web_driver_type()
+        context = self.get_web_driver_info().context
         try:
             try:
-                if web_driver_type in WebDriverType._MOBILE:
+                if context == WebDriverContext.NATIVE_APP:
                     self._selenium_element().set_text(text)
                 else:
                     self.get_web_driver().execute_script("arguments[0].innerText = '%s'" % text, self)
             except (NoSuchElementException, StaleElementReferenceException):
                 self.wait_for().exists()
-                if web_driver_type in WebDriverType._MOBILE:
+                if context == WebDriverContext.NATIVE_APP:
                     self._selenium_element().set_text(text)
                 else:
                     self.get_web_driver().execute_script("arguments[0].innerText = '%s'" % text, self)
@@ -537,7 +539,6 @@ class Element(Context):
         except WebDriverException as wde:
             raise EasyiumException(wde.msg, self)
 
-    @SupportedBy(WebDriverType._BROWSER)
     def mouse_over(self, native=False):
         """
             Do mouse over this element.
@@ -569,7 +570,6 @@ class Element(Context):
         except WebDriverException as wde:
             raise EasyiumException(wde.msg, self)
 
-    @SupportedBy(WebDriverType._BROWSER)
     def mouse_out(self, native=False):
         """
             Do mouse out this element.
@@ -608,10 +608,10 @@ class Element(Context):
         :param x_offset: X offset to drop
         :param y_offset: Y offset to drop
         """
-        web_driver_type = self.get_web_driver_type()
+        context = self.get_web_driver_info().context
         try:
             try:
-                if web_driver_type in WebDriverType._MOBILE:
+                if context == WebDriverContext.NATIVE_APP:
                     self.get_web_driver().create_touch_action().long_press(self._selenium_element()).move_to(
                         x=x_offset, y=y_offset).release().perform()
                 else:
@@ -619,7 +619,7 @@ class Element(Context):
                         x_offset, y_offset).release().perform()
             except (NoSuchElementException, StaleElementReferenceException):
                 self.wait_for().visible()
-                if web_driver_type in WebDriverType._MOBILE:
+                if context == WebDriverContext.NATIVE_APP:
                     self.get_web_driver().create_touch_action().long_press(self._selenium_element()).move_to(
                         x=x_offset, y=y_offset).release().perform()
                 else:
@@ -634,10 +634,10 @@ class Element(Context):
 
         :param target_element: the target element to drop
         """
-        web_driver_type = self.get_web_driver_type()
+        context = self.get_web_driver_info().context
         try:
             try:
-                if web_driver_type in WebDriverType._MOBILE:
+                if context == WebDriverContext.NATIVE_APP:
                     self.get_web_driver().create_touch_action().long_press(self._selenium_element()).move_to(
                         target_element._selenium_element()).release().perform()
                 else:
@@ -646,7 +646,7 @@ class Element(Context):
             except (NoSuchElementException, StaleElementReferenceException):
                 self.wait_for().visible()
                 target_element.wait_for().visible()
-                if web_driver_type in WebDriverType._MOBILE:
+                if context == WebDriverContext.NATIVE_APP:
                     self.get_web_driver().create_touch_action().long_press(self._selenium_element()).move_to(
                         target_element._selenium_element()).release().perform()
                 else:
@@ -664,10 +664,10 @@ class Element(Context):
         :param x_offset: X offset to drop
         :param y_offset: Y offset to drop
         """
-        web_driver_type = self.get_web_driver_type()
+        context = self.get_web_driver_info().context
         try:
             try:
-                if web_driver_type in WebDriverType._MOBILE:
+                if context == WebDriverContext.NATIVE_APP:
                     self.get_web_driver().create_touch_action().long_press(self._selenium_element()).move_to(
                         target_element._selenium_element(), x_offset, y_offset).release().perform()
                 else:
@@ -676,7 +676,7 @@ class Element(Context):
             except (NoSuchElementException, StaleElementReferenceException):
                 self.wait_for().visible()
                 target_element.wait_for().visible()
-                if web_driver_type in WebDriverType._MOBILE:
+                if context == WebDriverContext.NATIVE_APP:
                     self.get_web_driver().create_touch_action().long_press(self._selenium_element()).move_to(
                         target_element._selenium_element(), x_offset, y_offset).release().perform()
                 else:
@@ -685,7 +685,7 @@ class Element(Context):
         except WebDriverException as wde:
             raise EasyiumException(wde.msg, self)
 
-    @SupportedBy(WebDriverType._MOBILE)
+    @SupportedBy(WebDriverPlatform._MOBILE)
     def multiple_tap(self, count=1):
         """
             Perform a multiple-tap action on this element
@@ -701,21 +701,21 @@ class Element(Context):
         except WebDriverException as wde:
             raise EasyiumException(wde.msg, self)
 
-    @SupportedBy(WebDriverType._MOBILE)
+    @SupportedBy(WebDriverPlatform._MOBILE)
     def tap(self):
         """
             Perform a tap action on this element.
         """
         self.multiple_tap(1)
 
-    @SupportedBy(WebDriverType._MOBILE)
+    @SupportedBy(WebDriverPlatform._MOBILE)
     def double_tap(self):
         """
             Perform a double-tap action on this element.
         """
         self.multiple_tap(2)
 
-    @SupportedBy(WebDriverType._MOBILE)
+    @SupportedBy(WebDriverPlatform._MOBILE)
     def long_press(self, duration=1000):
         """
             Long press on this element.
@@ -731,7 +731,7 @@ class Element(Context):
         except WebDriverException as wde:
             raise EasyiumException(wde.msg, self)
 
-    @SupportedBy(WebDriverType._MOBILE)
+    @SupportedBy(WebDriverPlatform._MOBILE)
     def scroll(self, direction):
         """
             Scrolls to direction in this element.
@@ -755,7 +755,33 @@ class Element(Context):
         except WebDriverException as wde:
             raise EasyiumException(wde.msg, self)
 
-    @SupportedBy(WebDriverType._MOBILE)
+    def scroll_into_view(self):
+        """
+            Scrolls this element into view.
+        """
+        context = self.get_web_driver_info().context
+        try:
+            try:
+                if context == WebDriverContext.NATIVE_APP:
+                    scroll_params = {
+                        "element": self._selenium_element().id
+                    }
+                    self.get_web_driver().execute_script("mobile: scrollTo", scroll_params)
+                else:
+                    self.get_web_driver().execute_script("arguments[0].scrollIntoView();", self)
+            except (NoSuchElementException, StaleElementReferenceException):
+                self.wait_for().exists()
+                if context == WebDriverContext.NATIVE_APP:
+                    scroll_params = {
+                        "element": self._selenium_element().id
+                    }
+                    self.get_web_driver().execute_script("mobile: scrollTo", scroll_params)
+                else:
+                    self.get_web_driver().execute_script("arguments[0].scrollIntoView();", self)
+        except WebDriverException as wde:
+            raise EasyiumException(wde.msg, self)
+
+    @SupportedBy(WebDriverPlatform._MOBILE)
     def scroll_to(self, target_element):
         """
             Scrolls from this element to another.
@@ -774,33 +800,7 @@ class Element(Context):
         except WebDriverException as wde:
             raise EasyiumException(wde.msg, self)
 
-    def scroll_into_view(self):
-        """
-            Scrolls this element into view.
-        """
-        web_driver_type = self.get_web_driver_type()
-        try:
-            try:
-                if web_driver_type in WebDriverType._MOBILE:
-                    scroll_params = {
-                        "element": self._selenium_element().id
-                    }
-                    self.get_web_driver().execute_script("mobile: scrollTo", scroll_params)
-                else:
-                    self.get_web_driver().execute_script("arguments[0].scrollIntoView();", self)
-            except (NoSuchElementException, StaleElementReferenceException):
-                self.wait_for().exists()
-                if web_driver_type in WebDriverType._MOBILE:
-                    scroll_params = {
-                        "element": self._selenium_element().id
-                    }
-                    self.get_web_driver().execute_script("mobile: scrollTo", scroll_params)
-                else:
-                    self.get_web_driver().execute_script("arguments[0].scrollIntoView();", self)
-        except WebDriverException as wde:
-            raise EasyiumException(wde.msg, self)
-
-    @SupportedBy(WebDriverType._MOBILE)
+    @SupportedBy(WebDriverPlatform._MOBILE)
     def pinch(self, percent=200, steps=50):
         """
             Pinch on this element a certain amount
@@ -817,7 +817,7 @@ class Element(Context):
         except WebDriverException as wde:
             raise EasyiumException(wde.msg, self)
 
-    @SupportedBy(WebDriverType._MOBILE)
+    @SupportedBy(WebDriverPlatform._MOBILE)
     def zoom(self, percent=200, steps=50):
         """
             Zooms in on an element a certain amount.

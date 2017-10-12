@@ -1,26 +1,33 @@
 from appium.webdriver.common.multi_action import MultiAction
 from appium.webdriver.common.touch_action import TouchAction
-from appium.webdriver.webdriver import WebDriver as _Mobile
-from selenium.webdriver import ActionChains, Ie as _Ie , Firefox as _Firefox, Chrome as _Chrome, Opera as _Opera, \
-    Safari as _Safari, Edge as _Edge, PhantomJS as _PhantomJS
+from appium.webdriver.webdriver import WebDriver as _Appium
 from selenium.common.exceptions import NoAlertPresentException
+from selenium.webdriver import ActionChains, Ie as _Ie, Firefox as _Firefox, Chrome as _Chrome, Opera as _Opera, \
+    Safari as _Safari, Edge as _Edge, PhantomJS as _PhantomJS, Remote as _Remote
+from selenium.webdriver.common.desired_capabilities import DesiredCapabilities
 
-from .utils import StringTypes
 from .alert import Alert
 from .context import Context
-from .enumeration import WebDriverType
-from .waiter import WebDriverWaitFor
-from .exceptions import UnsupportedWebDriverTypeException
+from .enumeration import WebDriverPlatform, WebDriverContext
 from .decorator import SupportedBy
+from .utils import StringTypes
+from .waiter import WebDriverWaitFor
+
+
+class WebDriverInfo:
+    def __init__(self, platform, context):
+        self.platform = platform
+        self.context = context
 
 
 class WebDriver(Context):
-    def __init__(self, web_driver_type=WebDriverType.CHROME, wait_interval=1000, wait_timeout=30000,
-                page_load_timeout=30000, script_timeout=30000, **kwargs):
+    def __init__(self, selenium_web_driver, web_driver_info, wait_interval=1000, wait_timeout=30000,
+                 page_load_timeout=30000, script_timeout=30000, **kwargs):
         """
             Creates a new instance of the WebDriver.
-
-        :param web_driver_type: the web driver type, use values of enumeration easyium.WebDriverType
+        
+        :param selenium_web_driver: the selenium web driver instance
+        :param web_driver_info: the web driver info
         :param wait_interval: the wait interval (in milliseconds)
         :param wait_timeout: the wait timeout (in milliseconds)
         :param page_load_timeout: the page load timeout (in milliseconds)
@@ -29,22 +36,13 @@ class WebDriver(Context):
             For the keyword args, please refer to the classes Ie, Firefox, Chrome, Opera, Safari, Edge, PhantomJS, Ios, Android.
         """
         Context.__init__(self)
-        self.__web_driver_type = web_driver_type.lower()
-        web_driver = {
-            WebDriverType.IE: _Ie,
-            WebDriverType.FIREFOX: _Firefox,
-            WebDriverType.CHROME: _Chrome,
-            WebDriverType.OPERA: _Opera,
-            WebDriverType.SAFARI: _Safari,
-            WebDriverType.EDGE: _Edge,
-            WebDriverType.PHANTOMJS: _PhantomJS,
-            WebDriverType.ANDROID: _Mobile,
-            WebDriverType.IOS: _Mobile
-        }.get(self.__web_driver_type, None)
-        if web_driver:
-            self.__selenium_web_driver = web_driver(**kwargs)
-        else:
-            raise UnsupportedWebDriverTypeException("The web driver type [%s] is not supported." % web_driver_type)
+        self.__selenium_web_driver = selenium_web_driver
+
+        # avoid that "autoWebview" in desired_capabilities affects the default context
+        if web_driver_info.context == WebDriverContext.NATIVE_APP and self.get_current_context() != "NATIVE_APP":
+            web_driver_info.context = WebDriverContext.WEB_VIEW
+        self.__web_driver_info = web_driver_info
+
         self.set_wait_interval(wait_interval)
         self.set_wait_timeout(wait_timeout)
         self.set_page_load_timeout(page_load_timeout)
@@ -64,13 +62,13 @@ class WebDriver(Context):
         """
         return self
 
-    def get_web_driver_type(self):
+    def get_web_driver_info(self):
         """
-            Get type of this web driver.
+            Get current info of this web driver.
 
-        :return: the web driver type
+        :return: the web driver info
         """
-        return self.__web_driver_type
+        return self.__web_driver_info
 
     def create_action_chains(self):
         """
@@ -78,14 +76,14 @@ class WebDriver(Context):
         """
         return ActionChains(self._selenium_web_driver())
 
-    @SupportedBy(WebDriverType._MOBILE)
+    @SupportedBy(WebDriverPlatform._MOBILE)
     def create_touch_action(self):
         """
             Create a new appium.webdriver.common.TouchAction instance.
         """
         return TouchAction(self._selenium_web_driver())
 
-    @SupportedBy(WebDriverType._MOBILE)
+    @SupportedBy(WebDriverPlatform._MOBILE)
     def create_multi_action(self):
         """
             Create a new appium.webdriver.common.MultiAction instance.
@@ -103,7 +101,6 @@ class WebDriver(Context):
         _timeout = self.get_wait_timeout() if timeout is None else timeout
         return WebDriverWaitFor(self, _interval, _timeout)
 
-    @SupportedBy(WebDriverType._BROWSER)
     def maximize_window(self):
         """
             Maximizes the current window that webdriver is using
@@ -174,8 +171,6 @@ class WebDriver(Context):
         """
         self._selenium_web_driver().get(url)
 
-    open = get
-
     def get_title(self):
         """
             Returns the title of the current page.
@@ -218,21 +213,21 @@ class WebDriver(Context):
         """
         return self._selenium_web_driver().page_source
 
-    @SupportedBy(WebDriverType._MOBILE)
+    @SupportedBy(WebDriverPlatform._MOBILE)
     def get_contexts(self):
         """
             Returns the contexts within the current session.
         """
         return self._selenium_web_driver().contexts
 
-    @SupportedBy(WebDriverType._MOBILE)
+    @SupportedBy(WebDriverPlatform._MOBILE)
     def get_current_context(self):
         """
             Returns the current context of the current session.
         """
         return self._selenium_web_driver().current_context
 
-    @SupportedBy(WebDriverType._MOBILE)
+    @SupportedBy(WebDriverPlatform._MOBILE)
     def switch_to_context(self, context_name):
         """
             Sets the context for the current session.
@@ -243,6 +238,10 @@ class WebDriver(Context):
             driver.switch_to.context('WEBVIEW_1')
         """
         self._selenium_web_driver().switch_to.context(context_name)
+        if context_name == "NATIVE_APP":
+            self.__web_driver_info.context = WebDriverContext.NATIVE_APP
+        else:
+            self.__web_driver_info.context = WebDriverContext.WEB_VIEW
 
     def switch_to_frame(self, frame_reference):
         """
@@ -420,8 +419,10 @@ class WebDriver(Context):
             driver.switch_to_new_window(previous_window_handles)
         """
         new_window_handles = {"inner": []}
+
         def get_new_window_handles():
-            new_window_handles["inner"] = [handle for handle in self.get_window_handles() if handle not in previous_window_handles]
+            new_window_handles["inner"] = [handle for handle in self.get_window_handles() if
+                                           handle not in previous_window_handles]
             return new_window_handles["inner"]
 
         def new_window_opened():
@@ -505,14 +506,14 @@ class WebDriver(Context):
         """
         self._selenium_web_driver().set_window_rect(x, y, width, height)
 
-    @SupportedBy(WebDriverType._MOBILE)
+    @SupportedBy(WebDriverPlatform._MOBILE)
     def get_orientation(self):
         """
             Gets the current orientation of the device
         """
         return self._selenium_web_driver().orientation
 
-    @SupportedBy(WebDriverType._MOBILE)
+    @SupportedBy(WebDriverPlatform._MOBILE)
     def set_orientation(self, value):
         """
             Sets the current orientation of the device
@@ -547,7 +548,7 @@ class WebDriver(Context):
         """
         return self._selenium_web_driver().get_log(log_type)
 
-    @SupportedBy(WebDriverType._MOBILE)
+    @SupportedBy(WebDriverPlatform._MOBILE)
     def swipe(self, start_x, start_y, end_x, end_y, duration=None):
         """
             Swipe from one point to another point, for an optional duration.
@@ -563,7 +564,7 @@ class WebDriver(Context):
         """
         self._selenium_web_driver().swipe(start_x, start_y, end_x, end_y, duration)
 
-    @SupportedBy(WebDriverType._MOBILE)
+    @SupportedBy(WebDriverPlatform._MOBILE)
     def flick(self, start_x, start_y, end_x, end_y):
         """
             Flick from one point to another point.
@@ -578,7 +579,7 @@ class WebDriver(Context):
         """
         self._selenium_web_driver().flick(start_x, start_y, end_x, end_y)
 
-    @SupportedBy(WebDriverType._MOBILE)
+    @SupportedBy(WebDriverPlatform._MOBILE)
     def scroll(self, direction):
         """
             Scrolls the device to direction.
@@ -600,7 +601,7 @@ class WebDriver(Context):
         """
         element.scroll_into_view()
 
-    @SupportedBy(WebDriverType._MOBILE)
+    @SupportedBy(WebDriverPlatform._MOBILE)
     def hide_keyboard(self, key_name=None, key=None, strategy=None):
         """
             Hides the software keyboard on the device. In iOS, use `key_name` to press
@@ -612,7 +613,7 @@ class WebDriver(Context):
         """
         self._selenium_web_driver().hide_keyboard(key_name, key, strategy)
 
-    @SupportedBy(WebDriverType.ANDROID)
+    @SupportedBy(WebDriverPlatform.ANDROID)
     def key_event(self, keycode, metastate=None):
         """
             Sends a keycode to the device. Android only. Possible keycodes can be
@@ -623,7 +624,7 @@ class WebDriver(Context):
         """
         self._selenium_web_driver().keyevent(keycode, metastate)
 
-    @SupportedBy(WebDriverType.ANDROID)
+    @SupportedBy(WebDriverPlatform.ANDROID)
     def press_keycode(self, keycode, metastate=None):
         """
             Sends a keycode to the device. Android only. Possible keycodes can be
@@ -634,7 +635,7 @@ class WebDriver(Context):
         """
         self._selenium_web_driver().press_keycode(keycode, metastate)
 
-    @SupportedBy(WebDriverType.ANDROID)
+    @SupportedBy(WebDriverPlatform.ANDROID)
     def long_press_keycode(self, keycode, metastate=None):
         """
             Sends a long press of keycode to the device. Android only. Possible keycodes can be
@@ -645,7 +646,7 @@ class WebDriver(Context):
         """
         self._selenium_web_driver().long_press_keycode(keycode, metastate)
 
-    @SupportedBy(WebDriverType._MOBILE)
+    @SupportedBy(WebDriverPlatform._MOBILE)
     def pull_file(self, path):
         """
             Retrieves the file at `path`. Returns the file's content encoded as Base64.
@@ -654,7 +655,7 @@ class WebDriver(Context):
         """
         return self._selenium_web_driver().pull_file(path)
 
-    @SupportedBy(WebDriverType._MOBILE)
+    @SupportedBy(WebDriverPlatform._MOBILE)
     def pull_folder(self, path):
         """
             Retrieves a folder at `path`. Returns the folder's contents zipped and encoded as Base64.
@@ -663,7 +664,7 @@ class WebDriver(Context):
         """
         return self._selenium_web_driver().pull_folder(path)
 
-    @SupportedBy(WebDriverType._MOBILE)
+    @SupportedBy(WebDriverPlatform._MOBILE)
     def push_file(self, path, base64data):
         """
             Puts the data, encoded as Base64, in the file specified as `path`.
@@ -673,7 +674,7 @@ class WebDriver(Context):
         """
         self._selenium_web_driver().push_file(path, base64data)
 
-    @SupportedBy(WebDriverType._MOBILE)
+    @SupportedBy(WebDriverPlatform._MOBILE)
     def get_app_strings(self, language=None, string_file=None):
         """
             Returns the application strings from the device for the specified language.
@@ -683,7 +684,7 @@ class WebDriver(Context):
         """
         return self._selenium_web_driver().app_strings(language, string_file)
 
-    @SupportedBy(WebDriverType._MOBILE)
+    @SupportedBy(WebDriverPlatform._MOBILE)
     def install_app(self, app_path):
         """
             Install the application found at `app_path` on the device.
@@ -692,7 +693,7 @@ class WebDriver(Context):
         """
         self._selenium_web_driver().install_app(app_path)
 
-    @SupportedBy(WebDriverType._MOBILE)
+    @SupportedBy(WebDriverPlatform._MOBILE)
     def is_app_installed(self, bundle_id):
         """
             Checks whether the application specified by `bundle_id` is installed on the device.
@@ -701,7 +702,7 @@ class WebDriver(Context):
         """
         return self._selenium_web_driver().is_app_installed(bundle_id)
 
-    @SupportedBy(WebDriverType._MOBILE)
+    @SupportedBy(WebDriverPlatform._MOBILE)
     def remove_app(self, app_id):
         """
             Remove the specified application from the device.
@@ -710,28 +711,28 @@ class WebDriver(Context):
         """
         self._selenium_web_driver().remove_app(app_id)
 
-    @SupportedBy(WebDriverType._MOBILE)
+    @SupportedBy(WebDriverPlatform._MOBILE)
     def launch_app(self):
         """
             Start on the device the application specified in the desired capabilities.
         """
         self._selenium_web_driver().launch_app()
 
-    @SupportedBy(WebDriverType._MOBILE)
+    @SupportedBy(WebDriverPlatform._MOBILE)
     def close_app(self):
         """
             Stop the running application, specified in the desired capabilities, on the device.
         """
         self._selenium_web_driver().close_app()
 
-    @SupportedBy(WebDriverType._MOBILE)
+    @SupportedBy(WebDriverPlatform._MOBILE)
     def reset_app(self):
         """
             Resets the current application on the device.
         """
         self._selenium_web_driver().reset()
 
-    @SupportedBy(WebDriverType._MOBILE)
+    @SupportedBy(WebDriverPlatform._MOBILE)
     def background_app(self, duration):
         """
             Puts the application in the background on the device for a certain duration.
@@ -740,14 +741,14 @@ class WebDriver(Context):
         """
         self._selenium_web_driver().background_app(duration / 1000.0)
 
-    @SupportedBy(WebDriverType.ANDROID)
+    @SupportedBy(WebDriverPlatform.ANDROID)
     def get_current_activity(self):
         """
             Retrieves the current activity on the device.
         """
         return self._selenium_web_driver().current_activity
 
-    @SupportedBy(WebDriverType.ANDROID)
+    @SupportedBy(WebDriverPlatform.ANDROID)
     def start_activity(self, app_package, app_activity, app_wait_package=None, app_wait_activity=None,
                        intent_action=None, intent_category=None, intent_flags=None,
                        optional_intent_arguments=None, stop_app_on_reset=None):
@@ -785,7 +786,7 @@ class WebDriver(Context):
 
         self._selenium_web_driver().start_activity(app_package, app_activity, **options)
 
-    @SupportedBy(WebDriverType.ANDROID)
+    @SupportedBy(WebDriverPlatform.ANDROID)
     def end_test_coverage(self, intent, path):
         """
             Ends the coverage collection and pull the coverage.ec file from the device.
@@ -798,7 +799,7 @@ class WebDriver(Context):
         """
         self._selenium_web_driver().end_test_coverage(intent, path)
 
-    @SupportedBy(WebDriverType.IOS)
+    @SupportedBy(WebDriverPlatform.IOS)
     def lock(self, duration):
         """
             Lock the device for a certain period of time. iOS only.
@@ -807,21 +808,21 @@ class WebDriver(Context):
         """
         self._selenium_web_driver().lock(duration / 1000.0)
 
-    @SupportedBy(WebDriverType._MOBILE)
+    @SupportedBy(WebDriverPlatform._MOBILE)
     def shake(self):
         """
             Shake the device.
         """
         self._selenium_web_driver().shake()
 
-    @SupportedBy(WebDriverType.ANDROID)
+    @SupportedBy(WebDriverPlatform.ANDROID)
     def open_notifications(self):
         """
             Open notification shade in Android (API Level 18 and above)
         """
         self._selenium_web_driver().open_notifications()
 
-    @SupportedBy(WebDriverType.ANDROID)
+    @SupportedBy(WebDriverPlatform.ANDROID)
     def get_network_connection(self):
         """
             Returns an integer bitmask specifying the network connection type.
@@ -830,7 +831,7 @@ class WebDriver(Context):
         """
         return self._selenium_web_driver().network_connection
 
-    @SupportedBy(WebDriverType.ANDROID)
+    @SupportedBy(WebDriverPlatform.ANDROID)
     def set_network_connection(self, connection_type):
         """
             Sets the network connection type. Android only.
@@ -848,7 +849,7 @@ class WebDriver(Context):
         """
         self._selenium_web_driver().set_network_connection(connection_type)
 
-    @SupportedBy(WebDriverType.ANDROID)
+    @SupportedBy(WebDriverPlatform.ANDROID)
     def get_available_ime_engines(self):
         """
             Get the available input methods for an Android device. Package and
@@ -857,7 +858,7 @@ class WebDriver(Context):
         """
         return self._selenium_web_driver().available_ime_engines
 
-    @SupportedBy(WebDriverType.ANDROID)
+    @SupportedBy(WebDriverPlatform.ANDROID)
     def is_ime_service_active(self):
         """
             Checks whether the device has IME service active. Returns True/False.
@@ -865,7 +866,7 @@ class WebDriver(Context):
         """
         return self._selenium_web_driver().is_ime_active()
 
-    @SupportedBy(WebDriverType.ANDROID)
+    @SupportedBy(WebDriverPlatform.ANDROID)
     def active_ime_engine(self, engine):
         """
             Activates the given IME engine on the device.
@@ -875,7 +876,7 @@ class WebDriver(Context):
         """
         self._selenium_web_driver().activate_ime_engine(engine)
 
-    @SupportedBy(WebDriverType.ANDROID)
+    @SupportedBy(WebDriverPlatform.ANDROID)
     def deactivate_current_ime_engine(self):
         """
             Deactivates the currently active IME engine on the device.
@@ -883,7 +884,7 @@ class WebDriver(Context):
         """
         self._selenium_web_driver().deactivate_ime_engine()
 
-    @SupportedBy(WebDriverType.ANDROID)
+    @SupportedBy(WebDriverPlatform.ANDROID)
     def get_current_ime_engine(self):
         """
             Returns the activity and package of the currently active IME engine (e.g., 'com.android.inputmethod.latin/.LatinIME').
@@ -891,7 +892,7 @@ class WebDriver(Context):
         """
         return self._selenium_web_driver().active_ime_engine
 
-    @SupportedBy(WebDriverType._MOBILE)
+    @SupportedBy(WebDriverPlatform._MOBILE)
     def get_settings(self):
         """
             Returns the appium server Settings for the current session.
@@ -900,7 +901,7 @@ class WebDriver(Context):
         """
         return self._selenium_web_driver().get_settings()
 
-    @SupportedBy(WebDriverType._MOBILE)
+    @SupportedBy(WebDriverPlatform._MOBILE)
     def update_settings(self, settings):
         """
             Set settings for the current session.
@@ -910,14 +911,14 @@ class WebDriver(Context):
         """
         self._selenium_web_driver().update_settings(settings)
 
-    @SupportedBy(WebDriverType.ANDROID)
+    @SupportedBy(WebDriverPlatform.ANDROID)
     def toggle_location_services(self):
         """
             Toggle the location services on the device. Android only.
         """
         self._selenium_web_driver().toggle_location_services()
 
-    @SupportedBy(WebDriverType._MOBILE)
+    @SupportedBy(WebDriverPlatform._MOBILE)
     def set_location(self, latitude, longitude, altitude):
         """
             Set the location of the device
@@ -929,7 +930,8 @@ class WebDriver(Context):
         self._selenium_web_driver().set_location(latitude, longitude, altitude)
 
     def __str__(self):
-        return "WebDriver <WebDriverType: %s><SessionId: %s>" % (self.__web_driver_type, self._selenium_web_driver().session_id)
+        return "WebDriver <WebDriverType: %s><SessionId: %s>" % (
+            self.__web_driver_info, self._selenium_web_driver().session_id)
 
     def __enter__(self):
         return self
@@ -938,12 +940,63 @@ class WebDriver(Context):
         self.quit()
 
 
+class Remote(WebDriver):
+    def __init__(self, command_executor="http://127.0.0.1:4444/wd/hub",
+                 desired_capabilities=None, browser_profile=None, proxy=None,
+                 keep_alive=False, file_detector=None,
+                 wait_interval=1000, wait_timeout=30000,
+                 page_load_timeout=30000, script_timeout=30000, **kwargs):
+        """
+            Create a new driver that will issue commands using the wire protocol.
+
+        :param command_executor: Either a string representing URL of the remote server or a custom remote_connection.RemoteConnection object. Defaults to 'http://127.0.0.1:4444/wd/hub'.
+        :param desired_capabilities: A dictionary of capabilities to request when starting the browser session. Required parameter.
+        :param browser_profile: A selenium.webdriver.firefox.firefox_profile.FirefoxProfile object. Only used if Firefox is requested. Optional.
+        :param proxy: A selenium.webdriver.common.proxy.Proxy object. The browser session will be started with given proxy settings, if possible. Optional.
+        :param keep_alive: Whether to configure remote_connection.RemoteConnection to use HTTP keep-alive. Defaults to False.
+        :param file_detector: Pass custom file detector object during instantiation. If None, then default LocalFileDetector() will be used.
+        """
+
+        if "browserName" in desired_capabilities:
+            context = {
+                "internet explorer": WebDriverContext.IE,
+                "firefox": WebDriverContext.FIREFOX,
+                "chrome": WebDriverContext.CHROME,
+                "opera": WebDriverContext.OPERA,
+                "safari": WebDriverContext.SAFARI,
+                "microsoftedge": WebDriverContext.EDGE,
+                "phantomjs": WebDriverContext.PHANTOMJS
+            }.get(desired_capabilities["browserName"].lower(), WebDriverContext.NATIVE_APP)
+        else:
+            context = WebDriverContext.NATIVE_APP
+
+        if "platformName" in desired_capabilities:
+            platform = {
+                "ios": WebDriverPlatform.IOS,
+                "android": WebDriverPlatform.ANDROID
+            }[desired_capabilities["platformName"].lower(), WebDriverPlatform.PC]
+        else:
+            platform = WebDriverPlatform.PC
+
+        if platform == WebDriverPlatform.PC:
+            selenium_web_driver = _Remote(command_executor=command_executor, desired_capabilities=desired_capabilities,
+                                          browser_profile=browser_profile, proxy=proxy, keep_alive=keep_alive,
+                                          file_detector=file_detector)
+        else:
+            selenium_web_driver = _Appium(command_executor=command_executor, desired_capabilities=desired_capabilities,
+                                          browser_profile=browser_profile, proxy=proxy, keep_alive=keep_alive)
+
+        web_driver_info = WebDriverInfo(platform, context)
+        WebDriver.__init__(selenium_web_driver=selenium_web_driver, web_driver_info=web_driver_info,
+                           wait_interval=wait_interval, wait_timeout=wait_timeout, page_load_timeout=page_load_timeout,
+                           script_timeout=script_timeout, **kwargs)
+
+
 class Ie(WebDriver):
     def __init__(self, executable_path='IEDriverServer.exe', capabilities=None,
-                port=0, timeout=30000, host=None,
-                log_level=None, log_file=None,
-                wait_interval=1000, wait_timeout=30000,
-                page_load_timeout=30000, script_timeout=30000):
+                 port=0, timeout=30000, host=None, log_level=None, log_file=None, ie_options=None,
+                 wait_interval=1000, wait_timeout=30000,
+                 page_load_timeout=30000, script_timeout=30000):
         """
             Creates a new instance of Ie.
 
@@ -954,26 +1007,27 @@ class Ie(WebDriver):
         :param host: IP address the service port is bound
         :param log_level: Level of logging of service, may be "FATAL", "ERROR", "WARN", "INFO", "DEBUG", "TRACE". Default is "FATAL".
         :param log_file: Target of logging of service, may be "stdout", "stderr" or file path. Default is "stdout".
+        :param ie_options: IE Options instance, providing additional IE options
         :param wait_interval: the wait interval (in milliseconds)
         :param wait_timeout: the wait timeout (in milliseconds)
         :param page_load_timeout: the page load timeout (in milliseconds)
         :param script_timeout: the script timeout (in milliseconds)
         """
         timeout /= 1000.0
-        WebDriver.__init__(self, web_driver_type=WebDriverType.IE,
-                        executable_path=executable_path, capabilities=capabilities,
-                        port=port, timeout=timeout, host=host,
-                        log_level=log_level, log_file=log_file,
-                        wait_interval=wait_interval, wait_timeout=wait_timeout,
-                        page_load_timeout=page_load_timeout, script_timeout=script_timeout)
+        web_driver_info = WebDriverInfo(WebDriverPlatform.PC, WebDriverContext.IE)
+        selenium_web_driver = _Ie(executable_path=executable_path, capabilities=capabilities,
+                                  port=port, timeout=timeout, host=host, log_level=log_level, log_file=log_file, ie_options=ie_options)
+        WebDriver.__init__(self, selenium_web_driver=selenium_web_driver, web_driver_info=web_driver_info,
+                           wait_interval=wait_interval, wait_timeout=wait_timeout,
+                           page_load_timeout=page_load_timeout, script_timeout=script_timeout)
 
 
 class Firefox(WebDriver):
     def __init__(self, firefox_profile=None, firefox_binary=None, timeout=30000,
-                capabilities=None, proxy=None, executable_path="geckodriver",
-                firefox_options=None, log_path="geckodriver.log",
-                wait_interval=1000, wait_timeout=30000,
-                page_load_timeout=30000, script_timeout=30000):
+                 capabilities=None, proxy=None, executable_path="geckodriver",
+                 firefox_options=None, log_path="geckodriver.log",
+                 wait_interval=1000, wait_timeout=30000,
+                 page_load_timeout=30000, script_timeout=30000):
         """
             Creates a new instance of Firefox.
 
@@ -991,20 +1045,21 @@ class Firefox(WebDriver):
         :param script_timeout: the script timeout (in milliseconds)
         """
         timeout /= 1000.0
-        WebDriver.__init__(self, web_driver_type=WebDriverType.FIREFOX,
-                        firefox_profile=firefox_profile, firefox_binary=firefox_binary, timeout=timeout,
-                        capabilities=capabilities, proxy=proxy, executable_path=executable_path,
-                        firefox_options=firefox_options, log_path=log_path,
-                        wait_interval=wait_interval, wait_timeout=wait_timeout,
-                        page_load_timeout=page_load_timeout, script_timeout=script_timeout)
+        web_driver_info = WebDriverInfo(WebDriverPlatform.PC, WebDriverContext.FIREFOX)
+        selenium_web_driver = _Firefox(firefox_profile=firefox_profile, firefox_binary=firefox_binary, timeout=timeout,
+                                       capabilities=capabilities, proxy=proxy, executable_path=executable_path,
+                                       firefox_options=firefox_options, log_path=log_path)
+        WebDriver.__init__(self, selenium_web_driver=selenium_web_driver, web_driver_info=web_driver_info,
+                           wait_interval=wait_interval, wait_timeout=wait_timeout,
+                           page_load_timeout=page_load_timeout, script_timeout=script_timeout)
 
 
 class Chrome(WebDriver):
     def __init__(self, executable_path="chromedriver", port=0,
-                chrome_options=None, service_args=None,
-                desired_capabilities=None, service_log_path=None,
-                wait_interval=1000, wait_timeout=30000,
-                page_load_timeout=30000, script_timeout=30000):
+                 chrome_options=None, service_args=None,
+                 desired_capabilities=None, service_log_path=None,
+                 wait_interval=1000, wait_timeout=30000,
+                 page_load_timeout=30000, script_timeout=30000):
         """
             Creates a new instance of Chrome.
 
@@ -1019,20 +1074,21 @@ class Chrome(WebDriver):
         :param page_load_timeout: the page load timeout (in milliseconds)
         :param script_timeout: the script timeout (in milliseconds)
         """
-        WebDriver.__init__(self, web_driver_type=WebDriverType.CHROME,
-                        executable_path=executable_path, port=port,
-                        chrome_options=chrome_options, service_args=service_args,
-                        desired_capabilities=desired_capabilities, service_log_path=service_log_path,
-                        wait_interval=wait_interval, wait_timeout=wait_timeout,
-                        page_load_timeout=page_load_timeout, script_timeout=script_timeout)
+        web_driver_info = WebDriverInfo(WebDriverPlatform.PC, WebDriverContext.CHROME)
+        selenium_web_driver = _Chrome(executable_path=executable_path, port=port,
+                                      chrome_options=chrome_options, service_args=service_args,
+                                      desired_capabilities=desired_capabilities, service_log_path=service_log_path)
+        WebDriver.__init__(self, selenium_web_driver=selenium_web_driver, web_driver_info=web_driver_info,
+                           wait_interval=wait_interval, wait_timeout=wait_timeout,
+                           page_load_timeout=page_load_timeout, script_timeout=script_timeout)
 
 
 class Opera(WebDriver):
     def __init__(self, executable_path=None, port=0,
-                opera_options=None, service_args=None,
-                desired_capabilities=None, service_log_path=None,
-                wait_interval=1000, wait_timeout=30000,
-                page_load_timeout=30000, script_timeout=30000):
+                 opera_options=None, service_args=None,
+                 desired_capabilities=None, service_log_path=None,
+                 wait_interval=1000, wait_timeout=30000,
+                 page_load_timeout=30000, script_timeout=30000):
         """
             Creates a new instance of Opera.
 
@@ -1047,19 +1103,20 @@ class Opera(WebDriver):
         :param page_load_timeout: the page load timeout (in milliseconds)
         :param script_timeout: the script timeout (in milliseconds)
         """
-        WebDriver.__init__(self, web_driver_type=WebDriverType.OPERA,
-                        executable_path=executable_path, port=port,
-                        opera_options=opera_options, service_args=service_args,
-                        desired_capabilities=desired_capabilities, service_log_path=service_log_path,
-                        wait_interval=wait_interval, wait_timeout=wait_timeout,
-                        page_load_timeout=page_load_timeout, script_timeout=script_timeout)
+        web_driver_info = WebDriverInfo(WebDriverPlatform.PC, WebDriverContext.OPERA)
+        selenium_web_driver = _Opera(executable_path=executable_path, port=port,
+                                     opera_options=opera_options, service_args=service_args,
+                                     desired_capabilities=desired_capabilities, service_log_path=service_log_path)
+        WebDriver.__init__(self, selenium_web_driver=selenium_web_driver, web_driver_info=web_driver_info,
+                           wait_interval=wait_interval, wait_timeout=wait_timeout,
+                           page_load_timeout=page_load_timeout, script_timeout=script_timeout)
 
 
 class Safari(WebDriver):
     def __init__(self, port=0, executable_path="/usr/bin/safaridriver",
-                desired_capabilities=None, quiet=False,
-                wait_interval=1000, wait_timeout=30000,
-                page_load_timeout=30000, script_timeout=30000):
+                 desired_capabilities=DesiredCapabilities.SAFARI, quiet=False,
+                 wait_interval=1000, wait_timeout=30000,
+                 page_load_timeout=30000, script_timeout=30000):
         """
             Creates a new instance of Safari.
 
@@ -1072,45 +1129,46 @@ class Safari(WebDriver):
         :param page_load_timeout: the page load timeout (in milliseconds)
         :param script_timeout: the script timeout (in milliseconds)
         """
-        if desired_capabilities is None:
-            from selenium.webdriver.common.desired_capabilities import DesiredCapabilities
-            desired_capabilities = DesiredCapabilities.SAFARI
-        WebDriver.__init__(self, web_driver_type=WebDriverType.SAFARI,
-                        port=port, executable_path=executable_path,
-                        desired_capabilities=desired_capabilities, quiet=quiet,
-                        wait_interval=wait_interval, wait_timeout=wait_timeout,
-                        page_load_timeout=page_load_timeout, script_timeout=script_timeout)
+        web_driver_info = WebDriverInfo(WebDriverPlatform.PC, WebDriverContext.SAFARI)
+        selenium_web_driver = _Safari(port=port, executable_path=executable_path,
+                                      desired_capabilities=desired_capabilities, quiet=quiet)
+        WebDriver.__init__(self, selenium_web_driver=selenium_web_driver, web_driver_info=web_driver_info,
+                           wait_interval=wait_interval, wait_timeout=wait_timeout,
+                           page_load_timeout=page_load_timeout, script_timeout=script_timeout)
 
 
 class Edge(WebDriver):
     def __init__(self, executable_path='MicrosoftWebDriver.exe',
-                capabilities=None, port=0,
-                wait_interval=1000, wait_timeout=30000,
-                page_load_timeout=30000, script_timeout=30000):
+                 capabilities=None, port=0, verbose=False, log_path=None,
+                 wait_interval=1000, wait_timeout=30000,
+                 page_load_timeout=30000, script_timeout=30000):
         """
             Creates a new instance of Edge.
 
         :param executable_path: path to the executable
         :param capabilities: a dictionary of capabilities to request when starting the browser session
         :param port: port you would like the service to run, if left as 0, a free port will be found.
+        :param verbose: verbose log
+        :param log_path: Where to log information from the driver
         :param wait_interval: the wait interval (in milliseconds)
         :param wait_timeout: the wait timeout (in milliseconds)
         :param page_load_timeout: the page load timeout (in milliseconds)
         :param script_timeout: the script timeout (in milliseconds)
         """
-        WebDriver.__init__(self, web_driver_type=WebDriverType.EDGE,
-                        executable_path=executable_path,
-                        capabilities=capabilities, port=port,
-                        wait_interval=wait_interval, wait_timeout=wait_timeout,
-                        page_load_timeout=page_load_timeout, script_timeout=script_timeout)
+        web_driver_info = WebDriverInfo(WebDriverPlatform.PC, WebDriverContext.EDGE)
+        selenium_web_driver = _Edge(executable_path=executable_path,
+                                    capabilities=capabilities, port=port, verbose=verbose, log_path=log_path)
+        WebDriver.__init__(self, selenium_web_driver=selenium_web_driver, web_driver_info=web_driver_info,
+                           wait_interval=wait_interval, wait_timeout=wait_timeout,
+                           page_load_timeout=page_load_timeout, script_timeout=script_timeout)
 
 
 class PhantomJS(WebDriver):
     def __init__(self, executable_path="phantomjs",
-                port=0, desired_capabilities=None,
-                service_args=None, service_log_path=None,
-                wait_interval=1000, wait_timeout=30000,
-                page_load_timeout=30000, script_timeout=30000):
+                 port=0, desired_capabilities=DesiredCapabilities.PHANTOMJS,
+                 service_args=None, service_log_path=None,
+                 wait_interval=1000, wait_timeout=30000,
+                 page_load_timeout=30000, script_timeout=30000):
         """
             Creates a new instance of PhantomJS.
 
@@ -1124,62 +1182,10 @@ class PhantomJS(WebDriver):
         :param page_load_timeout: the page load timeout (in milliseconds)
         :param script_timeout: the script timeout (in milliseconds)
         """
-        if desired_capabilities is None:
-            from selenium.webdriver.common.desired_capabilities import DesiredCapabilities
-            desired_capabilities = DesiredCapabilities.PHANTOMJS
-        WebDriver.__init__(self, web_driver_type=WebDriverType.PHANTOMJS,
-                        executable_path=executable_path,
-                        port=port, desired_capabilities=desired_capabilities,
-                        service_args=service_args, service_log_path=service_log_path,
-                        wait_interval=wait_interval, wait_timeout=wait_timeout,
-                        page_load_timeout=page_load_timeout, script_timeout=script_timeout)
-
-
-class Ios(WebDriver):
-    def __init__(self, command_executor='http://127.0.0.1:4444/wd/hub',
-                desired_capabilities=None, browser_profile=None, proxy=None, keep_alive=False,
-                wait_interval=1000, wait_timeout=30000,
-                page_load_timeout=30000, script_timeout=30000):
-        """
-            Creates a new instance of IOS.
-
-        :param command_executor: Either a string representing URL of the remote server or a custom remote_connection.RemoteConnection object. Defaults to 'http://127.0.0.1:4444/wd/hub'.
-        :param desired_capabilities: a dictionary of capabilities to request when starting the browser session
-        :param browser_profile: A selenium.webdriver.firefox.firefox_profile.FirefoxProfile object. Only used if Firefox is requested. Optional.
-        :param proxy: A selenium.webdriver.common.proxy.Proxy object. The browser session will be started with given proxy settings, if possible. Optional.
-        :param keep_alive: Whether to configure remote_connection.RemoteConnection to use HTTP keep-alive. Defaults to False.
-        :param wait_interval: the wait interval (in milliseconds)
-        :param wait_timeout: the wait timeout (in milliseconds)
-        :param page_load_timeout: the page load timeout (in milliseconds)
-        :param script_timeout: the script timeout (in milliseconds)
-        """
-        WebDriver.__init__(self, web_driver_type=WebDriverType.IOS,
-                        command_executor=command_executor,
-                        desired_capabilities=desired_capabilities, browser_profile=browser_profile, proxy=proxy, keep_alive=keep_alive,
-                        wait_interval=wait_interval, wait_timeout=wait_timeout,
-                        page_load_timeout=page_load_timeout, script_timeout=script_timeout)
-
-
-class Android(WebDriver):
-    def __init__(self, command_executor='http://127.0.0.1:4444/wd/hub',
-                desired_capabilities=None, browser_profile=None, proxy=None, keep_alive=False,
-                wait_interval=1000, wait_timeout=30000,
-                page_load_timeout=30000, script_timeout=30000):
-        """
-            Creates a new instance of Android.
-
-        :param command_executor: Either a string representing URL of the remote server or a custom remote_connection.RemoteConnection object. Defaults to 'http://127.0.0.1:4444/wd/hub'.
-        :param desired_capabilities: a dictionary of capabilities to request when starting the browser session
-        :param browser_profile: A selenium.webdriver.firefox.firefox_profile.FirefoxProfile object. Only used if Firefox is requested. Optional.
-        :param proxy: A selenium.webdriver.common.proxy.Proxy object. The browser session will be started with given proxy settings, if possible. Optional.
-        :param keep_alive: Whether to configure remote_connection.RemoteConnection to use HTTP keep-alive. Defaults to False.
-        :param wait_interval: the wait interval (in milliseconds)
-        :param wait_timeout: the wait timeout (in milliseconds)
-        :param page_load_timeout: the page load timeout (in milliseconds)
-        :param script_timeout: the script timeout (in milliseconds)
-        """
-        WebDriver.__init__(self, web_driver_type=WebDriverType.ANDROID,
-                        command_executor=command_executor,
-                        desired_capabilities=desired_capabilities, browser_profile=browser_profile, proxy=proxy, keep_alive=keep_alive,
-                        wait_interval=wait_interval, wait_timeout=wait_timeout,
-                        page_load_timeout=page_load_timeout, script_timeout=script_timeout)
+        web_driver_info = WebDriverInfo(WebDriverPlatform.PC, WebDriverContext.PHANTOMJS)
+        selenium_web_driver = _PhantomJS(executable_path=executable_path,
+                                         port=port, desired_capabilities=desired_capabilities,
+                                         service_args=service_args, service_log_path=service_log_path)
+        WebDriver.__init__(self, selenium_web_driver=selenium_web_driver, web_driver_info=web_driver_info,
+                           wait_interval=wait_interval, wait_timeout=wait_timeout,
+                           page_load_timeout=page_load_timeout, script_timeout=script_timeout)

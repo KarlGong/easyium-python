@@ -14,7 +14,7 @@ class Context:
     def get_web_driver(self):
         pass
 
-    def get_web_driver_type(self):
+    def get_web_driver_info(self):
         pass
 
     def _selenium_context(self):

@@ -1,11 +1,11 @@
-from easyium import WebDriver, WebDriverType, StaticElement
+from easyium import Chrome, StaticElement
 
 
 # This class maps the google page in the browser.
 class Google:
     def __init__(self):
         # Create a WebDriver instance for chrome.
-        self._web_driver = WebDriver(WebDriverType.CHROME)
+        self._web_driver = Chrome()
 
         # The google apps grid button is in the top-right.
         # This button is always in the page, so it is StaticElement.
@@ -17,7 +17,7 @@ class Google:
 
         # Currently the StaticElement does not refer to WebElement in Browser,
         # so open url here is fine.
-        self._web_driver.open("https://www.google.com")
+        self._web_driver.get("https://www.google.com")
 
     def click_google_apps_grid_button(self):
         # It is StaticElement, easyium will wait it to be visible automatically.

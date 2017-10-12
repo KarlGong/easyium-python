@@ -1,4 +1,4 @@
-class WebDriverType:
+class WebDriverContext:
     IE = "ie"
     FIREFOX = "firefox"
     CHROME = "chrome"
@@ -6,9 +6,17 @@ class WebDriverType:
     SAFARI = "safari"
     EDGE = "edge"
     PHANTOMJS = "phantomjs"
+
+    NATIVE_APP = "native_app"
+    WEB_VIEW = "web_view"
+
+    _WEB = [IE, FIREFOX, CHROME, OPERA, SAFARI, EDGE, PHANTOMJS, WEB_VIEW]
+    _APP = [NATIVE_APP, WEB_VIEW]
+
+
+class WebDriverPlatform:
+    PC = "pc"
     ANDROID = "android"
     IOS = "ios"
 
-    _BROWSER = [IE, FIREFOX, CHROME, OPERA, SAFARI, EDGE, PHANTOMJS]
     _MOBILE = [ANDROID, IOS]
-    _ALL = _BROWSER + _MOBILE
