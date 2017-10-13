@@ -63,6 +63,10 @@ For information and suggestions you can contact me at karl.gong@outlook.com
 
 Change Log
 ----------
+1.2.7 (compared to 1.2.6)
+
+- Fix the string format of web driver.
+
 1.2.6 (compared to 1.2.5)
 
 - Add Remote web driver back.
