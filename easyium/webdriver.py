@@ -931,7 +931,7 @@ class WebDriver(Context):
 
     def __str__(self):
         return "WebDriver <Platform: %s><Context: %s><SessionId: %s>" % (
-            self.__web_driver_info.platform, self.__web_driver_info.context, self._selenium_web_driver().session_id)
+            self.get_web_driver_info().platform, self.get_web_driver_info().context, self._selenium_web_driver().session_id)
 
     def __enter__(self):
         return self
