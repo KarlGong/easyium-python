@@ -21,7 +21,7 @@ def main():
         name="easyium",
         description="easy use of selenium and appium",
         long_description=long_description,
-        install_requires = ['selenium>=3.4.1', 'appium-python-client>=0.24'],
+        install_requires = ['selenium>=3.6.0', 'appium-python-client>=0.24'],
         version="1.2.5",
         keywords="selenium appium test testing framework automation",
         author="Karl Gong",

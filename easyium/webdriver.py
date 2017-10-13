@@ -8,8 +8,8 @@ from selenium.webdriver.common.desired_capabilities import DesiredCapabilities
 
 from .alert import Alert
 from .context import Context
-from .enumeration import WebDriverPlatform, WebDriverContext
 from .decorator import SupportedBy
+from .enumeration import WebDriverPlatform, WebDriverContext
 from .utils import StringTypes
 from .waiter import WebDriverWaitFor
 
@@ -1016,7 +1016,8 @@ class Ie(WebDriver):
         timeout /= 1000.0
         web_driver_info = WebDriverInfo(WebDriverPlatform.PC, WebDriverContext.IE)
         selenium_web_driver = _Ie(executable_path=executable_path, capabilities=capabilities,
-                                  port=port, timeout=timeout, host=host, log_level=log_level, log_file=log_file, ie_options=ie_options)
+                                  port=port, timeout=timeout, host=host, log_level=log_level, log_file=log_file,
+                                  ie_options=ie_options)
         WebDriver.__init__(self, selenium_web_driver=selenium_web_driver, web_driver_info=web_driver_info,
                            wait_interval=wait_interval, wait_timeout=wait_timeout,
                            page_load_timeout=page_load_timeout, script_timeout=script_timeout)
