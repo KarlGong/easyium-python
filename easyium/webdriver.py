@@ -21,32 +21,20 @@ class WebDriverInfo:
 
 
 class WebDriver(Context):
-    def __init__(self, selenium_web_driver, web_driver_info, wait_interval=1000, wait_timeout=30000,
-                 page_load_timeout=30000, script_timeout=30000, **kwargs):
+    def __init__(self, selenium_web_driver, web_driver_info):
         """
-            Creates a new instance of the WebDriver.
+            Create a wrapper for selenium WebDriver.
         
         :param selenium_web_driver: the selenium web driver instance
         :param web_driver_info: the web driver info
-        :param wait_interval: the wait interval (in milliseconds)
-        :param wait_timeout: the wait timeout (in milliseconds)
-        :param page_load_timeout: the page load timeout (in milliseconds)
-        :param script_timeout: the script timeout (in milliseconds)
-        :param kwargs: the keyword args for the web driver specified by web_driver_type.
-            For the keyword args, please refer to the classes Ie, Firefox, Chrome, Opera, Safari, Edge, PhantomJS, Ios, Android.
         """
         Context.__init__(self)
         self.__selenium_web_driver = selenium_web_driver
-
-        # avoid that "autoWebview" in desired_capabilities affects the default context
-        if web_driver_info.context == WebDriverContext.NATIVE_APP and self.get_current_context() != "NATIVE_APP":
-            web_driver_info.context = WebDriverContext.WEB_VIEW
         self.__web_driver_info = web_driver_info
 
-        self.set_wait_interval(wait_interval)
-        self.set_wait_timeout(wait_timeout)
-        self.set_page_load_timeout(page_load_timeout)
-        self.set_script_timeout(script_timeout)
+        # set default wait interval and timeout
+        self.set_wait_interval(1000)
+        self.set_wait_timeout(30000)
 
     def _selenium_context(self):
         return self.__selenium_web_driver
@@ -943,9 +931,7 @@ class WebDriver(Context):
 class Remote(WebDriver):
     def __init__(self, command_executor="http://127.0.0.1:4444/wd/hub",
                  desired_capabilities=None, browser_profile=None, proxy=None,
-                 keep_alive=False, file_detector=None,
-                 wait_interval=1000, wait_timeout=30000,
-                 page_load_timeout=30000, script_timeout=30000, **kwargs):
+                 keep_alive=False, file_detector=None, options=None):
         """
             Create a new driver that will issue commands using the wire protocol.
 
@@ -955,6 +941,7 @@ class Remote(WebDriver):
         :param proxy: A selenium.webdriver.common.proxy.Proxy object. The browser session will be started with given proxy settings, if possible. Optional.
         :param keep_alive: Whether to configure remote_connection.RemoteConnection to use HTTP keep-alive. Defaults to False.
         :param file_detector: Pass custom file detector object during instantiation. If None, then default LocalFileDetector() will be used.
+        :param options: instance of a driver options.Options class
         """
 
         if "browserName" in desired_capabilities:
@@ -978,25 +965,25 @@ class Remote(WebDriver):
         else:
             platform = WebDriverPlatform.PC
 
+        web_driver_info = WebDriverInfo(platform, context)
+
         if platform == WebDriverPlatform.PC:
             selenium_web_driver = _Remote(command_executor=command_executor, desired_capabilities=desired_capabilities,
                                           browser_profile=browser_profile, proxy=proxy, keep_alive=keep_alive,
-                                          file_detector=file_detector)
+                                          file_detector=file_detector, options=options)
         else:
             selenium_web_driver = _Appium(command_executor=command_executor, desired_capabilities=desired_capabilities,
                                           browser_profile=browser_profile, proxy=proxy, keep_alive=keep_alive)
+            # avoid that "autoWebview" in desired_capabilities affects the default context
+            if web_driver_info.context == WebDriverContext.NATIVE_APP and selenium_web_driver.current_context != "NATIVE_APP":
+                web_driver_info.context = WebDriverContext.WEB_VIEW
 
-        web_driver_info = WebDriverInfo(platform, context)
-        WebDriver.__init__(selenium_web_driver=selenium_web_driver, web_driver_info=web_driver_info,
-                           wait_interval=wait_interval, wait_timeout=wait_timeout, page_load_timeout=page_load_timeout,
-                           script_timeout=script_timeout, **kwargs)
+        WebDriver.__init__(self, selenium_web_driver=selenium_web_driver, web_driver_info=web_driver_info)
 
 
 class Ie(WebDriver):
     def __init__(self, executable_path='IEDriverServer.exe', capabilities=None,
-                 port=0, timeout=30000, host=None, log_level=None, log_file=None, ie_options=None,
-                 wait_interval=1000, wait_timeout=30000,
-                 page_load_timeout=30000, script_timeout=30000):
+                 port=0, timeout=30000, host=None, log_level=None, log_file=None, ie_options=None):
         """
             Creates a new instance of Ie.
 
@@ -1008,27 +995,19 @@ class Ie(WebDriver):
         :param log_level: Level of logging of service, may be "FATAL", "ERROR", "WARN", "INFO", "DEBUG", "TRACE". Default is "FATAL".
         :param log_file: Target of logging of service, may be "stdout", "stderr" or file path. Default is "stdout".
         :param ie_options: IE Options instance, providing additional IE options
-        :param wait_interval: the wait interval (in milliseconds)
-        :param wait_timeout: the wait timeout (in milliseconds)
-        :param page_load_timeout: the page load timeout (in milliseconds)
-        :param script_timeout: the script timeout (in milliseconds)
         """
         timeout /= 1000.0
         web_driver_info = WebDriverInfo(WebDriverPlatform.PC, WebDriverContext.IE)
         selenium_web_driver = _Ie(executable_path=executable_path, capabilities=capabilities,
                                   port=port, timeout=timeout, host=host, log_level=log_level, log_file=log_file,
                                   ie_options=ie_options)
-        WebDriver.__init__(self, selenium_web_driver=selenium_web_driver, web_driver_info=web_driver_info,
-                           wait_interval=wait_interval, wait_timeout=wait_timeout,
-                           page_load_timeout=page_load_timeout, script_timeout=script_timeout)
+        WebDriver.__init__(self, selenium_web_driver=selenium_web_driver, web_driver_info=web_driver_info)
 
 
 class Firefox(WebDriver):
     def __init__(self, firefox_profile=None, firefox_binary=None, timeout=30000,
                  capabilities=None, proxy=None, executable_path="geckodriver",
-                 firefox_options=None, log_path="geckodriver.log",
-                 wait_interval=1000, wait_timeout=30000,
-                 page_load_timeout=30000, script_timeout=30000):
+                 options=None, log_path="geckodriver.log", firefox_options=None):
         """
             Creates a new instance of Firefox.
 
@@ -1038,86 +1017,64 @@ class Firefox(WebDriver):
         :param capabilities: a dictionary of capabilities to request when starting the browser session
         :param proxy: the firefox proxy
         :param executable_path: path to the GeckoDriver binary
-        :param firefox_options: Instance of options.Options
+        :param options: Instance of ``options.Options``.
         :param log_path: Where to log information from the driver
-        :param wait_interval: the wait interval (in milliseconds)
-        :param wait_timeout: the wait timeout (in milliseconds)
-        :param page_load_timeout: the page load timeout (in milliseconds)
-        :param script_timeout: the script timeout (in milliseconds)
+        :param firefox_options: Instance of options.Options
         """
         timeout /= 1000.0
         web_driver_info = WebDriverInfo(WebDriverPlatform.PC, WebDriverContext.FIREFOX)
         selenium_web_driver = _Firefox(firefox_profile=firefox_profile, firefox_binary=firefox_binary, timeout=timeout,
                                        capabilities=capabilities, proxy=proxy, executable_path=executable_path,
-                                       firefox_options=firefox_options, log_path=log_path)
-        WebDriver.__init__(self, selenium_web_driver=selenium_web_driver, web_driver_info=web_driver_info,
-                           wait_interval=wait_interval, wait_timeout=wait_timeout,
-                           page_load_timeout=page_load_timeout, script_timeout=script_timeout)
+                                       options=options, log_path=log_path, firefox_options=firefox_options)
+        WebDriver.__init__(self, selenium_web_driver=selenium_web_driver, web_driver_info=web_driver_info)
 
 
 class Chrome(WebDriver):
     def __init__(self, executable_path="chromedriver", port=0,
-                 chrome_options=None, service_args=None,
+                 options=None, service_args=None,
                  desired_capabilities=None, service_log_path=None,
-                 wait_interval=1000, wait_timeout=30000,
-                 page_load_timeout=30000, script_timeout=30000):
+                 chrome_options=None):
         """
             Creates a new instance of Chrome.
 
         :param executable_path: path to the executable. If the default is used it assumes the executable is in the $PATH
         :param port: port you would like the service to run, if left as 0, a free port will be found.
-        :param chrome_options: this takes an instance of ChromeOptions
+        :param options: this takes an instance of ChromeOptions
         :param service_args: list of args to pass to the chromedriver service
         :param desired_capabilities: Dictionary object with non-browser specific capabilities only, such as "proxy" or "loggingPref".
         :param service_log_path: path for the chromedriver service to log to
-        :param wait_interval: the wait interval (in milliseconds)
-        :param wait_timeout: the wait timeout (in milliseconds)
-        :param page_load_timeout: the page load timeout (in milliseconds)
-        :param script_timeout: the script timeout (in milliseconds)
+        :param chrome_options: this takes an instance of ChromeOptions
         """
         web_driver_info = WebDriverInfo(WebDriverPlatform.PC, WebDriverContext.CHROME)
         selenium_web_driver = _Chrome(executable_path=executable_path, port=port,
-                                      chrome_options=chrome_options, service_args=service_args,
-                                      desired_capabilities=desired_capabilities, service_log_path=service_log_path)
-        WebDriver.__init__(self, selenium_web_driver=selenium_web_driver, web_driver_info=web_driver_info,
-                           wait_interval=wait_interval, wait_timeout=wait_timeout,
-                           page_load_timeout=page_load_timeout, script_timeout=script_timeout)
+                                      options=options, service_args=service_args,
+                                      desired_capabilities=desired_capabilities, service_log_path=service_log_path,
+                                      chrome_options=chrome_options)
+        WebDriver.__init__(self, selenium_web_driver=selenium_web_driver, web_driver_info=web_driver_info)
 
 
 class Opera(WebDriver):
-    def __init__(self, executable_path=None, port=0,
-                 opera_options=None, service_args=None,
-                 desired_capabilities=None, service_log_path=None,
-                 wait_interval=1000, wait_timeout=30000,
-                 page_load_timeout=30000, script_timeout=30000):
+    def __init__(self, desired_capabilities=None, executable_path=None, port=0,
+                 service_log_path=None, service_args=None, options=None):
         """
             Creates a new instance of Opera.
 
+        :param desired_capabilities: Dictionary object with non-browser specific capabilities only, such as "proxy" or "loggingPref".
         :param executable_path: path to the executable. If the default is used, it assumes the executable is in the $PATH
         :param port: port you would like the service to run, if left as 0, a free port will be found.
-        :param opera_options: this takes an instance of ChromeOptions
-        :param service_args: list of args to pass to the chromedriver service
-        :param desired_capabilities: Dictionary object with non-browser specific capabilities only, such as "proxy" or "loggingPref".
         :param service_log_path: path for the chromedriver service to log to
-        :param wait_interval: the wait interval (in milliseconds)
-        :param wait_timeout: the wait timeout (in milliseconds)
-        :param page_load_timeout: the page load timeout (in milliseconds)
-        :param script_timeout: the script timeout (in milliseconds)
+        :param service_args: list of args to pass to the chromedriver service
+        :param options: Instance of ``options.Options``.
         """
         web_driver_info = WebDriverInfo(WebDriverPlatform.PC, WebDriverContext.OPERA)
-        selenium_web_driver = _Opera(executable_path=executable_path, port=port,
-                                     opera_options=opera_options, service_args=service_args,
-                                     desired_capabilities=desired_capabilities, service_log_path=service_log_path)
-        WebDriver.__init__(self, selenium_web_driver=selenium_web_driver, web_driver_info=web_driver_info,
-                           wait_interval=wait_interval, wait_timeout=wait_timeout,
-                           page_load_timeout=page_load_timeout, script_timeout=script_timeout)
+        selenium_web_driver = _Opera(desired_capabilities=desired_capabilities, executable_path=executable_path, port=port,
+                                     service_log_path=service_log_path, service_args=service_args, options=options)
+        WebDriver.__init__(self, selenium_web_driver=selenium_web_driver, web_driver_info=web_driver_info)
 
 
 class Safari(WebDriver):
     def __init__(self, port=0, executable_path="/usr/bin/safaridriver",
-                 desired_capabilities=DesiredCapabilities.SAFARI, quiet=False,
-                 wait_interval=1000, wait_timeout=30000,
-                 page_load_timeout=30000, script_timeout=30000):
+                 desired_capabilities=DesiredCapabilities.SAFARI, quiet=False):
         """
             Creates a new instance of Safari.
 
@@ -1125,24 +1082,16 @@ class Safari(WebDriver):
         :param executable_path: path to the executable. If the default is used it assumes the executable is in the Environment Variable SELENIUM_SERVER_JAR
         :param desired_capabilities: a dictionary of capabilities to request when starting the browser session
         :param quiet: whether the service runs quietly
-        :param wait_interval: the wait interval (in milliseconds)
-        :param wait_timeout: the wait timeout (in milliseconds)
-        :param page_load_timeout: the page load timeout (in milliseconds)
-        :param script_timeout: the script timeout (in milliseconds)
         """
         web_driver_info = WebDriverInfo(WebDriverPlatform.PC, WebDriverContext.SAFARI)
         selenium_web_driver = _Safari(port=port, executable_path=executable_path,
                                       desired_capabilities=desired_capabilities, quiet=quiet)
-        WebDriver.__init__(self, selenium_web_driver=selenium_web_driver, web_driver_info=web_driver_info,
-                           wait_interval=wait_interval, wait_timeout=wait_timeout,
-                           page_load_timeout=page_load_timeout, script_timeout=script_timeout)
+        WebDriver.__init__(self, selenium_web_driver=selenium_web_driver, web_driver_info=web_driver_info)
 
 
 class Edge(WebDriver):
     def __init__(self, executable_path='MicrosoftWebDriver.exe',
-                 capabilities=None, port=0, verbose=False, log_path=None,
-                 wait_interval=1000, wait_timeout=30000,
-                 page_load_timeout=30000, script_timeout=30000):
+                 capabilities=None, port=0, verbose=False, log_path=None):
         """
             Creates a new instance of Edge.
 
@@ -1151,25 +1100,17 @@ class Edge(WebDriver):
         :param port: port you would like the service to run, if left as 0, a free port will be found.
         :param verbose: verbose log
         :param log_path: Where to log information from the driver
-        :param wait_interval: the wait interval (in milliseconds)
-        :param wait_timeout: the wait timeout (in milliseconds)
-        :param page_load_timeout: the page load timeout (in milliseconds)
-        :param script_timeout: the script timeout (in milliseconds)
         """
         web_driver_info = WebDriverInfo(WebDriverPlatform.PC, WebDriverContext.EDGE)
         selenium_web_driver = _Edge(executable_path=executable_path,
                                     capabilities=capabilities, port=port, verbose=verbose, log_path=log_path)
-        WebDriver.__init__(self, selenium_web_driver=selenium_web_driver, web_driver_info=web_driver_info,
-                           wait_interval=wait_interval, wait_timeout=wait_timeout,
-                           page_load_timeout=page_load_timeout, script_timeout=script_timeout)
+        WebDriver.__init__(self, selenium_web_driver=selenium_web_driver, web_driver_info=web_driver_info)
 
 
 class PhantomJS(WebDriver):
     def __init__(self, executable_path="phantomjs",
                  port=0, desired_capabilities=DesiredCapabilities.PHANTOMJS,
-                 service_args=None, service_log_path=None,
-                 wait_interval=1000, wait_timeout=30000,
-                 page_load_timeout=30000, script_timeout=30000):
+                 service_args=None, service_log_path=None):
         """
             Creates a new instance of PhantomJS.
 
@@ -1178,15 +1119,9 @@ class PhantomJS(WebDriver):
         :param desired_capabilities: a dictionary of capabilities to request when starting the browser session
         :param service_args: a list of command line arguments to pass to PhantomJS
         :param service_log_path: path for phantomjs service to log to
-        :param wait_interval: the wait interval (in milliseconds)
-        :param wait_timeout: the wait timeout (in milliseconds)
-        :param page_load_timeout: the page load timeout (in milliseconds)
-        :param script_timeout: the script timeout (in milliseconds)
         """
         web_driver_info = WebDriverInfo(WebDriverPlatform.PC, WebDriverContext.PHANTOMJS)
         selenium_web_driver = _PhantomJS(executable_path=executable_path,
                                          port=port, desired_capabilities=desired_capabilities,
                                          service_args=service_args, service_log_path=service_log_path)
-        WebDriver.__init__(self, selenium_web_driver=selenium_web_driver, web_driver_info=web_driver_info,
-                           wait_interval=wait_interval, wait_timeout=wait_timeout,
-                           page_load_timeout=page_load_timeout, script_timeout=script_timeout)
+        WebDriver.__init__(self, selenium_web_driver=selenium_web_driver, web_driver_info=web_driver_info)
