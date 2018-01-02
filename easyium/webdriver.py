@@ -974,7 +974,7 @@ class Remote(WebDriver):
             platform = {
                 "ios": WebDriverPlatform.IOS,
                 "android": WebDriverPlatform.ANDROID
-            }[desired_capabilities["platformName"].lower(), WebDriverPlatform.PC]
+            }.get(desired_capabilities["platformName"].lower(), WebDriverPlatform.PC)
         else:
             platform = WebDriverPlatform.PC
 
