@@ -63,6 +63,10 @@ For information and suggestions you can contact me at karl.gong@outlook.com
 
 Change Log
 ----------
+1.2.9 (compared to 1.2.9)
+
+- Support selenium>=3.13.0 and appium>=0.26
+
 1.2.9 (compared to 1.2.8)
 
 - Support selenium>=3.8.0 and appium>=0.25
