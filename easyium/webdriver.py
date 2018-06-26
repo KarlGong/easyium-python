@@ -983,7 +983,8 @@ class Remote(WebDriver):
 
 class Ie(WebDriver):
     def __init__(self, executable_path='IEDriverServer.exe', capabilities=None,
-                 port=0, timeout=30000, host=None, log_level=None, log_file=None, ie_options=None):
+                 port=0, timeout=30000, host=None, log_level=None, log_file=None,
+                 options=None, ie_options=None, desired_capabilities=None):
         """
             Creates a new instance of Ie.
 
@@ -994,20 +995,23 @@ class Ie(WebDriver):
         :param host: IP address the service port is bound
         :param log_level: Level of logging of service, may be "FATAL", "ERROR", "WARN", "INFO", "DEBUG", "TRACE". Default is "FATAL".
         :param log_file: Target of logging of service, may be "stdout", "stderr" or file path. Default is "stdout".
+        :param options: IE Options instance, providing additional IE options
         :param ie_options: IE Options instance, providing additional IE options
+        :param desired_capabilities: alias of capabilities; this will make the signature consistent with RemoteWebDriver.
         """
         timeout /= 1000.0
         web_driver_info = WebDriverInfo(WebDriverPlatform.PC, WebDriverContext.IE)
         selenium_web_driver = _Ie(executable_path=executable_path, capabilities=capabilities,
                                   port=port, timeout=timeout, host=host, log_level=log_level, log_file=log_file,
-                                  ie_options=ie_options)
+                                  options=options, ie_options=ie_options, desired_capabilities=desired_capabilities)
         WebDriver.__init__(self, selenium_web_driver=selenium_web_driver, web_driver_info=web_driver_info)
 
 
 class Firefox(WebDriver):
     def __init__(self, firefox_profile=None, firefox_binary=None, timeout=30000,
                  capabilities=None, proxy=None, executable_path="geckodriver",
-                 options=None, log_path="geckodriver.log", firefox_options=None):
+                 options=None, log_path="geckodriver.log", firefox_options=None,
+                 service_args=None, desired_capabilities=None):
         """
             Creates a new instance of Firefox.
 
@@ -1020,12 +1024,16 @@ class Firefox(WebDriver):
         :param options: Instance of ``options.Options``.
         :param log_path: Where to log information from the driver
         :param firefox_options: Instance of options.Options
+        :param desired_capabilities: alias of capabilities. In future
+            versions of this library, this will replace 'capabilities'.
+            This will make the signature consistent with RemoteWebDriver.
         """
         timeout /= 1000.0
         web_driver_info = WebDriverInfo(WebDriverPlatform.PC, WebDriverContext.FIREFOX)
         selenium_web_driver = _Firefox(firefox_profile=firefox_profile, firefox_binary=firefox_binary, timeout=timeout,
                                        capabilities=capabilities, proxy=proxy, executable_path=executable_path,
-                                       options=options, log_path=log_path, firefox_options=firefox_options)
+                                       options=options, log_path=log_path, firefox_options=firefox_options,
+                                       service_args=service_args, desired_capabilities=desired_capabilities)
         WebDriver.__init__(self, selenium_web_driver=selenium_web_driver, web_driver_info=web_driver_info)
 
 
@@ -1073,7 +1081,7 @@ class Opera(WebDriver):
 
 
 class Safari(WebDriver):
-    def __init__(self, port=0, executable_path="/usr/bin/safaridriver",
+    def __init__(self, port=0, executable_path="/usr/bin/safaridriver", reuse_service=False,
                  desired_capabilities=DesiredCapabilities.SAFARI, quiet=False):
         """
             Creates a new instance of Safari.
@@ -1084,7 +1092,7 @@ class Safari(WebDriver):
         :param quiet: whether the service runs quietly
         """
         web_driver_info = WebDriverInfo(WebDriverPlatform.PC, WebDriverContext.SAFARI)
-        selenium_web_driver = _Safari(port=port, executable_path=executable_path,
+        selenium_web_driver = _Safari(port=port, executable_path=executable_path, reuse_service=reuse_service,
                                       desired_capabilities=desired_capabilities, quiet=quiet)
         WebDriver.__init__(self, selenium_web_driver=selenium_web_driver, web_driver_info=web_driver_info)
 
