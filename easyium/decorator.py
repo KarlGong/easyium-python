@@ -29,13 +29,13 @@ def SupportedBy(*_platforms):
                     raise UnsupportedOperationException(
                         "Operation [webdriver.%s()] is not supported by platform [%s]." % (func.__name__, platform))
             elif isinstance(args[0], ElementWaitFor):
-                platform = args[0]._get_element.get_web_driver_info().platform
+                platform = args[0]._get_element().get_web_driver_info().platform
                 if platform not in platforms:
                     raise UnsupportedOperationException(
                         "Operation [element.wait_for().%s()] is not supported by platform [%s]." % (
                         func.__name__, platform))
             elif isinstance(args[0], WebDriverWaitFor):
-                platform = args[0]._get_web_driver.get_web_driver_info().platform
+                platform = args[0]._get_web_driver().get_web_driver_info().platform
                 if platform not in platforms:
                     raise UnsupportedOperationException(
                         "Operation [webdriver.wait_for().%s()] is not supported by platform [%s]." % (
