@@ -853,6 +853,18 @@ class Element(Context):
         except WebDriverException as wde:
             raise EasyiumException(wde.msg, self)
 
+    def save_screenshot(self, filename):
+        """
+            Gets the screenshot of the current element. Returns False if there is
+            any IOError, else returns True. Use full paths in your filename.
+
+        :param filename: The full path you wish to save your screenshot to.
+
+        :Usage:
+            element.get_screenshot_as_file('/Screenshots/foo.png')
+        """
+        return self.get_screenshot_as_file(filename)
+
     def get_screenshot_as_png(self):
         """
             Gets the screenshot of the current element as a binary data.
@@ -884,8 +896,6 @@ class Element(Context):
                 return self._selenium_element().screenshot_as_base64
         except WebDriverException as wde:
             raise EasyiumException(wde.msg, self)
-
-    save_screenshot = get_screenshot_as_file
 
     def is_displayed(self):
         """
