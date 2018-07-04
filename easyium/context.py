@@ -120,6 +120,7 @@ class Context:
                 "css": By.CSS_SELECTOR
                 "ios_predicate": MobileBy.IOS_PREDICATE
                 "ios_uiautomation": MobileBy.IOS_UIAUTOMATION
+                "ios_class_chain": MobileBy.IOS_CLASS_CHAIN
                 "android_uiautomation": MobileBy.ANDROID_UIAUTOMATOR
                 "accessibility_id": MobileBy.ACCESSIBILITY_ID
         :return: whether this context has a child element.
@@ -146,6 +147,7 @@ class Context:
                 "css": By.CSS_SELECTOR
                 "ios_predicate": MobileBy.IOS_PREDICATE
                 "ios_uiautomation": MobileBy.IOS_UIAUTOMATION
+                "ios_class_chain": MobileBy.IOS_CLASS_CHAIN
                 "android_uiautomation": MobileBy.ANDROID_UIAUTOMATOR
                 "accessibility_id": MobileBy.ACCESSIBILITY_ID
         :param identifier:
