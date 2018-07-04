@@ -403,7 +403,7 @@ class ContextPresent:
 
     def occurred(self):
         return len([context_name for context_name in self.__web_driver._selenium_web_driver().contexts
-                    if self.__context_partial_name in context_name]) != 0
+                    if self.__context_partial_name in context_name]) > 0
 
     def __str__(self):
         return "ContextPresent [webdriver: \n%s\n][context partial name: %s]" % (self.__web_driver, self.__context_partial_name)

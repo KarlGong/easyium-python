@@ -224,13 +224,14 @@ class WebDriver(Context):
         :Usage:
             driver.switch_to_context('WEBVIEW_1')
         """
-        self.wait_for().context_present(context_partial_name)
-        context = [context_name for context_name in self._selenium_web_driver().contexts
-                   if context_partial_name in context_name][0]
-        self._selenium_web_driver().switch_to.context(context)
         if context_partial_name == "NATIVE_APP":
+            self._selenium_web_driver().switch_to.context(context_partial_name)
             self.__web_driver_info.context = WebDriverContext.NATIVE_APP
         else:
+            self.wait_for().context_present(context_partial_name)
+            context = [context_name for context_name in self._selenium_web_driver().contexts
+                       if context_partial_name in context_name][0]
+            self._selenium_web_driver().switch_to.context(context)
             self.__web_driver_info.context = WebDriverContext.WEB_VIEW
 
     def is_context_present(self, context_partial_name):
