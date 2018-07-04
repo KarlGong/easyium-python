@@ -1,7 +1,6 @@
 from appium.webdriver.common.multi_action import MultiAction
 from appium.webdriver.common.touch_action import TouchAction
 from appium.webdriver.webdriver import WebDriver as _Appium
-from selenium.common.exceptions import NoAlertPresentException
 from selenium.webdriver import ActionChains, Ie as _Ie, Firefox as _Firefox, Chrome as _Chrome, Opera as _Opera, \
     Safari as _Safari, Edge as _Edge, PhantomJS as _PhantomJS, Remote as _Remote
 from selenium.webdriver.common.desired_capabilities import DesiredCapabilities
@@ -11,7 +10,7 @@ from .context import Context
 from .decorator import SupportedBy
 from .enumeration import WebDriverPlatform, WebDriverContext
 from .utils import StringTypes
-from .waiter import WebDriverWaitFor
+from .waiter import WebDriverWaitFor, AlertPresent, ContextPresent
 
 
 class WebDriverInfo:
@@ -216,20 +215,31 @@ class WebDriver(Context):
         return self._selenium_web_driver().current_context
 
     @SupportedBy(WebDriverPlatform._MOBILE)
-    def switch_to_context(self, context_name):
+    def switch_to_context(self, context_partial_name):
         """
             Sets the context for the current session.
 
-        :param context_name: The name of the context to switch to
+        :param context_partial_name: The partial name of the context to switch to
 
         :Usage:
-            driver.switch_to.context('WEBVIEW_1')
+            driver.switch_to_context('WEBVIEW_1')
         """
-        self._selenium_web_driver().switch_to.context(context_name)
-        if context_name == "NATIVE_APP":
+        self.wait_for().context_present(context_partial_name)
+        context = [context_name for context_name in self._selenium_web_driver().contexts
+                   if context_partial_name in context_name][0]
+        self._selenium_web_driver().switch_to.context(context)
+        if context_partial_name == "NATIVE_APP":
             self.__web_driver_info.context = WebDriverContext.NATIVE_APP
         else:
             self.__web_driver_info.context = WebDriverContext.WEB_VIEW
+
+    def is_context_present(self, context_partial_name):
+        """
+            Return whether the context is present on the page or not.
+
+        :param context_partial_name: the partial name of the context
+        """
+        return ContextPresent(self, context_partial_name).occurred()
 
     def switch_to_frame(self, frame_reference):
         """
@@ -285,11 +295,7 @@ class WebDriver(Context):
         """
             Return whether the alert is present on the page or not.
         """
-        try:
-            alert_text = self._selenium_web_driver().switch_to.alert.text
-            return True
-        except NoAlertPresentException:
-            return False
+        return AlertPresent(self).occurred()
 
     def get_cookies(self):
         """
@@ -919,7 +925,8 @@ class WebDriver(Context):
 
     def __str__(self):
         return "WebDriver <Platform: %s><Context: %s><SessionId: %s>" % (
-            self.get_web_driver_info().platform, self.get_web_driver_info().context, self._selenium_web_driver().session_id)
+            self.get_web_driver_info().platform, self.get_web_driver_info().context,
+            self._selenium_web_driver().session_id)
 
     def __enter__(self):
         return self
@@ -1075,7 +1082,8 @@ class Opera(WebDriver):
         :param options: Instance of ``options.Options``.
         """
         web_driver_info = WebDriverInfo(WebDriverPlatform.PC, WebDriverContext.OPERA)
-        selenium_web_driver = _Opera(desired_capabilities=desired_capabilities, executable_path=executable_path, port=port,
+        selenium_web_driver = _Opera(desired_capabilities=desired_capabilities, executable_path=executable_path,
+                                     port=port,
                                      service_log_path=service_log_path, service_args=service_args, options=options)
         WebDriver.__init__(self, selenium_web_driver=selenium_web_driver, web_driver_info=web_driver_info)
 

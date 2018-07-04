@@ -4,8 +4,8 @@ from selenium.common.exceptions import NoAlertPresentException, NoSuchElementExc
 from selenium.webdriver.common.by import By
 
 from .decorator import SupportedBy
-from .exceptions import TimeoutException, ElementTimeoutException, WebDriverTimeoutException
 from .enumeration import WebDriverPlatform
+from .exceptions import TimeoutException, ElementTimeoutException, WebDriverTimeoutException
 
 
 class Waiter:
@@ -165,6 +165,7 @@ class ElementVisible:
     def __str__(self):
         return "ElementVisible [\n%s\n]" % self.__element
 
+
 class ElementTextEquals:
     def __init__(self, element, text):
         self.__element = element
@@ -175,6 +176,7 @@ class ElementTextEquals:
 
     def __str__(self):
         return "ElementTextEquals [element: \n%s\n][text: %s]" % (self.__element, self.__text)
+
 
 class ElementAttributeEquals:
     def __init__(self, element, attribute, value):
@@ -188,6 +190,7 @@ class ElementAttributeEquals:
     def __str__(self):
         return "ElementAttributeEquals [element: \n%s\n][attribute: %s][value: %s]" % (
             self.__element, self.__attribute, self.__value)
+
 
 class ElementAttributeContainsOne:
     def __init__(self, element, attribute, *values):
@@ -312,6 +315,15 @@ class WebDriverWaitFor:
         """
         self.__wait_for(ActivityPresent(self.__web_driver, activity))
 
+    @SupportedBy(WebDriverPlatform._MOBILE)
+    def context_present(self, context_partial_name):
+        """
+            Wait for the context present.
+
+        :param context_partial_name: the partial name of the context
+        """
+        self.__wait_for(ContextPresent(self.__web_driver, context_partial_name))
+
 
 class AlertPresent:
     def __init__(self, web_driver):
@@ -382,3 +394,16 @@ class ActivityPresent:
 
     def __str__(self):
         return "ActivityPresent [webdriver: \n%s\n][activity: %s]" % (self.__web_driver, self.__activity)
+
+
+class ContextPresent:
+    def __init__(self, web_driver, context_partial_name):
+        self.__web_driver = web_driver
+        self.__context_partial_name = context_partial_name
+
+    def occurred(self):
+        return len([context_name for context_name in self.__web_driver._selenium_web_driver().contexts
+                    if self.__context_partial_name in context_name]) != 0
+
+    def __str__(self):
+        return "ContextPresent [webdriver: \n%s\n][context partial name: %s]" % (self.__web_driver, self.__context_partial_name)
