@@ -1,6 +1,6 @@
 import time
 
-from selenium.common.exceptions import NoAlertPresentException, NoSuchElementException, StaleElementReferenceException
+from selenium.common.exceptions import NoSuchElementException, StaleElementReferenceException, WebDriverException
 from selenium.webdriver.common.by import By
 
 from .decorator import SupportedBy
@@ -333,7 +333,7 @@ class AlertPresent:
         try:
             alert_text = self.__web_driver._selenium_web_driver().switch_to.alert.text
             return True
-        except NoAlertPresentException:
+        except WebDriverException:
             return False
 
     def __str__(self):
