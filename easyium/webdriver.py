@@ -585,7 +585,7 @@ class WebDriver(Context):
             def context_available(partial_name):
                 return len(get_contexts(partial_name)) > 0
 
-            self.waiter().wait_for(context_available)
+            self.waiter().wait_for(context_available, partial_name=context_partial_name)
             self._selenium_web_driver().switch_to.context(contexts["inner"][0])
             self.__web_driver_info.context = WebDriverContext.WEB_VIEW
 
