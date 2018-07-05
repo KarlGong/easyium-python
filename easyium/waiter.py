@@ -316,13 +316,13 @@ class WebDriverWaitFor:
         self.__wait_for(ActivityPresent(self.__web_driver, activity))
 
     @SupportedBy(WebDriverPlatform._MOBILE)
-    def context_present(self, context_partial_name):
+    def context_available(self, context_partial_name):
         """
-            Wait for the context present.
+            Wait for the context available.
 
         :param context_partial_name: the partial name of the context
         """
-        self.__wait_for(ContextPresent(self.__web_driver, context_partial_name))
+        self.__wait_for(ContextAvailable(self.__web_driver, context_partial_name))
 
 
 class AlertPresent:
@@ -333,7 +333,7 @@ class AlertPresent:
         try:
             alert_text = self.__web_driver._selenium_web_driver().switch_to.alert.text
             return True
-        except WebDriverException:
+        except WebDriverException as e:
             return False
 
     def __str__(self):
@@ -396,14 +396,18 @@ class ActivityPresent:
         return "ActivityPresent [webdriver: \n%s\n][activity: %s]" % (self.__web_driver, self.__activity)
 
 
-class ContextPresent:
+class ContextAvailable:
     def __init__(self, web_driver, context_partial_name):
         self.__web_driver = web_driver
         self.__context_partial_name = context_partial_name
 
     def occurred(self):
-        return len([context_name for context_name in self.__web_driver._selenium_web_driver().contexts
-                    if self.__context_partial_name in context_name]) > 0
+        try:
+            contexts = self.__web_driver._selenium_web_driver().contexts
+            return len([context for context in contexts if self.__context_partial_name in context]) > 0
+        except WebDriverException as e:
+            return False
 
     def __str__(self):
-        return "ContextPresent [webdriver: \n%s\n][context partial name: %s]" % (self.__web_driver, self.__context_partial_name)
+        return "ContextAvailable [webdriver: \n%s\n][context partial name: %s]" % (
+            self.__web_driver, self.__context_partial_name)

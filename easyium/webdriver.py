@@ -1,6 +1,7 @@
 from appium.webdriver.common.multi_action import MultiAction
 from appium.webdriver.common.touch_action import TouchAction
 from appium.webdriver.webdriver import WebDriver as _Appium
+from selenium.common.exceptions import WebDriverException
 from selenium.webdriver import ActionChains, Ie as _Ie, Firefox as _Firefox, Chrome as _Chrome, Opera as _Opera, \
     Safari as _Safari, Edge as _Edge, PhantomJS as _PhantomJS, Remote as _Remote
 from selenium.webdriver.common.desired_capabilities import DesiredCapabilities
@@ -10,7 +11,7 @@ from .context import Context
 from .decorator import SupportedBy
 from .enumeration import WebDriverPlatform, WebDriverContext
 from .utils import StringTypes
-from .waiter import WebDriverWaitFor, AlertPresent, ContextPresent
+from .waiter import WebDriverWaitFor
 
 
 class WebDriverInfo:
@@ -572,19 +573,21 @@ class WebDriver(Context):
             self._selenium_web_driver().switch_to.context(context_partial_name)
             self.__web_driver_info.context = WebDriverContext.NATIVE_APP
         else:
-            self.wait_for().context_present(context_partial_name)
-            context = [context_name for context_name in self._selenium_web_driver().contexts
-                       if context_partial_name in context_name][0]
-            self._selenium_web_driver().switch_to.context(context)
+            contexts = {"inner": []}
+
+            def get_contexts(partial_name):
+                try:
+                    contexts["inner"] = [context for context in self.get_contexts() if partial_name in context]
+                    return contexts["inner"]
+                except WebDriverException as e:
+                    return []
+
+            def context_available(partial_name):
+                return len(get_contexts(partial_name)) > 0
+
+            self.waiter().wait_for(context_available)
+            self._selenium_web_driver().switch_to.context(contexts["inner"][0])
             self.__web_driver_info.context = WebDriverContext.WEB_VIEW
-
-    def is_context_present(self, context_partial_name):
-        """
-            Return whether the context is present on the page or not.
-
-        :param context_partial_name: the partial name of the context
-        """
-        return ContextPresent(self, context_partial_name).occurred()
 
     # Window
 
@@ -915,7 +918,11 @@ class WebDriver(Context):
         """
             Return whether the alert is present on the page or not.
         """
-        return AlertPresent(self).occurred()
+        try:
+            alert_text = self._selenium_web_driver().switch_to.alert.text
+            return True
+        except WebDriverException as e:
+            return False
 
     # Screenshot
 
