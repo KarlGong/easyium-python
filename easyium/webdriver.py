@@ -1044,7 +1044,6 @@ class Remote(WebDriver):
         :param file_detector: Pass custom file detector object during instantiation. If None, then default LocalFileDetector() will be used.
         :param options: instance of a driver options.Options class
         """
-
         if "browserName" in desired_capabilities:
             context = {
                 "internet explorer": WebDriverContext.IE,

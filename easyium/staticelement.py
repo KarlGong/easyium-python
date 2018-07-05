@@ -19,11 +19,11 @@ class StaticElement(Element):
                 "tag": By.TAG_NAME
                 "class": By.CLASS_NAME
                 "css": By.CSS_SELECTOR
-                "ios_predicate": MobileBy.IOS_PREDICATE
-                "ios_uiautomation": MobileBy.IOS_UIAUTOMATION
-                "ios_class_chain": MobileBy.IOS_CLASS_CHAIN
-                "android_uiautomation": MobileBy.ANDROID_UIAUTOMATOR
-                "accessibility_id": MobileBy.ACCESSIBILITY_ID
+                "ios_pre": MobileBy.IOS_PREDICATE
+                "ios_ui": MobileBy.IOS_UIAUTOMATION
+                "ios_class": MobileBy.IOS_CLASS_CHAIN
+                "android_ui": MobileBy.ANDROID_UIAUTOMATOR
+                "acc_id": MobileBy.ACCESSIBILITY_ID
         """
         Element.__init__(self, parent)
         # from element

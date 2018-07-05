@@ -118,11 +118,11 @@ class Context:
                 "tag": By.TAG_NAME
                 "class": By.CLASS_NAME
                 "css": By.CSS_SELECTOR
-                "ios_predicate": MobileBy.IOS_PREDICATE
-                "ios_uiautomation": MobileBy.IOS_UIAUTOMATION
-                "ios_class_chain": MobileBy.IOS_CLASS_CHAIN
-                "android_uiautomation": MobileBy.ANDROID_UIAUTOMATOR
-                "accessibility_id": MobileBy.ACCESSIBILITY_ID
+                "ios_pre": MobileBy.IOS_PREDICATE
+                "ios_ui": MobileBy.IOS_UIAUTOMATION
+                "ios_class": MobileBy.IOS_CLASS_CHAIN
+                "android_ui": MobileBy.ANDROID_UIAUTOMATOR
+                "acc_id": MobileBy.ACCESSIBILITY_ID
         :return: whether this context has a child element.
         """
         return self.find_element(locator) is not None
@@ -145,11 +145,11 @@ class Context:
                 "tag": By.TAG_NAME
                 "class": By.CLASS_NAME
                 "css": By.CSS_SELECTOR
-                "ios_predicate": MobileBy.IOS_PREDICATE
-                "ios_uiautomation": MobileBy.IOS_UIAUTOMATION
-                "ios_class_chain": MobileBy.IOS_CLASS_CHAIN
-                "android_uiautomation": MobileBy.ANDROID_UIAUTOMATOR
-                "accessibility_id": MobileBy.ACCESSIBILITY_ID
+                "ios_pre": MobileBy.IOS_PREDICATE
+                "ios_ui": MobileBy.IOS_UIAUTOMATION
+                "ios_class": MobileBy.IOS_CLASS_CHAIN
+                "android_ui": MobileBy.ANDROID_UIAUTOMATOR
+                "acc_id": MobileBy.ACCESSIBILITY_ID
         :param identifier:
             the identifier is a function to generate the locator of the found element, you can get the standard ones in class Identifier.
             Otherwise, you can create one like this::
@@ -219,10 +219,11 @@ class Context:
                 "tag": By.TAG_NAME
                 "class": By.CLASS_NAME
                 "css": By.CSS_SELECTOR
-                "ios_predicate": MobileBy.IOS_PREDICATE
-                "ios_uiautomation": MobileBy.IOS_UIAUTOMATION
-                "android_uiautomation": MobileBy.ANDROID_UIAUTOMATOR
-                "accessibility_id": MobileBy.ACCESSIBILITY_ID
+                "ios_pre": MobileBy.IOS_PREDICATE
+                "ios_ui": MobileBy.IOS_UIAUTOMATION
+                "ios_class": MobileBy.IOS_CLASS_CHAIN
+                "android_ui": MobileBy.ANDROID_UIAUTOMATOR
+                "acc_id": MobileBy.ACCESSIBILITY_ID
         :param identifier:
             the identifier is a function to generate the locator of the found elements, you can get the standard ones in class Identifier.
             Otherwise, you can create one like this::
