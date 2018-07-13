@@ -241,6 +241,8 @@ class Element(Context):
     def get_location(self):
         """
             Gets the location for the top-left corner of this element.
+
+        :return: the location dict, {'x': x, 'y': y}
         """
         try:
             try:
@@ -278,6 +280,8 @@ class Element(Context):
     def get_size(self):
         """
             Gets the size (including border) of this element.
+
+        :return: the size dict, {'width': width, 'height': height}
         """
         try:
             try:
@@ -291,6 +295,8 @@ class Element(Context):
     def get_rect(self):
         """
             Gets a dictionary with the size and location of this element.
+
+        :return: the rect dict, {'width': width, 'height': height, 'x': x, 'y': y}
         """
         try:
             try:
@@ -318,6 +324,8 @@ class Element(Context):
     def get_center(self):
         """
             Gets the location for the center of this element.
+
+        :return: the location dict, {'x': x, 'y': y}
         """
         rect = self.get_rect()
         return {"x": rect["x"] + rect["width"] / 2,
