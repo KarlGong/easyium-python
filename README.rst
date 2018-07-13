@@ -63,6 +63,14 @@ For information and suggestions you can contact me at karl.gong@outlook.com
 
 Change Log
 ----------
+1.3.0 (compared to 1.2.10)
+
+- Support appium>=0.27 and add the new actions.
+
+- Shorten the locator name. e.g., accessibility_id -> acc_id
+
+- Add waiting for WebDriver.switch_to_context.
+
 1.2.10 (compared to 1.2.9)
 
 - Support selenium>=3.13.0 and appium>=0.26
