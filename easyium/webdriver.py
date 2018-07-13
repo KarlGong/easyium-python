@@ -293,13 +293,28 @@ class WebDriver(Context):
     # App
 
     @SupportedBy(WebDriverPlatform._MOBILE)
-    def install_app(self, app_path):
+    def install_app(self, app_path, replace=True, timeout=60000, allow_test_packages=False,
+                    usd_sd_card=False, grant_permissions=False):
         """
             Install the application found at `app_path` on the device.
 
-        :param app_path: the local or remote path to the application to install
+        :param app_path - the local or remote path to the application to install
+
+        The following options are available for Android:
+        :param replace: whether to reinstall/upgrade the package if it is already present on the device under test. True by default
+        :param timeout: how much time to wait for the installation to complete. 60000ms by default.
+        :param allow_test_packages: whether to allow installation of packages marked as test in the manifest. False by default
+        :param usd_sd_card: whether to use the SD card to install the app. False by default
+        :param grant_permissions: whether to automatically grant application permissions on Android 6+ after the installation completes. False by default
         """
-        self._selenium_web_driver().install_app(app_path)
+        options = {
+            "replace": replace,
+            "timeout": timeout,
+            "allowTestPackages": allow_test_packages,
+            "useSdcard": usd_sd_card,
+            "grantPermissions": grant_permissions
+        }
+        self._selenium_web_driver().install_app(app_path, **options)
 
     @SupportedBy(WebDriverPlatform._MOBILE)
     def is_app_installed(self, bundle_id):
@@ -327,11 +342,37 @@ class WebDriver(Context):
         self._selenium_web_driver().background_app(duration / 1000.0)
 
     @SupportedBy(WebDriverPlatform._MOBILE)
+    def activate_app(self, app_id):
+        """
+            Activates the application if it is not running or is running in the background.
+
+        :param app_id: the application id to be activated
+        """
+        self._selenium_web_driver().activate_app(app_id)
+
+    @SupportedBy(WebDriverPlatform._MOBILE)
     def close_app(self):
         """
             Stop the running application, specified in the desired capabilities, on the device.
         """
         self._selenium_web_driver().close_app()
+
+    @SupportedBy(WebDriverPlatform._MOBILE)
+    def terminate_app(self, app_id, timeout=500):
+        """
+            Terminates the application if it is running.
+
+        :param app_id: the application id to be terminates
+
+        The following options are available for Android:
+        :param timeout: how much time to wait for the uninstall to complete. 500ms by default.
+
+        :return: True if the app has been successfully terminated
+        """
+        options = {
+            "timeout": timeout
+        }
+        return self._selenium_web_driver().terminate_app(app_id, **options)
 
     @SupportedBy(WebDriverPlatform._MOBILE)
     def reset_app(self):
@@ -341,13 +382,32 @@ class WebDriver(Context):
         self._selenium_web_driver().reset()
 
     @SupportedBy(WebDriverPlatform._MOBILE)
-    def remove_app(self, app_id):
+    def remove_app(self, app_id, keep_data=False, timeout=20000):
         """
             Remove the specified application from the device.
 
         :param app_id: the application id to be removed
+
+        The following options are available for Android:
+        :param keep_data: whether to keep application data and caches after it is uninstalled. False by default
+        :param timeout: how much time to wait for the uninstall to complete. 20000ms by default.
         """
-        self._selenium_web_driver().remove_app(app_id)
+        options = {
+            "keepData": keep_data,
+            "timeout": timeout
+        }
+        self._selenium_web_driver().remove_app(app_id, **options)
+
+    @SupportedBy(WebDriverPlatform._MOBILE)
+    def get_app_state(self, app_id):
+        """
+            Queries the state of the application.
+
+        :param app_id: the application id to be queried
+
+        :return: One of possible application state constants. See appium.webdriver.applicationstate.ApplicationState class for more details.
+        """
+        return self._selenium_web_driver().query_app_state(app_id)
 
     @SupportedBy(WebDriverPlatform._MOBILE)
     def get_app_strings(self, language=None, string_file=None):
@@ -1071,17 +1131,17 @@ class WebDriver(Context):
                  (depends on the actual `remote_path` value).
         """
         options = {
-            "remote_path": remote_path,
+            "remotePath": remote_path,
             "user": user,
             "password": password,
             "method": method,
-            "time_limit": time_limit,
-            "forced_restart": forced_restart,
-            "bug_report": bug_report,
-            "video_quality": video_quality,
-            "video_type": video_type,
-            "video_size": video_size,
-            "bit_rate": bit_rate
+            "timeLimit": time_limit,
+            "forcedRestart": forced_restart,
+            "bugReport": bug_report,
+            "videoQuality": video_quality,
+            "videoType": video_type,
+            "videoSize": video_size,
+            "bitRate": bit_rate
         }
         return self._selenium_web_driver().start_recording_screen(**options)
 
@@ -1109,7 +1169,7 @@ class WebDriver(Context):
                 (depends on the actual `remote_path` value).
         """
         options = {
-            "remote_path": remote_path,
+            "remotePath": remote_path,
             "user": user,
             "password": password,
             "method": method
