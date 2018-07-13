@@ -407,7 +407,7 @@ class WebDriver(Context):
         """
         return self._selenium_web_driver().pull_folder(path)
 
-    # Interactions todo: unlock, is locked, rotate
+    # Interactions todo: rotate
 
     @SupportedBy(WebDriverPlatform._MOBILE)
     def shake(self):
@@ -416,38 +416,59 @@ class WebDriver(Context):
         """
         self._selenium_web_driver().shake()
 
-    @SupportedBy(WebDriverPlatform.IOS)
-    def lock(self, duration):
+    @SupportedBy(WebDriverPlatform._MOBILE)
+    def lock(self, duration=None):
         """
-            Lock the device for a certain period of time. iOS only.
+            Lock the device for a certain period of time.
+            No changes are made if the device is already locked.
 
-        :param duration: the duration to lock the device, in ms.
+        :param duration: (optional) the duration to lock the device, in ms.
+            The device is going to be locked forever until `unlock` is called if it equals or is less than zero,
+            otherwise this call blocks until the timeout expires and unlocks the screen automatically.
         """
         self._selenium_web_driver().lock(duration / 1000.0)
 
-    # Keys todo: is keyboard shown
+    @SupportedBy(WebDriverPlatform.ANDROID)
+    def unlock(self):
+        """
+            Unlock the device. No changes are made if the device is already unlocked.
+        """
+        self._selenium_web_driver().unlock()
 
     @SupportedBy(WebDriverPlatform.ANDROID)
-    def press_keycode(self, keycode, metastate=None):
+    def is_locked(self):
+        """
+            Checks whether the device is locked.
+
+        :return: Either True or False
+        """
+        return self._selenium_web_driver().is_locked()
+
+    # Keys
+
+    @SupportedBy(WebDriverPlatform.ANDROID)
+    def press_keycode(self, keycode, metastate=None, flags=None):
         """
             Sends a keycode to the device. Android only. Possible keycodes can be
             found in http://developer.android.com/reference/android/view/KeyEvent.html.
 
         :param keycode: the keycode to be sent to the device
         :param metastate: meta information about the keycode being sent
+        :param flags: the set of key event flags
         """
-        self._selenium_web_driver().press_keycode(keycode, metastate)
+        self._selenium_web_driver().press_keycode(keycode, metastate, flags)
 
     @SupportedBy(WebDriverPlatform.ANDROID)
-    def long_press_keycode(self, keycode, metastate=None):
+    def long_press_keycode(self, keycode, metastate=None, flags=None):
         """
             Sends a long press of keycode to the device. Android only. Possible keycodes can be
             found in http://developer.android.com/reference/android/view/KeyEvent.html.
 
         :param keycode: the keycode to be sent to the device
         :param metastate: meta information about the keycode being sent
+        :param flags: the set of key event flags
         """
-        self._selenium_web_driver().long_press_keycode(keycode, metastate)
+        self._selenium_web_driver().long_press_keycode(keycode, metastate, flags)
 
     @SupportedBy(WebDriverPlatform._MOBILE)
     def hide_keyboard(self, key_name=None, key=None, strategy=None):
@@ -460,6 +481,15 @@ class WebDriver(Context):
         :param strategy: strategy for closing the keyboard (e.g., `tapOutside`)
         """
         self._selenium_web_driver().hide_keyboard(key_name, key, strategy)
+
+    @SupportedBy(WebDriverPlatform._MOBILE)
+    def is_keyboard_shown(self):
+        """
+            Attempts to detect whether a software keyboard is present.
+
+        :return: Either True or False
+        """
+        return self._selenium_web_driver().is_keyboard_shown()
 
     @SupportedBy(WebDriverPlatform.ANDROID)
     def key_event(self, keycode, metastate=None):
@@ -542,6 +572,29 @@ class WebDriver(Context):
             Returns the date and time from the device
         """
         return self._selenium_web_driver().device_time
+
+    @SupportedBy(WebDriverPlatform._MOBILE)
+    def get_battery_info(self):
+        """
+            Retrieves battery information for the device under test.
+
+        :return: A dictionary containing the following entries
+        - level: Battery level in range [0.0, 1.0], where 1.0 means 100% charge.
+            Any value lower than 0 means the level cannot be retrieved
+        - state: Platform-dependent battery state value.
+            On iOS (XCUITest):
+                - 1: Unplugged
+                - 2: Charging
+                - 3: Full
+                Any other value means the state cannot be retrieved
+            On Android (UIAutomator2):
+                - 2: Charging
+                - 3: Discharging
+                - 4: Not charging
+                - 5: Full
+                Any other value means the state cannot be retrieved
+        """
+        return self._selenium_web_driver().battery_info
 
     # Context
 
