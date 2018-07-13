@@ -263,21 +263,15 @@ class WebDriver(Context):
         :param optional_intent_arguments: Optional arguments to the intent.
         :param stop_app_on_reset: Whether the app should be stopped on reset or not
         """
-        options = {}
-        if app_wait_package is not None:
-            options["app_wait_package"] = app_wait_package
-        if app_wait_activity is not None:
-            options["app_wait_activity"] = app_wait_activity
-        if intent_action is not None:
-            options["intent_action"] = intent_action
-        if intent_category is not None:
-            options["intent_category"] = intent_category
-        if intent_flags is not None:
-            options["intent_flags"] = intent_flags
-        if optional_intent_arguments is not None:
-            options["optional_intent_arguments"] = optional_intent_arguments
-        if stop_app_on_reset is not None:
-            options["stop_app_on_reset"] = stop_app_on_reset
+        options = {
+            "app_wait_package": app_wait_package,
+            "app_wait_activity": app_wait_activity,
+            "intent_action": intent_action,
+            "intent_category": intent_category,
+            "intent_flags": intent_flags,
+            "optional_intent_arguments": optional_intent_arguments,
+            "stop_app_on_reset": stop_app_on_reset
+        }
 
         self._selenium_web_driver().start_activity(app_package, app_activity, **options)
 
@@ -977,7 +971,7 @@ class WebDriver(Context):
         except WebDriverException as e:
             return False
 
-    # Screenshot
+    # Screenshot and recording
 
     def get_screenshot_as_file(self, filename):
         """
@@ -1021,6 +1015,105 @@ class WebDriver(Context):
             driver.get_screenshot_as_base64()
         """
         return self._selenium_web_driver().get_screenshot_as_base64()
+
+    @SupportedBy(WebDriverPlatform._MOBILE)
+    def start_recording_screen(self, remote_path=None, user=None, password=None, method=None, time_limit=None,
+                               forced_restart=None, bug_report=None, video_quality=None, video_type=None,
+                               video_size=None, bit_rate=None):
+        """
+            Start asynchronous screen recording process.
+
+        :param remote_path: The remote_path upload option is the path to the remote location,
+            where the resulting video from the previous screen recording should be uploaded.
+            The following protocols are supported: http/https (multipart), ftp.
+            Missing value (the default setting) means the content of the resulting
+            file should be encoded as Base64 and passed as the endpoint response value, but
+            an exception will be thrown if the generated media file is too big to
+            fit into the available process memory.
+            This option only has an effect if there is/was an active screen recording session
+            and forced restart is not enabled (the default setting).
+        :param user: The name of the user for the remote authentication.
+            Only has an effect if both `remote_path` and `password` are set.
+        :param password: The password for the remote authentication.
+            Only has an effect if both `remote_path` and `user` are set.
+        :param method: The HTTP method name ('PUT'/'POST'). PUT method is used by default.
+            Only has an effect if `remote_path` is set.
+        :param time_limit: The actual time limit of the recorded video in seconds.
+            The default value for both iOS and Android is 180 seconds (3 minutes).
+            The maximum value for Android is 3 minutes.
+            The maximum value for iOS is 10 minutes.
+        :param forced_restart: Whether to ignore the result of previous capture and start a new recording
+            immediately (`True` value). By default  (`False`) the endpoint will try to catch and return the result of
+            the previous capture if it's still available.
+        :param bug_report: Makes the recorder to display an additional information on the video overlay,
+            such as a timestamp, that is helpful in videos captured to illustrate bugs.
+            This option is only supported since API level 27 (Android P).
+
+        iOS Specific:
+        :param video_quality: The video encoding quality: 'low', 'medium', 'high', 'photo'. Defaults to 'medium'.
+            Only works for real devices.
+        :param video_type: The format of the screen capture to be recorded.
+            Available formats: 'h264', 'mp4' or 'fmp4'. Default is 'mp4'.
+            Only works for Simulator.
+
+        Android Specific:
+        :param video_size: The video size of the generated media file. The format is WIDTHxHEIGHT.
+            The default value is the device's native display resolution (if supported),
+            1280x720 if not. For best results, use a size supported by your device's
+            Advanced Video Coding (AVC) encoder.
+        :param bit_rate: The video bit rate for the video, in megabits per second.
+            The default value is 4. You can increase the bit rate to improve video quality,
+            but doing so results in larger movie files.
+
+        :return: Base-64 encoded content of the recorded media file or an empty string
+                 if the file has been successfully uploaded to a remote location
+                 (depends on the actual `remote_path` value).
+        """
+        options = {
+            "remote_path": remote_path,
+            "user": user,
+            "password": password,
+            "method": method,
+            "time_limit": time_limit,
+            "forced_restart": forced_restart,
+            "bug_report": bug_report,
+            "video_quality": video_quality,
+            "video_type": video_type,
+            "video_size": video_size,
+            "bit_rate": bit_rate
+        }
+        return self._selenium_web_driver().start_recording_screen(**options)
+
+    @SupportedBy(WebDriverPlatform._MOBILE)
+    def stop_recording_screen(self, remote_path=None, user=None, password=None, method=None):
+        """
+            Gather the output from the previously started screen recording to a media file.
+            
+        :param remote_path: The remote_path upload option is the path to the remote location,
+            where the resulting video should be uploaded.
+            The following protocols are supported: http/https (multipart), ftp.
+            Missing value (the default setting) means the content of the resulting
+            file should be encoded as Base64 and passed as the endpoint response value, but
+            an exception will be thrown if the generated media file is too big to
+            fit into the available process memory.
+        :param user: The name of the user for the remote authentication.
+            Only has an effect if both `remote_path` and `password` are set.
+        :param password: The password for the remote authentication.
+            Only has an effect if both `remote_path` and `user` are set.
+        :param method: The HTTP method name ('PUT'/'POST'). PUT method is used by default.
+            Only has an effect if `remote_path` is set.
+        
+        :return: Base-64 encoded content of the recorded media file or an empty string
+                if the file has been successfully uploaded to a remote location
+                (depends on the actual `remote_path` value).
+        """
+        options = {
+            "remote_path": remote_path,
+            "user": user,
+            "password": password,
+            "method": method
+        }
+        return self._selenium_web_driver().stop_recording_screen(**options)
 
     # Touch Actions
 
