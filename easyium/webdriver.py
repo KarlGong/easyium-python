@@ -752,6 +752,12 @@ class WebDriver(Context):
         """
         self._selenium_web_driver().maximize_window()
 
+    def fullscreen_window(self):
+        """
+            Invokes the window manager-specific 'full screen' operation
+        """
+        self._selenium_web_driver().fullscreen_window()
+
     def set_window_size(self, width, height, window_reference="current"):
         """
             Sets the width and height of the specified window.
