@@ -1,3 +1,4 @@
+from appium.webdriver.clipboard_content_type import ClipboardContentType
 from appium.webdriver.common.multi_action import MultiAction
 from appium.webdriver.common.touch_action import TouchAction
 from appium.webdriver.webdriver import WebDriver as _Appium
@@ -1114,6 +1115,50 @@ class WebDriver(Context):
             "method": method
         }
         return self._selenium_web_driver().stop_recording_screen(**options)
+
+    # clipboard
+
+    @SupportedBy(WebDriverPlatform._MOBILE)
+    def set_clipboard(self, content, content_type=ClipboardContentType.PLAINTEXT, label=None):
+        """
+            Set the content of the system clipboard.
+
+        :param content: The content to be set as bytearray string
+        :param content_type: One of enum appium.webdriver.clipboard_content_type.ClipboardContentType items.
+            Only ClipboardContentType.PLAINTEXT is supported on Android
+        :param label: Optional label argument, which only works for Android
+        """
+        self._selenium_web_driver().set_clipboard(content, content_type, label)
+
+    @SupportedBy(WebDriverPlatform._MOBILE)
+    def set_clipboard_text(self, text, label=None):
+        """
+            Copies the given text to the system clipboard.
+
+        :param text: The text to be set
+        :param label: Optional label argument, which only works for Android
+        """
+        self._selenium_web_driver().set_clipboard_text(text, label)
+
+    @SupportedBy(WebDriverPlatform._MOBILE)
+    def get_clipboard(self, content_type=ClipboardContentType.PLAINTEXT):
+        """
+            Receives the content of the system clipboard.
+
+        :param content_type: enum appium.webdriver.clipboard_content_type.ClipboardContentType items.
+            Only ClipboardContentType.PLAINTEXT is supported on Android
+        :return: Clipboard content as base64-encoded string or an empty string if the clipboard is empty
+        """
+        return self._selenium_web_driver().get_clipboard(content_type)
+
+    @SupportedBy(WebDriverPlatform._MOBILE)
+    def get_clipboard_text(self):
+        """
+            Receives the text of the system clipboard.
+
+        :return: The actual clipboard text or an empty string if the clipboard is empty
+        """
+        return self._selenium_web_driver().get_clipboard_text()
 
     # Touch Actions
 
