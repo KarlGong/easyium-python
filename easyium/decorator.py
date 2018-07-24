@@ -15,7 +15,7 @@ def SupportedBy(*_platforms):
                     platforms += [platform]
 
             from .element import Element
-            from .webdriver import WebDriver
+            from .web_driver import WebDriver
             from .waiter import ElementWaitFor, WebDriverWaitFor
 
             if isinstance(args[0], Element):

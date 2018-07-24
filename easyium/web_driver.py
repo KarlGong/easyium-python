@@ -938,7 +938,7 @@ class WebDriver(Context):
             driver.switch_to_frame(StaticElement(driver, "tag=iframe"))
         """
         from .element import Element
-        from .staticelement import StaticElement
+        from .static_element import StaticElement
 
         if isinstance(frame_reference, int):
             frame_element = StaticElement(self, "xpath=(.//iframe)[%s]" % (frame_reference + 1))

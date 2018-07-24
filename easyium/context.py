@@ -163,7 +163,7 @@ class Context:
         :return: the DynamicElement found by locator
         """
         # import the DynamicElement here to avoid cyclic dependency
-        from .dynamicelement import DynamicElement
+        from .dynamic_element import DynamicElement
 
         by, value = locator_to_by_value(locator)
         element = {"inner": None}
@@ -237,7 +237,7 @@ class Context:
         :return: the DynamicElement list found by locator
         """
         # import the DynamicElement here to avoid cyclic dependency
-        from .dynamicelement import DynamicElement
+        from .dynamic_element import DynamicElement
 
         by, value = locator_to_by_value(locator)
         elements = {"inner": []}
