@@ -826,21 +826,20 @@ class Element(Context):
             raise EasyiumException(wde.msg, self)
 
     @SupportedBy(WebDriverPlatform._MOBILE)
-    def scroll_to(self, target_element):
+    def scroll_to(self, target_element, duration=None):
         """
             Scrolls from this element to another.
 
         :param target_element: the target element to be scrolled to
+        :param duration: a duration after press and move to target element. Default is 600 ms for W3C spec. Zero for MJSONWP.
         """
         try:
             try:
-                self.get_web_driver()._selenium_web_driver().scroll(self._selenium_element(),
-                                                                    target_element._selenium_element())
+                self.get_web_driver()._selenium_web_driver().scroll(self._selenium_element(), target_element._selenium_element(), duration)
             except (NoSuchElementException, StaleElementReferenceException):
                 self.wait_for().exists()
                 target_element.wait_for().exists()
-                self.get_web_driver()._selenium_web_driver().scroll(self._selenium_element(),
-                                                                    target_element._selenium_element())
+                self.get_web_driver()._selenium_web_driver().scroll(self._selenium_element(), target_element._selenium_element(), duration)
         except WebDriverException as wde:
             raise EasyiumException(wde.msg, self)
 
