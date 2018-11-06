@@ -63,6 +63,12 @@ For information and suggestions you can contact me at karl.gong@outlook.com
 
 Change Log
 ----------
+1.3.1 (compared to 1.3.0)
+
+- Support selenium>=3.141.0 and appium>=0.30
+
+- Implement double_click and context_click for safari.
+
 1.3.0 (compared to 1.2.10)
 
 - Support appium>=0.27 and add the new actions.
