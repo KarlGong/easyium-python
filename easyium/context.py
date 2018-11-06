@@ -124,6 +124,7 @@ class Context:
                 "android_ui": MobileBy.ANDROID_UIAUTOMATOR
                 "android_tag": MobileBy.ANDROID_VIEWTAG
                 "acc_id": MobileBy.ACCESSIBILITY_ID
+                "custom": MobileBy.CUSTOM
         :return: whether this context has a child element.
         """
         return self.find_element(locator) is not None
@@ -152,6 +153,7 @@ class Context:
                 "android_ui": MobileBy.ANDROID_UIAUTOMATOR
                 "android_tag": MobileBy.ANDROID_VIEWTAG
                 "acc_id": MobileBy.ACCESSIBILITY_ID
+                "custom": MobileBy.CUSTOM
         :param identifier:
             the identifier is a function to generate the locator of the found element, you can get the standard ones in class Identifier.
             Otherwise, you can create one like this::
@@ -227,6 +229,7 @@ class Context:
                 "android_ui": MobileBy.ANDROID_UIAUTOMATOR
                 "android_tag": MobileBy.ANDROID_VIEWTAG
                 "acc_id": MobileBy.ACCESSIBILITY_ID
+                "custom": MobileBy.CUSTOM
         :param identifier:
             the identifier is a function to generate the locator of the found elements, you can get the standard ones in class Identifier.
             Otherwise, you can create one like this::

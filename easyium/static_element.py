@@ -25,6 +25,7 @@ class StaticElement(Element):
                 "android_ui": MobileBy.ANDROID_UIAUTOMATOR
                 "android_tag": MobileBy.ANDROID_VIEWTAG
                 "acc_id": MobileBy.ACCESSIBILITY_ID
+                "custom": MobileBy.CUSTOM
         """
         Element.__init__(self, parent)
         # from element
