@@ -1370,8 +1370,9 @@ class Remote(WebDriver):
 
 class Ie(WebDriver):
     def __init__(self, executable_path='IEDriverServer.exe', capabilities=None,
-                 port=0, timeout=30000, host=None, log_level=None, log_file=None,
-                 options=None, ie_options=None, desired_capabilities=None):
+                 port=0, timeout=30000, host=None,
+                 log_level=None, service_log_path=None, options=None,
+                 ie_options=None, desired_capabilities=None, log_file=None, keep_alive=False):
         """
             Creates a new instance of Ie.
 
@@ -1381,24 +1382,30 @@ class Ie(WebDriver):
         :param timeout: connection timeout for IEDriver, in milliseconds
         :param host: IP address the service port is bound
         :param log_level: Level of logging of service, may be "FATAL", "ERROR", "WARN", "INFO", "DEBUG", "TRACE". Default is "FATAL".
-        :param log_file: Target of logging of service, may be "stdout", "stderr" or file path. Default is "stdout".
+        :param service_log_path: target of logging of service, may be "stdout", "stderr" or file path.
         :param options: IE Options instance, providing additional IE options
         :param ie_options: IE Options instance, providing additional IE options
         :param desired_capabilities: alias of capabilities; this will make the signature consistent with RemoteWebDriver.
+        :param log_file: Target of logging of service, may be "stdout", "stderr" or file path. Default is "stdout".
+        :param keep_alive: Whether to configure RemoteConnection to use HTTP keep-alive.
         """
         timeout /= 1000.0
         web_driver_info = WebDriverInfo(WebDriverPlatform.PC, WebDriverContext.IE)
         selenium_web_driver = _Ie(executable_path=executable_path, capabilities=capabilities,
-                                  port=port, timeout=timeout, host=host, log_level=log_level, log_file=log_file,
-                                  options=options, ie_options=ie_options, desired_capabilities=desired_capabilities)
+                                  port=port, timeout=timeout, host=host,
+                                  log_level=log_level, service_log_path=service_log_path, options=options,
+                                  ie_options=ie_options, desired_capabilities=desired_capabilities,
+                                  log_file=log_file, keep_alive=keep_alive)
         WebDriver.__init__(self, selenium_web_driver=selenium_web_driver, web_driver_info=web_driver_info)
 
 
 class Firefox(WebDriver):
-    def __init__(self, firefox_profile=None, firefox_binary=None, timeout=30000,
-                 capabilities=None, proxy=None, executable_path="geckodriver",
-                 options=None, log_path="geckodriver.log", firefox_options=None,
-                 service_args=None, desired_capabilities=None):
+    def __init__(self, firefox_profile=None, firefox_binary=None,
+                 timeout=30000, capabilities=None, proxy=None,
+                 executable_path="geckodriver", options=None,
+                 service_log_path="geckodriver.log", firefox_options=None,
+                 service_args=None, desired_capabilities=None, log_path=None,
+                 keep_alive=True):
         """
             Creates a new instance of Firefox.
 
@@ -1409,18 +1416,22 @@ class Firefox(WebDriver):
         :param proxy: the firefox proxy
         :param executable_path: path to the GeckoDriver binary
         :param options: Instance of ``options.Options``.
-        :param log_path: Where to log information from the driver
+        :param service_log_path: Where to log information from the driver.
         :param firefox_options: Instance of options.Options
-        :param desired_capabilities: alias of capabilities. In future
-            versions of this library, this will replace 'capabilities'.
+        :param service_args: List of args to pass to the driver service
+        :param desired_capabilities: alias of capabilities. In future versions of this library, this will replace 'capabilities'.
             This will make the signature consistent with RemoteWebDriver.
+        :param log_path: Where to log information from the driver
+        :param keep_alive: Whether to configure remote_connection.RemoteConnection to use HTTP keep-alive.
         """
         timeout /= 1000.0
         web_driver_info = WebDriverInfo(WebDriverPlatform.PC, WebDriverContext.FIREFOX)
-        selenium_web_driver = _Firefox(firefox_profile=firefox_profile, firefox_binary=firefox_binary, timeout=timeout,
-                                       capabilities=capabilities, proxy=proxy, executable_path=executable_path,
-                                       options=options, log_path=log_path, firefox_options=firefox_options,
-                                       service_args=service_args, desired_capabilities=desired_capabilities)
+        selenium_web_driver = _Firefox(firefox_profile=firefox_profile, firefox_binary=firefox_binary,
+                                       timeout=timeout, capabilities=capabilities, proxy=proxy,
+                                       executable_path=executable_path, options=options,
+                                       service_log_path=service_log_path, firefox_options=firefox_options,
+                                       service_args=service_args, desired_capabilities=desired_capabilities, log_path=log_path,
+                                       keep_alive=keep_alive)
         WebDriver.__init__(self, selenium_web_driver=selenium_web_driver, web_driver_info=web_driver_info)
 
 
@@ -1428,7 +1439,7 @@ class Chrome(WebDriver):
     def __init__(self, executable_path="chromedriver", port=0,
                  options=None, service_args=None,
                  desired_capabilities=None, service_log_path=None,
-                 chrome_options=None):
+                 chrome_options=None, keep_alive=True):
         """
             Creates a new instance of Chrome.
 
@@ -1439,12 +1450,13 @@ class Chrome(WebDriver):
         :param desired_capabilities: Dictionary object with non-browser specific capabilities only, such as "proxy" or "loggingPref".
         :param service_log_path: path for the chromedriver service to log to
         :param chrome_options: this takes an instance of ChromeOptions
+        :param keep_alive: Whether to configure ChromeRemoteConnection to use HTTP keep-alive.
         """
         web_driver_info = WebDriverInfo(WebDriverPlatform.PC, WebDriverContext.CHROME)
         selenium_web_driver = _Chrome(executable_path=executable_path, port=port,
                                       options=options, service_args=service_args,
                                       desired_capabilities=desired_capabilities, service_log_path=service_log_path,
-                                      chrome_options=chrome_options)
+                                      chrome_options=chrome_options, keep_alive=keep_alive)
         WebDriver.__init__(self, selenium_web_driver=selenium_web_driver, web_driver_info=web_driver_info)
 
 
@@ -1470,7 +1482,8 @@ class Opera(WebDriver):
 
 class Safari(WebDriver):
     def __init__(self, port=0, executable_path="/usr/bin/safaridriver", reuse_service=False,
-                 desired_capabilities=DesiredCapabilities.SAFARI, quiet=False):
+                 desired_capabilities=DesiredCapabilities.SAFARI, quiet=False,
+                 keep_alive=True, service_args=None):
         """
             Creates a new instance of Safari.
 
@@ -1478,16 +1491,20 @@ class Safari(WebDriver):
         :param executable_path: path to the executable. If the default is used it assumes the executable is in the Environment Variable SELENIUM_SERVER_JAR
         :param desired_capabilities: a dictionary of capabilities to request when starting the browser session
         :param quiet: whether the service runs quietly
+        :param keep_alive: Whether to configure SafariRemoteConnection to use HTTP keep-alive. Defaults to False.
+        :param service_args: List of args to pass to the safaridriver service
         """
         web_driver_info = WebDriverInfo(WebDriverPlatform.PC, WebDriverContext.SAFARI)
         selenium_web_driver = _Safari(port=port, executable_path=executable_path, reuse_service=reuse_service,
-                                      desired_capabilities=desired_capabilities, quiet=quiet)
+                                      desired_capabilities=desired_capabilities, quiet=quiet,
+                                      keep_alive=keep_alive, service_args=service_args)
         WebDriver.__init__(self, selenium_web_driver=selenium_web_driver, web_driver_info=web_driver_info)
 
 
 class Edge(WebDriver):
     def __init__(self, executable_path='MicrosoftWebDriver.exe',
-                 capabilities=None, port=0, verbose=False, log_path=None):
+                 capabilities=None, port=0, verbose=False, service_log_path=None,
+                 log_path=None, keep_alive=False):
         """
             Creates a new instance of Edge.
 
@@ -1495,11 +1512,14 @@ class Edge(WebDriver):
         :param capabilities: a dictionary of capabilities to request when starting the browser session
         :param port: port you would like the service to run, if left as 0, a free port will be found.
         :param verbose: verbose log
-        :param log_path: Where to log information from the driver
+        :param service_log_path: Where to log information from the driver.
+        :param log_path: Deprecated argument for service_log_path
+        :param keep_alive Whether to configure ChromeRemoteConnection to use HTTP keep-alive.
         """
         web_driver_info = WebDriverInfo(WebDriverPlatform.PC, WebDriverContext.EDGE)
         selenium_web_driver = _Edge(executable_path=executable_path,
-                                    capabilities=capabilities, port=port, verbose=verbose, log_path=log_path)
+                                    capabilities=capabilities, port=port, verbose=verbose, service_log_path=service_log_path,
+                                    log_path=log_path, keep_alive=keep_alive)
         WebDriver.__init__(self, selenium_web_driver=selenium_web_driver, web_driver_info=web_driver_info)
 
 

@@ -336,24 +336,10 @@ class Element(Context):
         """
         try:
             try:
-                if self.get_web_driver_info().context == WebDriverContext.FIREFOX \
-                        and self.get_web_driver_info().platform == WebDriverPlatform.PC:
-                    return self._selenium_element().rect
-                else:
-                    rect = {}
-                    rect.update(self._selenium_element().location)
-                    rect.update(self._selenium_element().size)
-                    return rect
+                return self._selenium_element().rect
             except (NoSuchElementException, StaleElementReferenceException):
                 self.wait_for().exists()
-                if self.get_web_driver_info().context == WebDriverContext.FIREFOX \
-                        and self.get_web_driver_info().platform == WebDriverPlatform.PC:
-                    return self._selenium_element().rect
-                else:
-                    rect = {}
-                    rect.update(self._selenium_element().location)
-                    rect.update(self._selenium_element().size)
-                    return rect
+                return self._selenium_element().rect
         except WebDriverException as wde:
             raise EasyiumException(wde.msg, self)
 
