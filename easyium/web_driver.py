@@ -499,6 +499,17 @@ class WebDriver(Context):
         """
         return self._selenium_web_driver().is_locked()
 
+    @SupportedBy(WebDriverPlatform.IOS)
+    def press_button(self, button_name):
+        """
+            Sends a physical button name to the device to simulate the user pressing. iOS only.
+            Possible button names can be found in
+            https://github.com/appium/WebDriverAgent/blob/master/WebDriverAgentLib/Categories/XCUIDevice%2BFBHelpers.h
+
+        :param button_name: the button name to be sent to the device. volumeUp (real devices only), volumeDown (real device only), home
+        """
+        self._selenium_web_driver().press_button(button_name)
+
     # Keys
 
     @SupportedBy(WebDriverPlatform.ANDROID)
