@@ -106,14 +106,32 @@ class Element(Context):
 
     def double_click(self):
         """
-            Double clicks this element.
+            Double click this element.
+        """
+        script = """
+            var dblclickEventObj = null;
+            if (typeof window.Event == "function") {
+                dblclickEventObj = new MouseEvent('dblclick', {'bubbles': true, 'cancelable': true});
+            } else {
+                dblclickEventObj = document.createEvent("MouseEvents");
+                dblclickEventObj.initMouseEvent('dblclick', true, true, window, 0, 0, 0, 0, 0, false, false, false, false, 0, null);
+            }
+            arguments[0].dispatchEvent(dblclickEventObj);
         """
         try:
             try:
-                self.get_web_driver().create_action_chains().double_click(self._selenium_element()).perform()
+                if self.get_web_driver_info().context == WebDriverContext.SAFARI \
+                        and self.get_web_driver_info().platform == WebDriverPlatform.PC:
+                    self.get_web_driver().execute_script(script, self)
+                else:
+                    self.get_web_driver().create_action_chains().double_click(self._selenium_element()).perform()
             except (NoSuchElementException, StaleElementReferenceException, ElementNotVisibleException):
                 self.wait_for().visible()
-                self.get_web_driver().create_action_chains().double_click(self._selenium_element()).perform()
+                if self.get_web_driver_info().context == WebDriverContext.SAFARI \
+                        and self.get_web_driver_info().platform == WebDriverPlatform.PC:
+                    self.get_web_driver().execute_script(script, self)
+                else:
+                    self.get_web_driver().create_action_chains().double_click(self._selenium_element()).perform()
         except WebDriverException as wde:
             raise EasyiumException(wde.msg, self)
 
@@ -121,12 +139,30 @@ class Element(Context):
         """
             Context click this element.
         """
+        script = """
+            var clickEventObj = null;
+            if (typeof window.Event == "function") {
+                clickEventObj = new MouseEvent('click', {'bubbles': true, 'cancelable': true, 'button': 2, 'buttons': 2});
+            } else {
+                clickEventObj = document.createEvent("MouseEvents");
+                clickEventObj.initMouseEvent('click', true, true, window, 0, 0, 0, 0, 0, false, false, false, false, 2, 2);
+            }
+            arguments[0].dispatchEvent(clickEventObj);
+        """
         try:
             try:
-                self.get_web_driver().create_action_chains().context_click(self._selenium_element()).perform()
+                if self.get_web_driver_info().context == WebDriverContext.SAFARI \
+                        and self.get_web_driver_info().platform == WebDriverPlatform.PC:
+                    self.get_web_driver().execute_script(script, self)
+                else:
+                    self.get_web_driver().create_action_chains().context_click(self._selenium_element()).perform()
             except (NoSuchElementException, StaleElementReferenceException):
                 self.wait_for().visible()
-                self.get_web_driver().create_action_chains().context_click(self._selenium_element()).perform()
+                if self.get_web_driver_info().context == WebDriverContext.SAFARI \
+                        and self.get_web_driver_info().platform == WebDriverPlatform.PC:
+                    self.get_web_driver().execute_script(script, self)
+                else:
+                    self.get_web_driver().create_action_chains().context_click(self._selenium_element()).perform()
         except WebDriverException as wde:
             raise EasyiumException(wde.msg, self)
 
@@ -559,7 +595,7 @@ class Element(Context):
                 mouseoverEventObj = new MouseEvent('mouseover', {'bubbles': true, 'cancelable': true});
             } else {
                 mouseoverEventObj = document.createEvent("MouseEvents");
-                mouseoverEventObj.initMouseEvent("mouseover", true, true, window, 0, 0, 0, 0, 0, false, false, false, false, 0, null);
+                mouseoverEventObj.initMouseEvent('mouseover', true, true, window, 0, 0, 0, 0, 0, false, false, false, false, 0, null);
             }
             arguments[0].dispatchEvent(mouseoverEventObj);
         """
@@ -590,7 +626,7 @@ class Element(Context):
                 mouseoutEventObj = new MouseEvent('mouseout', {'bubbles': true, 'cancelable': true});
             } else {
                 mouseoutEventObj = document.createEvent("MouseEvents");
-                mouseoutEventObj.initMouseEvent("mouseout", true, true, window, 0, 0, 0, 0, 0, false, false, false, false, 0, null);
+                mouseoutEventObj.initMouseEvent('mouseout', true, true, window, 0, 0, 0, 0, 0, false, false, false, false, 0, null);
             }
             arguments[0].dispatchEvent(mouseoutEventObj);
         """
