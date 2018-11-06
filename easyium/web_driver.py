@@ -601,6 +601,7 @@ class WebDriver(Context):
     def perform_touch_id(self, match):
         """
             Simulate touchId on iOS Simulator
+
         :param match: boolean, passed or failed
         """
         self._selenium_web_driver().touch_id(match)
@@ -650,6 +651,17 @@ class WebDriver(Context):
                 Any other value means the state cannot be retrieved
         """
         return self._selenium_web_driver().battery_info
+
+    # Authentication
+
+    @SupportedBy(WebDriverPlatform.ANDROID)
+    def perform_finger_print(self, finger_id):
+        """
+            Authenticate users by using their finger print scans on supported emulators. Android only.
+
+        :param finger_id: Finger prints stored in Android Keystore system (from 1 to 10)
+        """
+        return self._selenium_web_driver().finger_print(finger_id)
 
     # Context
 
