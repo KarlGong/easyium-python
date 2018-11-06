@@ -122,6 +122,7 @@ class Context:
                 "ios_ui": MobileBy.IOS_UIAUTOMATION
                 "ios_class": MobileBy.IOS_CLASS_CHAIN
                 "android_ui": MobileBy.ANDROID_UIAUTOMATOR
+                "android_tag": MobileBy.ANDROID_VIEWTAG
                 "acc_id": MobileBy.ACCESSIBILITY_ID
         :return: whether this context has a child element.
         """
@@ -149,6 +150,7 @@ class Context:
                 "ios_ui": MobileBy.IOS_UIAUTOMATION
                 "ios_class": MobileBy.IOS_CLASS_CHAIN
                 "android_ui": MobileBy.ANDROID_UIAUTOMATOR
+                "android_tag": MobileBy.ANDROID_VIEWTAG
                 "acc_id": MobileBy.ACCESSIBILITY_ID
         :param identifier:
             the identifier is a function to generate the locator of the found element, you can get the standard ones in class Identifier.
@@ -223,6 +225,7 @@ class Context:
                 "ios_ui": MobileBy.IOS_UIAUTOMATION
                 "ios_class": MobileBy.IOS_CLASS_CHAIN
                 "android_ui": MobileBy.ANDROID_UIAUTOMATOR
+                "android_tag": MobileBy.ANDROID_VIEWTAG
                 "acc_id": MobileBy.ACCESSIBILITY_ID
         :param identifier:
             the identifier is a function to generate the locator of the found elements, you can get the standard ones in class Identifier.
