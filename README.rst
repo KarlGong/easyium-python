@@ -63,6 +63,10 @@ For information and suggestions you can contact me at karl.gong@outlook.com
 
 Change Log
 ----------
+1.3.3 (compared to 1.3.2)
+
+- Fix Element.set_selection_range() issue.
+
 1.3.2 (compared to 1.3.1)
 
 - Handle ElementNotInteractableException in element actions.
