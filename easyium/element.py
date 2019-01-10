@@ -501,7 +501,7 @@ class Element(Context):
                             endCharCount = charCount + textNode.length;
                             if (!foundStart && start >= charCount
                                     && (start < endCharCount ||
-                                    (start == endCharCount && i < textNodes.length))) {
+                                    (start == endCharCount && i <= textNodes.length))) {
                                 range.setStart(textNode, start - charCount);
                                 foundStart = true;
                             }
