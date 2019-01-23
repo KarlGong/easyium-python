@@ -63,6 +63,10 @@ For information and suggestions you can contact me at karl.gong@outlook.com
 
 Change Log
 ----------
+1.3.4 (compared to 1.3.3)
+
+- Fix InvalidElementStateException is not caught.
+
 1.3.3 (compared to 1.3.2)
 
 - Fix Element.set_selection_range() issue.

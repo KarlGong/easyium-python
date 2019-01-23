@@ -1,4 +1,4 @@
-from selenium.common.exceptions import WebDriverException, StaleElementReferenceException, ElementNotVisibleException, ElementNotInteractableException
+from selenium.common.exceptions import WebDriverException, StaleElementReferenceException, InvalidElementStateException
 
 from .context import Context
 from .decorator import SupportedBy
@@ -85,7 +85,7 @@ class Element(Context):
         try:
             try:
                 self._selenium_element().clear()
-            except (NoSuchElementException, StaleElementReferenceException, ElementNotVisibleException, ElementNotInteractableException):
+            except (NoSuchElementException, StaleElementReferenceException, InvalidElementStateException):
                 self.wait_for().visible()
                 self._selenium_element().clear()
         except WebDriverException as wde:
@@ -98,7 +98,7 @@ class Element(Context):
         try:
             try:
                 self._selenium_element().click()
-            except (NoSuchElementException, StaleElementReferenceException, ElementNotVisibleException, ElementNotInteractableException):
+            except (NoSuchElementException, StaleElementReferenceException, InvalidElementStateException):
                 self.wait_for().visible()
                 self._selenium_element().click()
         except WebDriverException as wde:
@@ -125,7 +125,7 @@ class Element(Context):
                     self.get_web_driver().execute_script(script, self)
                 else:
                     self.get_web_driver().create_action_chains().double_click(self._selenium_element()).perform()
-            except (NoSuchElementException, StaleElementReferenceException, ElementNotVisibleException, ElementNotInteractableException):
+            except (NoSuchElementException, StaleElementReferenceException, InvalidElementStateException):
                 self.wait_for().visible()
                 if self.get_web_driver_info().context == WebDriverContext.SAFARI \
                         and self.get_web_driver_info().platform == WebDriverPlatform.PC:
@@ -191,7 +191,7 @@ class Element(Context):
         try:
             try:
                 self._selenium_element().send_keys(*value)
-            except (NoSuchElementException, StaleElementReferenceException, ElementNotVisibleException, ElementNotInteractableException):
+            except (NoSuchElementException, StaleElementReferenceException, InvalidElementStateException):
                 self.wait_for().visible()
                 self._selenium_element().send_keys(*value)
         except WebDriverException as wde:
