@@ -63,6 +63,10 @@ For information and suggestions you can contact me at karl.gong@outlook.com
 
 Change Log
 ----------
+1.3.5 (compared to 1.3.4)
+
+- Optimize condition in Context.find_element(s).
+
 1.3.4 (compared to 1.3.3)
 
 - Fix InvalidElementStateException is not caught.
