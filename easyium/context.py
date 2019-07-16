@@ -1,9 +1,9 @@
 from selenium.common.exceptions import StaleElementReferenceException, NoSuchElementException, InvalidSelectorException, WebDriverException
 
-from .locator import locator_to_by_value
-from .identifier import Identifier
-from .waiter import Waiter
 from . import exceptions
+from .identifier import Identifier
+from .locator import locator_to_by_value
+from .waiter import Waiter
 
 
 class Context:
@@ -129,11 +129,10 @@ class Context:
         """
         return self.find_element(locator) is not None
 
-    def find_element(self, locator, identifier=Identifier.id, condition=None):
+    def find_element(self, locator, identifier=Identifier.id, condition=lambda element: True):
         """
             Find a DynamicElement under this context.
-            Note: 1. If no condition is specified, the result will be returned immediately.
-            2. if no element is found, None will be returned.
+            Note: if no element is found, None will be returned.
 
         :param locator:
             the locator (relative to this context) of the element to be found.
@@ -190,26 +189,21 @@ class Context:
             except WebDriverException as wde:
                 raise exceptions.EasyiumException(wde.msg, self)
 
-        if condition:
-            try:
-                self.waiter().wait_for(lambda : condition(_find_element()))
-            except exceptions.TimeoutException as e:
-                if e.__class__ == exceptions.ElementTimeoutException:
-                    # raised by self.wait_for().exists() in _find_element()
-                    raise
-                raise exceptions.TimeoutException(
-                    "Timed out waiting for the found element by <%s> under:\n%s\nmatches condition <%s>." % (locator, self, condition.__name__))
-        else:
-            _find_element()
+        try:
+            self.waiter().wait_for(lambda: condition(_find_element()))
+        except exceptions.TimeoutException as e:
+            if e.__class__ == exceptions.ElementTimeoutException:
+                # raised by self.wait_for().exists() in _find_element()
+                raise
+            raise exceptions.TimeoutException(
+                "Timed out waiting for the found element by <%s> under:\n%s\nmatches condition <%s>." % (locator, self, condition.__name__))
 
         return element["inner"]
 
-
-    def find_elements(self, locator, identifier=Identifier.id, condition=None):
+    def find_elements(self, locator, identifier=Identifier.id, condition=lambda elements: True):
         """
             Find DynamicElement list under this context.
-            Note: 1. If no condition is specified, the result will be returned immediately.
-            2. if no elements is found, empty list will be returned.
+            Note: if no elements is found, empty list will be returned.
 
         :param locator:
             the locator (relative to this context) of the elements to be found.
@@ -265,16 +259,14 @@ class Context:
             except WebDriverException as wde:
                 raise exceptions.EasyiumException(wde.msg, self)
 
-        if condition:
-            try:
-                self.waiter().wait_for(lambda : condition(_find_elements()))
-            except exceptions.TimeoutException as e:
-                if e.__class__ == exceptions.ElementTimeoutException:
-                    # raised by self.wait_for().exists() in _find_elements()
-                    raise
-                raise exceptions.TimeoutException(
-                    "Timed out waiting for the found element list by <%s> under:\n%s\nmatches condition <%s>." % (locator, self, condition.__name__))
-        else:
-            _find_elements()
+        try:
+            self.waiter().wait_for(lambda: condition(_find_elements()))
+        except exceptions.TimeoutException as e:
+            if e.__class__ == exceptions.ElementTimeoutException:
+                # raised by self.wait_for().exists() in _find_elements()
+                raise
+            raise exceptions.TimeoutException(
+                "Timed out waiting for the found element list by <%s> under:\n%s\nmatches condition <%s>." % (
+                locator, self, condition.__name__))
 
         return elements["inner"]
