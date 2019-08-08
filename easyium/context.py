@@ -123,6 +123,7 @@ class Context:
                 "ios_class": MobileBy.IOS_CLASS_CHAIN
                 "android_ui": MobileBy.ANDROID_UIAUTOMATOR
                 "android_tag": MobileBy.ANDROID_VIEWTAG
+                "android_data": MobileBy.ANDROID_DATA_MATCHER
                 "acc_id": MobileBy.ACCESSIBILITY_ID
                 "custom": MobileBy.CUSTOM
         :return: whether this context has a child element.
@@ -151,6 +152,7 @@ class Context:
                 "ios_class": MobileBy.IOS_CLASS_CHAIN
                 "android_ui": MobileBy.ANDROID_UIAUTOMATOR
                 "android_tag": MobileBy.ANDROID_VIEWTAG
+                "android_data": MobileBy.ANDROID_DATA_MATCHER
                 "acc_id": MobileBy.ACCESSIBILITY_ID
                 "custom": MobileBy.CUSTOM
         :param identifier:
@@ -222,6 +224,7 @@ class Context:
                 "ios_class": MobileBy.IOS_CLASS_CHAIN
                 "android_ui": MobileBy.ANDROID_UIAUTOMATOR
                 "android_tag": MobileBy.ANDROID_VIEWTAG
+                "android_data": MobileBy.ANDROID_DATA_MATCHER
                 "acc_id": MobileBy.ACCESSIBILITY_ID
                 "custom": MobileBy.CUSTOM
         :param identifier:

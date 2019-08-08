@@ -24,6 +24,7 @@ class StaticElement(Element):
                 "ios_class": MobileBy.IOS_CLASS_CHAIN
                 "android_ui": MobileBy.ANDROID_UIAUTOMATOR
                 "android_tag": MobileBy.ANDROID_VIEWTAG
+                "android_data": MobileBy.ANDROID_DATA_MATCHER
                 "acc_id": MobileBy.ACCESSIBILITY_ID
                 "custom": MobileBy.CUSTOM
         """
