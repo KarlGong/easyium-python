@@ -186,7 +186,19 @@ class WebDriver(Context):
         """
         self._selenium_web_driver().orientation = value.upper()
 
-    # Geolocation todo: get location
+    # Geolocation
+
+    @SupportedBy(WebDriverPlatform._MOBILE)
+    def get_location(self):
+        """
+            Retrieves the current location
+
+        :return: A dictionary whose keys are
+            - latitude (float)
+            - longitude (float)
+            - altitude (float)
+        """
+        return self._selenium_web_driver().location
 
     @SupportedBy(WebDriverPlatform._MOBILE)
     def set_location(self, latitude, longitude, altitude):
@@ -435,14 +447,16 @@ class WebDriver(Context):
     # Files
 
     @SupportedBy(WebDriverPlatform._MOBILE)
-    def push_file(self, path, base64data):
+    def push_file(self, destination_path, base64data=None, source_path=None):
         """
-            Puts the data, encoded as Base64, in the file specified as `path`.
+            Puts the data from the file at `source_path`, encoded as Base64, in the file specified as `path`.
+            Specify either `base64data` or `source_path`, if both specified default to `source_path`
 
-        :param path: the path on the device
-        :param base64data: data, encoded as Base64, to be written to the file
+        :param destination_path: the location on the device/simulator where the local file contents should be saved
+        :param base64data: file contents, encoded as Base64, to be written to the file on the device/simulator
+        :param source_path: local file path for the file to be loaded on device
         """
-        self._selenium_web_driver().push_file(path, base64data)
+        self._selenium_web_driver().push_file(destination_path, base64data, source_path)
 
     @SupportedBy(WebDriverPlatform._MOBILE)
     def pull_file(self, path):
@@ -495,7 +509,7 @@ class WebDriver(Context):
         """
             Checks whether the device is locked.
 
-        :return: Either True or False
+        :return: `True` if the device is locked
         """
         return self._selenium_web_driver().is_locked()
 
@@ -604,7 +618,42 @@ class WebDriver(Context):
         """
         self._selenium_web_driver().set_network_connection(connection_type)
 
-    # Performance Data todo: get performance data, performance data types
+    @SupportedBy(WebDriverPlatform.ANDROID)
+    def set_network_speed(self, speed_type):
+        """
+            Set the network speed emulation. Android Emulator only.
+
+        :param speed_type: The network speed type. A member of the const appium.webdriver.extensions.android.network.NetSpeed.
+        """
+        self._selenium_web_driver().set_network_speed(speed_type)
+
+    # Performance Data
+
+    @SupportedBy(WebDriverPlatform.ANDROID)
+    def get_performance_data(self, package_name, data_type, data_read_timeout=None):
+        """
+            Returns the information of the system state which is supported to read as like cpu, memory, network traffic, and battery.
+
+        :param package_name: The package name of the application
+        :param data_type: The type of system state which wants to read.
+            It should be one of the supported performance data types.
+            Check `get_performance_data_types` for supported types
+        :param data_read_timeout: The number of attempts to read
+        :return: The data along to `data_type`
+
+        :Usage:
+            self.driver.get_performance_data('my.app.package', 'cpuinfo', 5)
+        """
+        return self._selenium_web_driver().get_performance_data(package_name, data_type, data_read_timeout)
+
+    @SupportedBy(WebDriverPlatform.ANDROID)
+    def get_performance_data_types(self):
+        """
+            Returns the information types of the system state which is supported to read as like cpu, memory, network traffic, and battery.
+
+        :return: Available data types
+        """
+        return self._selenium_web_driver().get_performance_data_types()
 
     # Simulator
 
@@ -613,7 +662,7 @@ class WebDriver(Context):
         """
             Simulate touchId on iOS Simulator
 
-        :param match: boolean, passed or failed
+        :param match: Simulates a successful touch (`True`) or a failed touch (`False`)
         """
         self._selenium_web_driver().touch_id(match)
 
@@ -624,7 +673,37 @@ class WebDriver(Context):
         """
         return self._selenium_web_driver().toggle_touch_id_enrollment()
 
-    # System todo: system bars
+    # System
+
+    @SupportedBy(WebDriverPlatform.ANDROID)
+    def get_system_bars(self):
+        """
+            Retrieve visibility and bounds information of the status and navigation bars.
+
+        :return: A dictionary whose keys are
+            - statusBar
+                - visible
+                - x
+                - y
+                - width
+                - height
+            - navigationBar
+                - visible
+                - x
+                - y
+                - width
+                - height
+        """
+        return self._selenium_web_driver().get_system_bars()
+
+    @SupportedBy(WebDriverPlatform.ANDROID)
+    def get_display_density(self):
+        """
+            Get the display density, Android only
+
+        :return: The display density of the Android device(dpi)
+        """
+        return self._selenium_web_driver().get_display_density()
 
     @SupportedBy(WebDriverPlatform.ANDROID)
     def open_notifications(self):
@@ -634,11 +713,18 @@ class WebDriver(Context):
         self._selenium_web_driver().open_notifications()
 
     @SupportedBy(WebDriverPlatform._MOBILE)
-    def get_device_time(self):
+    def get_device_time(self, format=None):
         """
             Returns the date and time from the device
+
+        :param format: The set of format specifiers. Read https://momentjs.com/docs/ to get the full list of supported datetime format specifiers.
+            If unset, return :func:`.device_time` as default format is `YYYY-MM-DDTHH:mm:ssZ`, which complies to ISO-8601
+
+        :Usage:
+            self.driver.get_device_time()
+            self.driver.get_device_time("YYYY-MM-DD")
         """
-        return self._selenium_web_driver().device_time
+        return self._selenium_web_driver().get_device_time(format)
 
     @SupportedBy(WebDriverPlatform._MOBILE)
     def get_battery_info(self):
@@ -662,6 +748,78 @@ class WebDriver(Context):
                 Any other value means the state cannot be retrieved
         """
         return self._selenium_web_driver().battery_info
+
+    # Power
+
+    @SupportedBy(WebDriverPlatform.ANDROID)
+    def set_power_capacity(self, percent):
+        """
+            Emulate power capacity change on the connected emulator.
+
+        :param percent: The power capacity to be set. Can be set from 0 to 100
+        """
+        self._selenium_web_driver().set_power_capacity(percent)
+
+    @SupportedBy(WebDriverPlatform.ANDROID)
+    def set_power_ac(self, ac_state):
+        """
+            Emulate power state change on the connected emulator.
+
+        :param ac_state: The power ac state to be set. A member of the const appium.webdriver.extensions.android.power.Power
+        """
+        self._selenium_web_driver().set_power_ac(ac_state)
+
+    # GSM & SMS
+
+    @SupportedBy(WebDriverPlatform.ANDROID)
+    def make_gsm_call(self, phone_number, action):
+        """
+            Make GSM call (Emulator only)
+
+        :param phone_number: The phone number to call to.
+        :param action: The call action. A member of the const appium.webdriver.extensions.android.gsm.GsmCallActions
+
+        :Usage:
+            self.driver.make_gsm_call('5551234567', GsmCallActions.CALL)
+        """
+        self._selenium_web_driver().make_gsm_call(phone_number, action)
+
+    @SupportedBy(WebDriverPlatform.ANDROID)
+    def set_gsm_signal(self, strength):
+        """
+            Set GSM signal strength (Emulator only)
+
+        :param strength: Signal strength. A member of the enum appium.webdriver.extensions.android.gsm.GsmSignalStrength
+
+        :Usage:
+            self.driver.set_gsm_signal(GsmSignalStrength.GOOD)
+        """
+        self._selenium_web_driver().set_gsm_signal(strength)
+
+    @SupportedBy(WebDriverPlatform.ANDROID)
+    def set_gsm_voice(self, state):
+        """
+            Set GSM voice state (Emulator only)
+
+        :param state: State of GSM voice. A member of the const appium.webdriver.extensions.android.gsm.GsmVoiceState
+
+        :Usage:
+            self.driver.set_gsm_voice(GsmVoiceState.HOME)
+        """
+        self._selenium_web_driver().set_gsm_voice(state)
+
+    @SupportedBy(WebDriverPlatform.ANDROID)
+    def send_sms(self, phone_number, message):
+        """
+            Emulate send SMS event on the connected emulator.
+
+        :param phone_number: The phone number of message sender
+        :param message: The message to send
+
+        :Usage:
+            self.driver.send_sms('555-123-4567', 'Hey lol')
+        """
+        self._selenium_web_driver().send_sms(phone_number, message)
 
     # Authentication
 
@@ -1107,8 +1265,8 @@ class WebDriver(Context):
         return self._selenium_web_driver().get_screenshot_as_base64()
 
     @SupportedBy(WebDriverPlatform._MOBILE)
-    def start_recording_screen(self, remote_path=None, user=None, password=None, method=None, time_limit=None,
-                               forced_restart=None, bug_report=None, video_quality=None, video_type=None,
+    def start_recording_screen(self, remote_path=None, user=None, password=None, method=None, time_limit=None, forced_restart=None,
+                               bug_report=None, video_quality=None, video_type=None, video_fps=None, video_scale=None, pixel_format=None,
                                video_size=None, bit_rate=None):
         """
             Start asynchronous screen recording process.
@@ -1145,19 +1303,22 @@ class WebDriver(Context):
         :param video_type: The format of the screen capture to be recorded.
             Available formats: 'h264', 'mp4' or 'fmp4'. Default is 'mp4'.
             Only works for Simulator.
+        :param video_fps: The Frames Per Second rate of the recorded video. Change this value if the resulting video is too slow or too fast.
+            Defaults to 10. This can decrease the resulting file size.
+        :param video_scale: The scaling value to apply. Read https://trac.ffmpeg.org/wiki/Scaling for possible values.
+            No scale is applied by default. (Since Appium 1.10.0)
+        :param pixel_format: Output pixel format. Run `ffmpeg -pix_fmts` to list possible values.
+            For Quicktime compatibility, set to "yuv420p" along with videoType: "libx264". (Since Appium 1.12.0)
 
         Android Specific:
         :param video_size: The video size of the generated media file. The format is WIDTHxHEIGHT.
             The default value is the device's native display resolution (if supported),
-            1280x720 if not. For best results, use a size supported by your device's
-            Advanced Video Coding (AVC) encoder.
+            1280x720 if not. For best results, use a size supported by your device's Advanced Video Coding (AVC) encoder.
         :param bit_rate: The video bit rate for the video, in megabits per second.
-            The default value is 4. You can increase the bit rate to improve video quality,
-            but doing so results in larger movie files.
+            The default value is 4. You can increase the bit rate to improve video quality, but doing so results in larger movie files.
 
         :return: Base-64 encoded content of the recorded media file or an empty string
-                 if the file has been successfully uploaded to a remote location
-                 (depends on the actual `remote_path` value).
+            if the file has been successfully uploaded to a remote location (depends on the actual `remote_path` value).
         """
         options = {
             "remotePath": remote_path,
@@ -1169,6 +1330,9 @@ class WebDriver(Context):
             "bugReport": bug_report,
             "videoQuality": video_quality,
             "videoType": video_type,
+            "videoFps": video_fps,
+            "videoScale": video_scale,
+            "pixelFormat": pixel_format,
             "videoSize": video_size,
             "bitRate": bit_rate
         }
