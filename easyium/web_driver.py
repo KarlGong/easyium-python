@@ -1241,7 +1241,7 @@ class WebDriver(Context):
         :param filename: The full path you wish to save your screenshot to.
 
         :Usage:
-            driver.get_screenshot_as_file('/Screenshots/foo.png')
+            driver.save_screenshot('/Screenshots/foo.png')
         """
         return self.get_screenshot_as_file(filename)
 
