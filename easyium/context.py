@@ -29,6 +29,9 @@ class Context:
     def get_screenshot_as_file(self, filename):
         pass
 
+    def save_screenshot(self, filename):
+        pass
+
     def get_screenshot_as_png(self):
         pass
 
