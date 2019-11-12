@@ -999,6 +999,25 @@ class WebDriver(Context):
         """
         self._selenium_web_driver().set_window_rect(x, y, width, height)
 
+    def get_viewport_size(self):
+        """
+            Gets the width and height of viewport.
+        """
+        return self._selenium_web_driver().execute_script("return {width: window.innerWidth, height: window.innerHeight};")
+
+    def set_viewport_size(self, width, height):
+        """
+            Sets the width and height of viewport. When changes the viewport size, the window size will be also changed.
+
+        :param width: the width in pixels to set viewport to
+        :param height: the height in pixels to set viewport to
+        """
+        window_size = self._selenium_web_driver().execute_script("""
+                return [window.outerWidth - window.innerWidth + arguments[0],
+                  window.outerHeight - window.innerHeight + arguments[1]];
+                """, width, height)
+        self._selenium_web_driver().set_window_size(*window_size)
+
     def get_title(self):
         """
             Returns the title of the current page.
