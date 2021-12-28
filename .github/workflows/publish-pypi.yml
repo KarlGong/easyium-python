@@ -20,8 +20,8 @@ jobs:
           ref: 'refs/heads/master'
       - name: Build dist
         run: python setup.py sdist --formats=gztar
-#      - name: Publish
-#        uses: pypa/gh-action-pypi-publish@release/v1
-#        with:
-#          user: __token__
-#          password: ${{ secrets.PYPI_API_TOKEN }}
+      - name: Publish
+        uses: pypa/gh-action-pypi-publish@release/v1
+        with:
+          user: __token__
+          password: ${{ secrets.PYPI_API_TOKEN }}
