@@ -11,7 +11,7 @@ classifiers = ["License :: OSI Approved :: Apache Software License",
                "Topic :: Software Development :: Testing",
                "Operating System :: Microsoft :: Windows",
                "Operating System :: MacOS :: MacOS X"] \
-              + [("Programming Language :: Python :: %s" % x) for x in "2.7 3.4 3.5 3.6 3.7".split()]
+              + [("Programming Language :: Python :: %s" % x) for x in "2.7 3.4 3.5 3.6 3.7 3.8".split()]
 
 
 def main():
@@ -19,7 +19,7 @@ def main():
         name="easyium",
         description="easy use of selenium and appium",
         long_description=long_description,
-        install_requires=['selenium>=3.141.0', 'appium-python-client>=0.46'],
+        install_requires=['selenium==3.141.0', 'appium-python-client==0.46'],
         version="1.3.7",
         keywords="selenium appium test testing framework automation",
         author="Karl Gong",
