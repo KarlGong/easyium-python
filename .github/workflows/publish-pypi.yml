@@ -1,0 +1,19 @@
+name: Publish to pypi
+
+on:
+  push:
+    branches:
+      - master
+    tags:
+      - '*-release'
+
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Publish
+        uses: pypa/gh-action-pypi-publish@release/v1
+        with:
+          user: __token__
+          password: ${{ secrets.PYPI_API_TOKEN }}
