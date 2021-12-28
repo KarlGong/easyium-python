@@ -2,18 +2,26 @@ name: Publish to pypi
 
 on:
   push:
-    branches:
-      - master
     tags:
       - '*-release'
-
 
 jobs:
   build:
     runs-on: ubuntu-latest
+
     steps:
-      - name: Publish
-        uses: pypa/gh-action-pypi-publish@release/v1
+      - name: Setup Python
+        uses: actions/setup-python@v2
         with:
-          user: __token__
-          password: ${{ secrets.PYPI_API_TOKEN }}
+          python-version: 3.8
+      - name: Checkout
+        uses: actions/checkout@v2
+        with:
+          ref: 'refs/heads/master'
+      - name: Build dist
+        run: python setup.py sdist --formats=gztar
+#      - name: Publish
+#        uses: pypa/gh-action-pypi-publish@release/v1
+#        with:
+#          user: __token__
+#          password: ${{ secrets.PYPI_API_TOKEN }}
