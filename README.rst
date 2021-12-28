@@ -63,6 +63,10 @@ For information and suggestions you can contact me at karl.gong@outlook.com
 
 Change Log
 ----------
+1.3.8 (compared to 1.3.7)
+
+- Freeze selenium and appium version.
+
 1.3.7 (compared to 1.3.6)
 
 - Add web_driver.get_viewport_size, web_driver.set_viewport_size
