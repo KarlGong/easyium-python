@@ -1,17 +1,18 @@
-from typing import Union, Callable, List
+from typing import Union, Callable, List, TYPE_CHECKING
 
 from appium.webdriver.webdriver import WebDriver as AppiumWebDriver
 from appium.webdriver.webelement import WebElement as AppiumElement
 from selenium.common.exceptions import StaleElementReferenceException as SeleniumStaleElementReferenceException, NoSuchElementException as SeleniumNoSuchElementException, \
     InvalidSelectorException as SeleniumInvalidSelectorException, WebDriverException as SeleniumWebDriverException
 
-from .dynamic_element import DynamicElement
-from .element import Element
 from .exceptions import InvalidLocatorException, NoSuchElementException, EasyiumException, TimeoutException, ElementTimeoutException
 from .identifier import Identifier
 from .locator import locator_to_by_value
 from .waiter import Waiter, WebDriverWaitFor, ElementWaitFor
-from .web_driver import WebDriver, WebDriverInfo
+
+if TYPE_CHECKING:
+    from .dynamic_element import DynamicElement
+    from .web_driver import WebDriver, WebDriverInfo
 
 
 class Context:
@@ -19,10 +20,10 @@ class Context:
         self.__wait_interval = None
         self.__wait_timeout = None
 
-    def get_web_driver(self) -> WebDriver:
+    def get_web_driver(self) -> "WebDriver":
         pass
 
-    def get_web_driver_info(self) -> WebDriverInfo:
+    def get_web_driver_info(self) -> "WebDriverInfo":
         pass
 
     def _selenium_context(self) -> Union[AppiumWebDriver, AppiumElement]:
@@ -141,7 +142,8 @@ class Context:
         """
         return self.find_element(locator) is not None
 
-    def find_element(self, locator: str, identifier: Callable[[Element], str] = Identifier.id, condition: Callable[[Element], bool] = lambda element: True) -> DynamicElement:
+    def find_element(self, locator: str, identifier: Callable[["DynamicElement"], str] = Identifier.id, condition: Callable[["DynamicElement"], bool] = lambda element: True) \
+            -> "DynamicElement":
         """
             Find a DynamicElement under this context.
             Note: if no element is found, None will be returned.
@@ -212,8 +214,9 @@ class Context:
 
         return element["inner"]
 
-    def find_elements(self, locator: str, identifier: Callable[[Element], str] = Identifier.id, condition: Callable[[Element], bool] = lambda elements: True) \
-            -> List[DynamicElement]:
+    def find_elements(self, locator: str, identifier: Callable[["DynamicElement"], str] = Identifier.id,
+                      condition: Callable[[List["DynamicElement"]], bool] = lambda elements: True) \
+            -> List["DynamicElement"]:
         """
             Find DynamicElement list under this context.
             Note: if no elements is found, empty list will be returned.

@@ -7,4 +7,4 @@ from .exceptions import EasyiumException, TimeoutException, ElementTimeoutExcept
 from .identifier import Identifier
 from .static_element import StaticElement
 from .waiter import Waiter
-from .web_driver import Ie, Firefox, Chrome, Opera, Safari, Edge, Appium
+from .web_driver import WebDriver, Ie, Firefox, Chrome, Opera, Safari, Edge, Appium

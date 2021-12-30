@@ -1,4 +1,4 @@
-from typing import List, Union
+from typing import List, Union, TYPE_CHECKING
 
 from appium.webdriver.clipboard_content_type import ClipboardContentType
 from appium.webdriver.common.multi_action import MultiAction
@@ -23,9 +23,11 @@ from selenium.webdriver.safari.service import Service as SafariService
 from .alert import Alert
 from .context import Context
 from .decorator import SupportedBy
-from .element import Element
 from .enumeration import WebDriverPlatform, WebDriverContext
 from .waiter import WebDriverWaitFor
+
+if TYPE_CHECKING:
+    from .element import Element
 
 
 class WebDriverInfo:
@@ -232,7 +234,7 @@ class WebDriver(Context):
         """
         return self._selenium_web_driver().log_types
 
-    def get_log(self, log_type: str) -> str:
+    def get_log(self, log_type: str) -> List[dict]:
         """
             Gets the log for a given log type
 
@@ -1129,7 +1131,7 @@ class WebDriver(Context):
 
     # Frame
 
-    def switch_to_frame(self, frame_reference: Union[int, str, Element]):
+    def switch_to_frame(self, frame_reference: Union[int, str, "Element"]):
         """
             Switches focus to the specified frame, by index (zero-based), locator, or element.
 
@@ -1581,7 +1583,7 @@ class WebDriver(Context):
         }
         self.execute_script("mobile: scroll", scroll_params)
 
-    def scroll_to(self, element: Element):
+    def scroll_to(self, element: "Element"):
         """
             Scrolls to the given element.
 
@@ -1602,7 +1604,7 @@ class WebDriver(Context):
 
 
 class Ie(WebDriver):
-    def __init__(self, service: IeService = IeService(), options: IeOptions = IeOptions()):
+    def __init__(self, service: IeService = None, options: IeOptions = None):
         """
             Creates a new instance of Ie.
 
@@ -1615,7 +1617,7 @@ class Ie(WebDriver):
 
 
 class Firefox(WebDriver):
-    def __init__(self, service: FirefoxService = FirefoxService(), options: FirefoxOptions = FirefoxOptions()):
+    def __init__(self, service: FirefoxService = None, options: FirefoxOptions = None):
         """
             Creates a new instance of Firefox.
 
@@ -1628,7 +1630,7 @@ class Firefox(WebDriver):
 
 
 class Chrome(WebDriver):
-    def __init__(self, service: ChromeService = ChromeService(), options: ChromeOptions = ChromeOptions()):
+    def __init__(self, service: ChromeService = None, options: ChromeOptions = None):
         """
             Creates a new instance of Chrome.
 
@@ -1641,7 +1643,7 @@ class Chrome(WebDriver):
 
 
 class Opera(WebDriver):
-    def __init__(self, options: OperaOptions = OperaOptions()):
+    def __init__(self, options: OperaOptions = None):
         """
             Creates a new instance of Opera.
 
@@ -1653,7 +1655,7 @@ class Opera(WebDriver):
 
 
 class Safari(WebDriver):
-    def __init__(self, service: SafariService = SafariService(), options: SafariOptions = SafariOptions()):
+    def __init__(self, service: SafariService = None, options: SafariOptions = None):
         """
             Creates a new instance of Safari.
 
@@ -1666,7 +1668,7 @@ class Safari(WebDriver):
 
 
 class Edge(WebDriver):
-    def __init__(self, service: EdgeService = EdgeService(), options: EdgeOptions = EdgeOptions()):
+    def __init__(self, service: EdgeService = None, options: EdgeOptions = None):
         """
             Creates a new instance of Edge.
 

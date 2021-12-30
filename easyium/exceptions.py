@@ -1,12 +1,14 @@
 import re
+from typing import TYPE_CHECKING
 
-from .context import Context
+if TYPE_CHECKING:
+    from .context import Context
 
 filter_msg_regex = re.compile(r"\n  \(Session info:.*?\)\n  \(Driver info:.*?\(.*?\).*?\)")
 
 
 class EasyiumException(Exception):
-    def __init__(self, msg: str = None, context: Context = None):
+    def __init__(self, msg: str = None, context: "Context" = None):
         # Remove Session info and Driver info of the message.
         self.msg = filter_msg_regex.sub("", msg)
         self.message = self.msg
