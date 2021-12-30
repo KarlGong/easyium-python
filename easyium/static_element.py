@@ -1,8 +1,9 @@
+from .context import Context
 from .element import Element
 
 
 class StaticElement(Element):
-    def __init__(self, parent, locator):
+    def __init__(self, parent: Context, locator: str):
         """
             Creates a new instance of the StaticElement.
 

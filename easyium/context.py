@@ -1,9 +1,17 @@
-from selenium.common.exceptions import StaleElementReferenceException, NoSuchElementException, InvalidSelectorException, WebDriverException
+from typing import Union, Callable, List
 
-from . import exceptions
+from appium.webdriver.webdriver import WebDriver as AppiumWebDriver
+from appium.webdriver.webelement import WebElement as AppiumElement
+from selenium.common.exceptions import StaleElementReferenceException as SeleniumStaleElementReferenceException, NoSuchElementException as SeleniumNoSuchElementException, \
+    InvalidSelectorException as SeleniumInvalidSelectorException, WebDriverException as SeleniumWebDriverException
+
+from .dynamic_element import DynamicElement
+from .element import Element
+from .exceptions import InvalidLocatorException, NoSuchElementException, EasyiumException, TimeoutException, ElementTimeoutException
 from .identifier import Identifier
 from .locator import locator_to_by_value
-from .waiter import Waiter
+from .waiter import Waiter, WebDriverWaitFor, ElementWaitFor
+from .web_driver import WebDriver, WebDriverInfo
 
 
 class Context:
@@ -11,13 +19,13 @@ class Context:
         self.__wait_interval = None
         self.__wait_timeout = None
 
-    def get_web_driver(self):
+    def get_web_driver(self) -> WebDriver:
         pass
 
-    def get_web_driver_info(self):
+    def get_web_driver_info(self) -> WebDriverInfo:
         pass
 
-    def _selenium_context(self):
+    def _selenium_context(self) -> Union[AppiumWebDriver, AppiumElement]:
         pass
 
     def _refresh(self):
@@ -26,19 +34,19 @@ class Context:
     def persist(self):
         pass
 
-    def get_screenshot_as_file(self, filename):
+    def get_screenshot_as_file(self, filename: str) -> bool:
         pass
 
-    def save_screenshot(self, filename):
+    def save_screenshot(self, filename: str) -> bool:
         pass
 
-    def get_screenshot_as_png(self):
+    def get_screenshot_as_png(self) -> bytes:
         pass
 
-    def get_screenshot_as_base64(self):
+    def get_screenshot_as_base64(self) -> str:
         pass
 
-    def get_wait_interval(self):
+    def get_wait_interval(self) -> int:
         """
             Get the wait interval of this context.
             If the wait interval for element is not set, return the driver's wait interval.
@@ -49,7 +57,7 @@ class Context:
             return self.__wait_interval
         return self.get_web_driver().get_wait_interval()
 
-    def set_wait_interval(self, interval):
+    def set_wait_interval(self, interval: int):
         """
             Set the wait interval of this context.
 
@@ -57,7 +65,7 @@ class Context:
         """
         self.__wait_interval = interval
 
-    def get_wait_timeout(self):
+    def get_wait_timeout(self) -> int:
         """
             Get the wait timeout of this context.
             If the wait timeout for element is not set, return the driver's wait timeout.
@@ -68,7 +76,7 @@ class Context:
             return self.__wait_timeout
         return self.get_web_driver().get_wait_timeout()
 
-    def set_wait_timeout(self, timeout):
+    def set_wait_timeout(self, timeout: int):
         """
             Set the wait timeout of this context.
 
@@ -76,10 +84,10 @@ class Context:
         """
         self.__wait_timeout = timeout
 
-    def wait_for(self, interval=None, timeout=None):
+    def wait_for(self, interval=None, timeout=None) -> Union[ElementWaitFor, WebDriverWaitFor]:
         pass
 
-    def waiter(self, interval=None, timeout=None):
+    def waiter(self, interval: int = None, timeout: int = None):
         """
             Get a Waiter instance.
 
@@ -90,22 +98,22 @@ class Context:
         _timeout = self.get_wait_timeout() if timeout is None else timeout
         return Waiter(_interval, _timeout)
 
-    def _find_selenium_element(self, locator):
+    def _find_selenium_element(self, locator: str) -> AppiumElement:
         by, value = locator_to_by_value(locator)
         try:
             try:
                 return self._selenium_context().find_element(by, value)
-            except StaleElementReferenceException:
+            except SeleniumStaleElementReferenceException:
                 self._refresh()
                 return self._selenium_context().find_element(by, value)
-        except InvalidSelectorException:
-            raise exceptions.InvalidLocatorException("The value <%s> of locator <%s> is not a valid expression." % (value, locator), self)
-        except NoSuchElementException:
-            raise exceptions.NoSuchElementException("Cannot find element by <%s> under:" % locator, self)
-        except WebDriverException as wde:
-            raise exceptions.EasyiumException(wde.msg, self)
+        except SeleniumInvalidSelectorException:
+            raise InvalidLocatorException("The value <%s> of locator <%s> is not a valid expression." % (value, locator), self)
+        except SeleniumNoSuchElementException:
+            raise NoSuchElementException("Cannot find element by <%s> under:" % locator, self)
+        except SeleniumWebDriverException as wde:
+            raise EasyiumException(wde.msg, self)
 
-    def has_child(self, locator):
+    def has_child(self, locator: str) -> bool:
         """
             Whether this context has a child element.
 
@@ -133,7 +141,7 @@ class Context:
         """
         return self.find_element(locator) is not None
 
-    def find_element(self, locator, identifier=Identifier.id, condition=lambda element: True):
+    def find_element(self, locator: str, identifier: Callable[[Element], str] = Identifier.id, condition: Callable[[Element], bool] = lambda element: True) -> DynamicElement:
         """
             Find a DynamicElement under this context.
             Note: if no element is found, None will be returned.
@@ -181,31 +189,31 @@ class Context:
                 try:
                     element["inner"] = DynamicElement(self, self._selenium_context().find_element(by, value), locator, identifier)
                     return element["inner"]
-                except (exceptions.NoSuchElementException, StaleElementReferenceException):
+                except (NoSuchElementException, SeleniumStaleElementReferenceException):
                     # Only Element can reach here
                     self.wait_for().exists()
                     element["inner"] = DynamicElement(self, self._selenium_context().find_element(by, value), locator, identifier)
                     return element["inner"]
-            except InvalidSelectorException:
-                raise exceptions.InvalidLocatorException("The value <%s> of locator <%s> is not a valid expression." % (value, locator), self)
-            except NoSuchElementException:
+            except SeleniumInvalidSelectorException:
+                raise InvalidLocatorException("The value <%s> of locator <%s> is not a valid expression." % (value, locator), self)
+            except SeleniumNoSuchElementException:
                 element["inner"] = None
                 return element["inner"]
-            except WebDriverException as wde:
-                raise exceptions.EasyiumException(wde.msg, self)
+            except SeleniumWebDriverException as wde:
+                raise EasyiumException(wde.msg, self)
 
         try:
             self.waiter().wait_for(lambda: condition(_find_element()))
-        except exceptions.TimeoutException as e:
-            if e.__class__ == exceptions.ElementTimeoutException:
+        except TimeoutException as e:
+            if e.__class__ == ElementTimeoutException:
                 # raised by self.wait_for().exists() in _find_element()
                 raise
-            raise exceptions.TimeoutException(
-                "Timed out waiting for the found element by <%s> under:\n%s\nmatches condition <%s>." % (locator, self, condition.__name__))
+            raise TimeoutException("Timed out waiting for the found element by <%s> under:\n%s\nmatches condition <%s>." % (locator, self, condition.__name__))
 
         return element["inner"]
 
-    def find_elements(self, locator, identifier=Identifier.id, condition=lambda elements: True):
+    def find_elements(self, locator: str, identifier: Callable[[Element], str] = Identifier.id, condition: Callable[[Element], bool] = lambda elements: True) \
+            -> List[DynamicElement]:
         """
             Find DynamicElement list under this context.
             Note: if no elements is found, empty list will be returned.
@@ -254,25 +262,23 @@ class Context:
                     selenium_elements = self._selenium_context().find_elements(by, value)
                     elements["inner"] = [DynamicElement(self, selenium_element, locator, identifier) for selenium_element in selenium_elements]
                     return elements["inner"]
-                except (exceptions.NoSuchElementException, StaleElementReferenceException):
+                except (NoSuchElementException, SeleniumStaleElementReferenceException):
                     # Only Element can reach here
                     self.wait_for().exists()
                     selenium_elements = self._selenium_context().find_elements(by, value)
                     elements["inner"] = [DynamicElement(self, selenium_element, locator, identifier) for selenium_element in selenium_elements]
                     return elements["inner"]
-            except InvalidSelectorException:
-                raise exceptions.InvalidLocatorException("The value <%s> of locator <%s> is not a valid expression." % (value, locator), self)
-            except WebDriverException as wde:
-                raise exceptions.EasyiumException(wde.msg, self)
+            except SeleniumInvalidSelectorException:
+                raise InvalidLocatorException("The value <%s> of locator <%s> is not a valid expression." % (value, locator), self)
+            except SeleniumWebDriverException as wde:
+                raise EasyiumException(wde.msg, self)
 
         try:
             self.waiter().wait_for(lambda: condition(_find_elements()))
-        except exceptions.TimeoutException as e:
-            if e.__class__ == exceptions.ElementTimeoutException:
+        except TimeoutException as e:
+            if e.__class__ == ElementTimeoutException:
                 # raised by self.wait_for().exists() in _find_elements()
                 raise
-            raise exceptions.TimeoutException(
-                "Timed out waiting for the found element list by <%s> under:\n%s\nmatches condition <%s>." % (
-                locator, self, condition.__name__))
+            raise TimeoutException("Timed out waiting for the found element list by <%s> under:\n%s\nmatches condition <%s>." % (locator, self, condition.__name__))
 
         return elements["inner"]

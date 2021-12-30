@@ -1,19 +1,10 @@
-try:
-    StringTypes = (str, unicode)
-except NameError:
-    StringTypes = (str,)
-
-# for other utils
 import socket
-try:
-    from urlparse import urlparse
-except ImportError:
-    from urllib.parse import urlparse
+from urllib.parse import urlparse
 
 from .waiter import Waiter
 
 
-def wait_for_server_started(server_url, interval=1000, timeout=30000):
+def wait_for_server_started(server_url: str, interval: int = 1000, timeout: int = 30000):
     """
         Wait for the remote server to be started.
 

@@ -5,12 +5,11 @@ class WebDriverContext:
     OPERA = "opera"
     SAFARI = "safari"
     EDGE = "edge"
-    PHANTOMJS = "phantomjs"
 
     NATIVE_APP = "native_app"
     WEB_VIEW = "web_view"
 
-    _WEB = [IE, FIREFOX, CHROME, OPERA, SAFARI, EDGE, PHANTOMJS, WEB_VIEW]
+    _WEB = [IE, FIREFOX, CHROME, OPERA, SAFARI, EDGE, WEB_VIEW]
     _APP = [NATIVE_APP, WEB_VIEW]
 
 

@@ -1,15 +1,19 @@
 import time
+from typing import Callable
 
-from selenium.common.exceptions import NoSuchElementException, StaleElementReferenceException, WebDriverException
+from selenium.common.exceptions import NoSuchElementException as SeleniumNoSuchElementException, StaleElementReferenceException as SeleniumStaleElementReferenceException, \
+    WebDriverException as SeleniumWebDriverException
 from selenium.webdriver.common.by import By
 
 from .decorator import SupportedBy
+from .element import Element
 from .enumeration import WebDriverPlatform
 from .exceptions import TimeoutException, ElementTimeoutException, WebDriverTimeoutException
+from .web_driver import WebDriver
 
 
 class Waiter:
-    def __init__(self, interval=1000, timeout=30000):
+    def __init__(self, interval: int = 1000, timeout: int = 30000):
         """
             Create a Waiter instance.
 
@@ -19,7 +23,7 @@ class Waiter:
         self.__interval = interval
         self.__timeout = timeout
 
-    def wait_for(self, condition_function, *function_args, **function_kwargs):
+    def wait_for(self, condition_function: Callable[[*any], bool], *function_args, **function_kwargs):
         """
             Wait for the condition.
 
@@ -41,16 +45,16 @@ class Waiter:
 
 
 class ElementWaitFor:
-    def __init__(self, element, interval, timeout):
+    def __init__(self, element: Element, interval: int, timeout: int):
         self.__element = element
         self.__desired_occurrence = True
         self.__interval = interval
         self.__timeout = timeout
 
-    def _get_element(self):
+    def _get_element(self) -> Element:
         return self.__element
 
-    def __wait_for(self, element_condition, interval, timeout):
+    def __wait_for(self, element_condition: "ElementCondition", interval: int, timeout: int) -> Waiter:
         def is_element_condition_occurred():
             return element_condition.occurred() == self.__desired_occurrence
 
@@ -60,7 +64,7 @@ class ElementWaitFor:
             raise ElementTimeoutException(
                 "Timed out waiting for <%s> to be <%s>." % (element_condition, self.__desired_occurrence))
 
-    def not_(self):
+    def not_(self) -> "ElementWaitFor":
         """
             Wait for not.
         """
@@ -79,7 +83,7 @@ class ElementWaitFor:
         """
         self.__wait_for(ElementVisible(self.__element), self.__interval, self.__timeout)
 
-    def text_equals(self, text):
+    def text_equals(self, text: str):
         """
             Wait for this element's text equals the expected text.
 
@@ -94,7 +98,7 @@ class ElementWaitFor:
         rest_timeout = start_time + self.__timeout - time.time() * 1000.0
         self.__wait_for(ElementTextEquals(self.__element, text), self.__interval, rest_timeout)
 
-    def attribute_equals(self, attribute, value):
+    def attribute_equals(self, attribute: str, value: str):
         """
             Wait for this element's attribute value equals the expected value.
 
@@ -109,7 +113,7 @@ class ElementWaitFor:
         rest_timeout = start_time + self.__timeout - time.time() * 1000.0
         self.__wait_for(ElementAttributeEquals(self.__element, attribute, value), self.__interval, rest_timeout)
 
-    def attribute_contains_one(self, attribute, *values):
+    def attribute_contains_one(self, attribute: str, *values: str):
         """
             Wait for this element's attribute value contains one of the value list.
 
@@ -126,7 +130,7 @@ class ElementWaitFor:
         rest_timeout = start_time + self.__timeout - time.time() * 1000.0
         self.__wait_for(ElementAttributeContainsOne(self.__element, attribute, *values), self.__interval, rest_timeout)
 
-    def attribute_contains_all(self, attribute, *values):
+    def attribute_contains_all(self, attribute: str, *values: str):
         """
             Wait for this element's attribute value contains all of the value list.
 
@@ -144,47 +148,52 @@ class ElementWaitFor:
         self.__wait_for(ElementAttributeContainsAll(self.__element, attribute, *values), self.__interval, rest_timeout)
 
 
-class ElementExistence:
-    def __init__(self, element):
+class ElementCondition:
+    def occurred(self):
+        pass
+
+
+class ElementExistence(ElementCondition):
+    def __init__(self, element: Element):
         self.__element = element
 
-    def occurred(self):
+    def occurred(self) -> bool:
         return self.__element.exists()
 
     def __str__(self):
         return "ElementExistence [\n%s\n]" % self.__element
 
 
-class ElementVisible:
-    def __init__(self, element):
+class ElementVisible(ElementCondition):
+    def __init__(self, element: Element):
         self.__element = element
 
-    def occurred(self):
+    def occurred(self) -> bool:
         return self.__element.is_displayed()
 
     def __str__(self):
         return "ElementVisible [\n%s\n]" % self.__element
 
 
-class ElementTextEquals:
-    def __init__(self, element, text):
+class ElementTextEquals(ElementCondition):
+    def __init__(self, element: Element, text: str):
         self.__element = element
         self.__text = text
 
-    def occurred(self):
+    def occurred(self) -> bool:
         return self.__element._selenium_element().text == self.__text
 
     def __str__(self):
         return "ElementTextEquals [element: \n%s\n][text: %s]" % (self.__element, self.__text)
 
 
-class ElementAttributeEquals:
-    def __init__(self, element, attribute, value):
+class ElementAttributeEquals(ElementCondition):
+    def __init__(self, element: Element, attribute: str, value: str):
         self.__element = element
         self.__attribute = attribute
         self.__value = value
 
-    def occurred(self):
+    def occurred(self) -> bool:
         return self.__element._selenium_element().get_attribute(self.__attribute) == self.__value
 
     def __str__(self):
@@ -192,8 +201,8 @@ class ElementAttributeEquals:
             self.__element, self.__attribute, self.__value)
 
 
-class ElementAttributeContainsOne:
-    def __init__(self, element, attribute, *values):
+class ElementAttributeContainsOne(ElementCondition):
+    def __init__(self, element: Element, attribute: str, *values: str):
         self.__element = element
         self.__attribute = attribute
         self.__values = []
@@ -203,7 +212,7 @@ class ElementAttributeContainsOne:
             else:
                 self.__values.append(value)
 
-    def occurred(self):
+    def occurred(self) -> bool:
         attribute_value = self.__element._selenium_element().get_attribute(self.__attribute)
         for value in self.__values:
             if value in attribute_value:
@@ -215,8 +224,8 @@ class ElementAttributeContainsOne:
             self.__element, self.__attribute, self.__values)
 
 
-class ElementAttributeContainsAll:
-    def __init__(self, element, attribute, *values):
+class ElementAttributeContainsAll(ElementCondition):
+    def __init__(self, element: Element, attribute: str, *values: str):
         self.__element = element
         self.__attribute = attribute
         self.__values = []
@@ -226,7 +235,7 @@ class ElementAttributeContainsAll:
             else:
                 self.__values.append(value)
 
-    def occurred(self):
+    def occurred(self) -> bool:
         attribute_value = self.__element._selenium_element().get_attribute(self.__attribute)
         for value in self.__values:
             if value not in attribute_value:
@@ -239,15 +248,15 @@ class ElementAttributeContainsAll:
 
 
 class WebDriverWaitFor:
-    def __init__(self, web_driver, interval, timeout):
+    def __init__(self, web_driver: WebDriver, interval: int, timeout: int):
         self.__web_driver = web_driver
         self.__desired_occurrence = True
         self.__waiter = Waiter(interval, timeout)
 
-    def _get_web_driver(self):
+    def _get_web_driver(self) -> WebDriver:
         return self.__web_driver
 
-    def __wait_for(self, web_driver_condition):
+    def __wait_for(self, web_driver_condition: "WebDriverCondition"):
         def is_web_driver_condition_occurred():
             return web_driver_condition.occurred() == self.__desired_occurrence
 
@@ -257,7 +266,7 @@ class WebDriverWaitFor:
             raise WebDriverTimeoutException(
                 "Timed out waiting for <%s> to be <%s>." % (web_driver_condition, self.__desired_occurrence))
 
-    def not_(self):
+    def not_(self) -> "WebDriverWaitFor":
         """
             Wait for not.
         """
@@ -270,7 +279,7 @@ class WebDriverWaitFor:
         """
         self.__wait_for(AlertPresent(self.__web_driver))
 
-    def text_present(self, text):
+    def text_present(self, text: str):
         """
             Wait for the text present.
 
@@ -278,7 +287,7 @@ class WebDriverWaitFor:
         """
         self.__wait_for(TextPresent(self.__web_driver, text))
 
-    def url_equals(self, url):
+    def url_equals(self, url: str):
         """
             Wait for the url equals expected url.
 
@@ -292,7 +301,7 @@ class WebDriverWaitFor:
         """
         self.__wait_for(URLEquals(self.__web_driver, url))
 
-    def reloaded(self, indicator):
+    def reloaded(self, indicator: Element):
         """
             Wait for the page to be refreshed / redirected.
 
@@ -307,7 +316,7 @@ class WebDriverWaitFor:
         self.__wait_for(Reloaded(self.__web_driver, indicator))
 
     @SupportedBy(WebDriverPlatform.ANDROID)
-    def activity_present(self, activity):
+    def activity_present(self, activity: str):
         """
             Wait for the activity present.
 
@@ -316,7 +325,7 @@ class WebDriverWaitFor:
         self.__wait_for(ActivityPresent(self.__web_driver, activity))
 
     @SupportedBy(WebDriverPlatform._MOBILE)
-    def context_available(self, context_partial_name):
+    def context_available(self, context_partial_name: str):
         """
             Wait for the context available.
 
@@ -325,87 +334,92 @@ class WebDriverWaitFor:
         self.__wait_for(ContextAvailable(self.__web_driver, context_partial_name))
 
 
-class AlertPresent:
-    def __init__(self, web_driver):
+class WebDriverCondition:
+    def occurred(self):
+        pass
+
+
+class AlertPresent(WebDriverCondition):
+    def __init__(self, web_driver: WebDriver):
         self.__web_driver = web_driver
 
-    def occurred(self):
+    def occurred(self) -> bool:
         try:
             alert_text = self.__web_driver._selenium_web_driver().switch_to.alert.text
             return True
-        except WebDriverException as e:
+        except SeleniumWebDriverException as e:
             return False
 
     def __str__(self):
         return "AlertPresent [\n%s\n]" % self.__web_driver
 
 
-class TextPresent:
-    def __init__(self, web_driver, text):
+class TextPresent(WebDriverCondition):
+    def __init__(self, web_driver: WebDriver, text: str):
         self.__web_driver = web_driver
         self.__text = text
 
-    def occurred(self):
+    def occurred(self) -> bool:
         try:
             self.__web_driver._selenium_web_driver().find_element(By.XPATH, "//*[contains(., '%s')]" % self.__text)
             return True
-        except NoSuchElementException:
+        except SeleniumNoSuchElementException:
             return False
 
     def __str__(self):
         return "TextPresent [webdriver: \n%s\n][text: %s]" % (self.__web_driver, self.__text)
 
 
-class URLEquals:
-    def __init__(self, web_driver, url):
+class URLEquals(WebDriverCondition):
+    def __init__(self, web_driver: WebDriver, url: str):
         self.__web_driver = web_driver
         self.__url = url
 
-    def occurred(self):
+    def occurred(self) -> bool:
         return self.__web_driver._selenium_web_driver().current_url == self.__url
 
     def __str__(self):
         return "URLEquals [webdriver: \n%s\n][url: %s]" % (self.__web_driver, self.__url)
 
 
-class Reloaded:
-    def __init__(self, web_driver, indicator):
+class Reloaded(WebDriverCondition):
+    def __init__(self, web_driver: WebDriver, indicator: Element):
         self.__web_driver = web_driver
         self.__indicator = indicator
 
-    def occurred(self):
+    def occurred(self) -> bool:
         try:
             self.__indicator._selenium_element().is_displayed()
             return False
-        except StaleElementReferenceException:
+        except SeleniumStaleElementReferenceException:
             return True
 
     def __str__(self):
         return "Reloaded [\n%s\n]" % self.__web_driver
 
 
-class ActivityPresent:
-    def __init__(self, web_driver, activity):
+class ActivityPresent(WebDriverCondition):
+    def __init__(self, web_driver: WebDriver, activity: str):
         self.__web_driver = web_driver
         self.__activity = activity
 
-    def occurred(self):
+    def occurred(self) -> bool:
         return self.__web_driver._selenium_web_driver().current_activity == self.__activity
 
     def __str__(self):
         return "ActivityPresent [webdriver: \n%s\n][activity: %s]" % (self.__web_driver, self.__activity)
 
 
-class ContextAvailable:
-    def __init__(self, web_driver, context_partial_name):
+class ContextAvailable(WebDriverCondition):
+    def __init__(self, web_driver: WebDriver, context_partial_name: str):
         self.__web_driver = web_driver
         self.__context_partial_name = context_partial_name
 
-    def occurred(self):
+    def occurred(self) -> bool:
         try:
             contexts = self.__web_driver._selenium_web_driver().contexts
             return len([context for context in contexts if self.__context_partial_name in context]) > 0
-        except WebDriverException as e:
+        except SeleniumWebDriverException as e:
             return False
 
     def __str__(self):

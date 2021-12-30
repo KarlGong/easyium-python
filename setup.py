@@ -10,8 +10,9 @@ with open(path.join(here, "README.rst")) as f:
 classifiers = ["License :: OSI Approved :: Apache Software License",
                "Topic :: Software Development :: Testing",
                "Operating System :: Microsoft :: Windows",
-               "Operating System :: MacOS :: MacOS X"] \
-              + [("Programming Language :: Python :: %s" % x) for x in "2.7 3.4 3.5 3.6 3.7 3.8".split()]
+               "Operating System :: MacOS :: MacOS X",
+               "Programming Language :: Python"] \
+              + [("Programming Language :: Python :: %s" % x) for x in "3.7 3.8 3.9".split()]
 
 
 def main():
@@ -19,7 +20,7 @@ def main():
         name="easyium",
         description="easy use of selenium and appium",
         long_description=long_description,
-        install_requires=['selenium==3.141.0', 'appium-python-client==0.46'],
+        install_requires=['selenium==4.1.0', 'appium-python-client==2.1.1'],
         version="1.3.8",
         keywords="selenium appium test testing framework automation",
         author="Karl Gong",

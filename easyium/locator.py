@@ -1,3 +1,5 @@
+from typing import Tuple
+
 from appium.webdriver.common.mobileby import MobileBy
 from selenium.webdriver.common.by import By
 
@@ -23,7 +25,7 @@ locator_to_by_map = {
 }
 
 
-def locator_to_by_value(locator):
+def locator_to_by_value(locator: str) -> Tuple[By, str]:
     separator_index = locator.find("=")
     if separator_index == -1:
         raise InvalidLocatorException("Separator '=' is not found.")

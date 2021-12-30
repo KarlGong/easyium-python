@@ -1,9 +1,14 @@
-from .exceptions import NotPersistException, LatePersistException
+from typing import Callable
+
+from appium.webdriver.webelement import WebElement as AppiumElement
+
+from .context import Context
 from .element import Element
+from .exceptions import NotPersistException, LatePersistException
 
 
 class DynamicElement(Element):
-    def __init__(self, parent, selenium_element, found_by, identifier):
+    def __init__(self, parent: Context, selenium_element: AppiumElement, found_by, identifier: Callable[[Element], str]):
         Element.__init__(self, parent)
         # from element
         self._inner_selenium_element = selenium_element

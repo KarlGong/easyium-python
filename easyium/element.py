@@ -1,21 +1,26 @@
-from selenium.common.exceptions import WebDriverException, StaleElementReferenceException, InvalidElementStateException
+from typing import Union
+
+from appium.webdriver.webelement import WebElement as AppiumElement
+from selenium.common.exceptions import WebDriverException as SeleniumWebDriverException, StaleElementReferenceException as SeleniumStaleElementReferenceException, \
+    InvalidElementStateException as SeleniumInvalidElementStateException
 
 from .context import Context
 from .decorator import SupportedBy
+from .enumeration import WebDriverContext, WebDriverPlatform
 from .exceptions import EasyiumException, NoSuchElementException
 from .waiter import ElementWaitFor
-from .enumeration import WebDriverContext, WebDriverPlatform
+from .web_driver import WebDriver, WebDriverInfo
 
 
 class Element(Context):
-    def __init__(self, parent):
+    def __init__(self, parent: Context):
         Context.__init__(self)
         # self
         self._inner_selenium_element = None
         self._locator = None
         self.__parent = parent
 
-    def get_web_driver(self):
+    def get_web_driver(self) -> WebDriver:
         """
             Get the web driver of this element.
 
@@ -23,7 +28,7 @@ class Element(Context):
         """
         return self.get_parent().get_web_driver()
 
-    def get_web_driver_info(self):
+    def get_web_driver_info(self) -> WebDriverInfo:
         """
             Get current info of this web driver.
 
@@ -31,7 +36,7 @@ class Element(Context):
         """
         return self.get_web_driver().get_web_driver_info()
 
-    def get_parent(self):
+    def get_parent(self) -> Context:
         """
             Get the parent of this element.
 
@@ -39,17 +44,17 @@ class Element(Context):
         """
         return self.__parent
 
-    def _selenium_context(self):
+    def _selenium_context(self) -> AppiumElement:
         if self._inner_selenium_element is None:
             self._refresh()
         return self._inner_selenium_element
 
-    def _selenium_element(self):
+    def _selenium_element(self) -> AppiumElement:
         if self._inner_selenium_element is None:
             self._refresh()
         return self._inner_selenium_element
 
-    def wait_for(self, interval=None, timeout=None):
+    def wait_for(self, interval: int = None, timeout: int = None) -> ElementWaitFor:
         """
             Get a ElementWaitFor instance.
 
@@ -66,7 +71,7 @@ class Element(Context):
         """
         try:
             self.get_web_driver().execute_script("arguments[0].focus()", self)
-        except WebDriverException as wde:
+        except SeleniumWebDriverException as wde:
             raise EasyiumException(wde.msg, self)
 
     def blur(self):
@@ -75,7 +80,7 @@ class Element(Context):
         """
         try:
             self.get_web_driver().execute_script("arguments[0].blur()", self)
-        except WebDriverException as wde:
+        except SeleniumWebDriverException as wde:
             raise EasyiumException(wde.msg, self)
 
     def clear(self):
@@ -85,10 +90,10 @@ class Element(Context):
         try:
             try:
                 self._selenium_element().clear()
-            except (NoSuchElementException, StaleElementReferenceException, InvalidElementStateException):
+            except (NoSuchElementException, SeleniumStaleElementReferenceException, SeleniumInvalidElementStateException):
                 self.wait_for().visible()
                 self._selenium_element().clear()
-        except WebDriverException as wde:
+        except SeleniumWebDriverException as wde:
             raise EasyiumException(wde.msg, self)
 
     def click(self):
@@ -98,10 +103,10 @@ class Element(Context):
         try:
             try:
                 self._selenium_element().click()
-            except (NoSuchElementException, StaleElementReferenceException, InvalidElementStateException):
+            except (NoSuchElementException, SeleniumStaleElementReferenceException, SeleniumInvalidElementStateException):
                 self.wait_for().visible()
                 self._selenium_element().click()
-        except WebDriverException as wde:
+        except SeleniumWebDriverException as wde:
             raise EasyiumException(wde.msg, self)
 
     def double_click(self):
@@ -125,14 +130,14 @@ class Element(Context):
                     self.get_web_driver().execute_script(script, self)
                 else:
                     self.get_web_driver().create_action_chains().double_click(self._selenium_element()).perform()
-            except (NoSuchElementException, StaleElementReferenceException, InvalidElementStateException):
+            except (NoSuchElementException, SeleniumStaleElementReferenceException, SeleniumInvalidElementStateException):
                 self.wait_for().visible()
                 if self.get_web_driver_info().context == WebDriverContext.SAFARI \
                         and self.get_web_driver_info().platform == WebDriverPlatform.PC:
                     self.get_web_driver().execute_script(script, self)
                 else:
                     self.get_web_driver().create_action_chains().double_click(self._selenium_element()).perform()
-        except WebDriverException as wde:
+        except SeleniumWebDriverException as wde:
             raise EasyiumException(wde.msg, self)
 
     def context_click(self):
@@ -156,17 +161,17 @@ class Element(Context):
                     self.get_web_driver().execute_script(script, self)
                 else:
                     self.get_web_driver().create_action_chains().context_click(self._selenium_element()).perform()
-            except (NoSuchElementException, StaleElementReferenceException):
+            except (NoSuchElementException, SeleniumStaleElementReferenceException):
                 self.wait_for().visible()
                 if self.get_web_driver_info().context == WebDriverContext.SAFARI \
                         and self.get_web_driver_info().platform == WebDriverPlatform.PC:
                     self.get_web_driver().execute_script(script, self)
                 else:
                     self.get_web_driver().create_action_chains().context_click(self._selenium_element()).perform()
-        except WebDriverException as wde:
+        except SeleniumWebDriverException as wde:
             raise EasyiumException(wde.msg, self)
 
-    def send_keys(self, *value):
+    def send_keys(self, *value: str):
         """
             Simulates typing into this element.
 
@@ -191,10 +196,10 @@ class Element(Context):
         try:
             try:
                 self._selenium_element().send_keys(*value)
-            except (NoSuchElementException, StaleElementReferenceException, InvalidElementStateException):
+            except (NoSuchElementException, SeleniumStaleElementReferenceException, SeleniumInvalidElementStateException):
                 self.wait_for().visible()
                 self._selenium_element().send_keys(*value)
-        except WebDriverException as wde:
+        except SeleniumWebDriverException as wde:
             raise EasyiumException(wde.msg, self)
 
     def submit(self):
@@ -204,13 +209,49 @@ class Element(Context):
         try:
             try:
                 self._selenium_element().submit()
-            except (NoSuchElementException, StaleElementReferenceException):
+            except (NoSuchElementException, SeleniumStaleElementReferenceException):
                 self.wait_for().visible()
                 self._selenium_element().submit()
-        except WebDriverException as wde:
+        except SeleniumWebDriverException as wde:
             raise EasyiumException(wde.msg, self)
 
-    def get_attribute(self, name):
+    def get_property(self, name: str) -> str:
+        """
+            Gets the given property of the element.
+
+        :param name: Name of the property to retrieve.
+
+        :Usage:
+            text_length = target_element.get_property("text_length")
+        """
+        try:
+            try:
+                return self._selenium_element().get_property(name)
+            except (NoSuchElementException, SeleniumStaleElementReferenceException):
+                self.wait_for().exists()
+                return self._selenium_element().get_property(name)
+        except SeleniumWebDriverException as wde:
+            raise EasyiumException(wde.msg, self)
+
+    def get_dom_attribute(self, name: str) -> str:
+        """
+            Gets the given attribute of the element. Unlike :func:`get_attribute`, this method only returns attributes declared in the element's HTML markup.
+
+        :param name: Name of the attribute to retrieve.
+
+        :Usage:
+            cls = target_element.get_dom_attribute("class")
+        """
+        try:
+            try:
+                return self._selenium_element().get_dom_attribute(name)
+            except (NoSuchElementException, SeleniumStaleElementReferenceException):
+                self.wait_for().exists()
+                return self._selenium_element().get_dom_attribute(name)
+        except SeleniumWebDriverException as wde:
+            raise EasyiumException(wde.msg, self)
+
+    def get_attribute(self, name: str) -> Union[str, bool]:
         """
             Gets the given attribute or property of this element.
 
@@ -233,13 +274,13 @@ class Element(Context):
         try:
             try:
                 return self._selenium_element().get_attribute(name)
-            except (NoSuchElementException, StaleElementReferenceException):
+            except (NoSuchElementException, SeleniumStaleElementReferenceException):
                 self.wait_for().exists()
                 return self._selenium_element().get_attribute(name)
-        except WebDriverException as wde:
+        except SeleniumWebDriverException as wde:
             raise EasyiumException(wde.msg, self)
 
-    def set_attribute(self, name, value):
+    def set_attribute(self, name: str, value: str):
         """
             Set the attribute of this element to value.
             
@@ -248,10 +289,10 @@ class Element(Context):
         """
         try:
             self.get_web_driver().execute_script("arguments[0].setAttribute('%s', '%s')" % (name, value), self)
-        except WebDriverException as wde:
+        except SeleniumWebDriverException as wde:
             raise EasyiumException(wde.msg, self)
 
-    def get_css_value(self, property_name):
+    def get_css_value(self, property_name: str) -> str:
         """
             Gets the value of a CSS property.
 
@@ -260,13 +301,13 @@ class Element(Context):
         try:
             try:
                 return self._selenium_element().value_of_css_property(property_name)
-            except (NoSuchElementException, StaleElementReferenceException):
+            except (NoSuchElementException, SeleniumStaleElementReferenceException):
                 self.wait_for().exists()
                 return self._selenium_element().value_of_css_property(property_name)
-        except WebDriverException as wde:
+        except SeleniumWebDriverException as wde:
             raise EasyiumException(wde.msg, self)
 
-    def get_value_of_css_property(self, property_name):
+    def get_value_of_css_property(self, property_name: str) -> str:
         """
             Gets the value of a CSS property.
 
@@ -274,7 +315,7 @@ class Element(Context):
         """
         return self.get_css_value(property_name)
 
-    def get_location(self):
+    def get_location(self) -> dict:
         """
             Gets the location for the top-left corner of this element.
 
@@ -283,13 +324,13 @@ class Element(Context):
         try:
             try:
                 return self._selenium_element().location
-            except (NoSuchElementException, StaleElementReferenceException):
+            except (NoSuchElementException, SeleniumStaleElementReferenceException):
                 self.wait_for().exists()
                 return self._selenium_element().location
-        except WebDriverException as wde:
+        except SeleniumWebDriverException as wde:
             raise EasyiumException(wde.msg, self)
 
-    def get_location_in_view(self):
+    def get_location_in_view(self) -> dict:
         """
             Use this to discover where on the screen this element is.
             THIS METHOD SHOULD CAUSE THE ELEMENT TO BE SCROLLED INTO VIEW.
@@ -304,16 +345,16 @@ class Element(Context):
                     return self._selenium_element().location_in_view
                 else:
                     return self._selenium_element().location_once_scrolled_into_view
-            except (NoSuchElementException, StaleElementReferenceException):
+            except (NoSuchElementException, SeleniumStaleElementReferenceException):
                 self.wait_for().exists()
                 if context == WebDriverContext.NATIVE_APP:
                     return self._selenium_element().location_in_view
                 else:
                     return self._selenium_element().location_once_scrolled_into_view
-        except WebDriverException as wde:
+        except SeleniumWebDriverException as wde:
             raise EasyiumException(wde.msg, self)
 
-    def get_size(self):
+    def get_size(self) -> dict:
         """
             Gets the size (including border) of this element.
 
@@ -322,13 +363,13 @@ class Element(Context):
         try:
             try:
                 return self._selenium_element().size
-            except (NoSuchElementException, StaleElementReferenceException):
+            except (NoSuchElementException, SeleniumStaleElementReferenceException):
                 self.wait_for().exists()
                 return self._selenium_element().size
-        except WebDriverException as wde:
+        except SeleniumWebDriverException as wde:
             raise EasyiumException(wde.msg, self)
 
-    def get_rect(self):
+    def get_rect(self) -> dict:
         """
             Gets a dictionary with the size and location of this element.
 
@@ -337,13 +378,13 @@ class Element(Context):
         try:
             try:
                 return self._selenium_element().rect
-            except (NoSuchElementException, StaleElementReferenceException):
+            except (NoSuchElementException, SeleniumStaleElementReferenceException):
                 self.wait_for().exists()
                 return self._selenium_element().rect
-        except WebDriverException as wde:
+        except SeleniumWebDriverException as wde:
             raise EasyiumException(wde.msg, self)
 
-    def get_center(self):
+    def get_center(self) -> dict:
         """
             Gets the location for the center of this element.
 
@@ -353,20 +394,20 @@ class Element(Context):
         return {"x": rect["x"] + rect["width"] / 2,
                 "y": rect["y"] + rect["height"] / 2}
 
-    def get_tag_name(self):
+    def get_tag_name(self) -> str:
         """
             Gets this element's tagName property.
         """
         try:
             try:
                 return self._selenium_element().tag_name
-            except (NoSuchElementException, StaleElementReferenceException):
+            except (NoSuchElementException, SeleniumStaleElementReferenceException):
                 self.wait_for().exists()
                 return self._selenium_element().tag_name
-        except WebDriverException as wde:
+        except SeleniumWebDriverException as wde:
             raise EasyiumException(wde.msg, self)
 
-    def get_value(self):
+    def get_value(self) -> str:
         """
             Gets the value of this element.
             Can be used to get the text of a text entry element.
@@ -375,13 +416,13 @@ class Element(Context):
         try:
             try:
                 return self._selenium_element().get_attribute("value")
-            except (NoSuchElementException, StaleElementReferenceException):
+            except (NoSuchElementException, SeleniumStaleElementReferenceException):
                 self.wait_for().exists()
                 return self._selenium_element().get_attribute("value")
-        except WebDriverException as wde:
+        except SeleniumWebDriverException as wde:
             raise EasyiumException(wde.msg, self)
 
-    def set_value(self, value):
+    def set_value(self, value: str):
         """
             Set the value on this element.
 
@@ -394,29 +435,29 @@ class Element(Context):
                     self._selenium_element().set_value(value)
                 else:
                     self.get_web_driver().execute_script("arguments[0].setAttribute('value', '%s')" % value, self)
-            except (NoSuchElementException, StaleElementReferenceException):
+            except (NoSuchElementException, SeleniumStaleElementReferenceException):
                 self.wait_for().exists()
                 if context == WebDriverContext.NATIVE_APP:
                     self._selenium_element().set_value(value)
                 else:
                     self.get_web_driver().execute_script("arguments[0].setAttribute('value', '%s')" % value, self)
-        except WebDriverException as wde:
+        except SeleniumWebDriverException as wde:
             raise EasyiumException(wde.msg, self)
 
-    def get_text(self):
+    def get_text(self) -> str:
         """
             Gets the text of this element(including the text of its children).
         """
         try:
             try:
                 return self._selenium_element().text
-            except (NoSuchElementException, StaleElementReferenceException):
+            except (NoSuchElementException, SeleniumStaleElementReferenceException):
                 self.wait_for().exists()
                 return self._selenium_element().text
-        except WebDriverException as wde:
+        except SeleniumWebDriverException as wde:
             raise EasyiumException(wde.msg, self)
 
-    def set_text(self, text):
+    def set_text(self, text: str):
         """
             Sends text to this element. Previous text is removed.
 
@@ -429,16 +470,16 @@ class Element(Context):
                     self._selenium_element().set_text(text)
                 else:
                     self.get_web_driver().execute_script("arguments[0].innerText = '%s'" % text, self)
-            except (NoSuchElementException, StaleElementReferenceException):
+            except (NoSuchElementException, SeleniumStaleElementReferenceException):
                 self.wait_for().exists()
                 if context == WebDriverContext.NATIVE_APP:
                     self._selenium_element().set_text(text)
                 else:
                     self.get_web_driver().execute_script("arguments[0].innerText = '%s'" % text, self)
-        except WebDriverException as wde:
+        except SeleniumWebDriverException as wde:
             raise EasyiumException(wde.msg, self)
 
-    def get_text_node_content(self, text_node_index):
+    def get_text_node_content(self, text_node_index: int) -> str:
         """
             Get content of the text node in this element.
             If the text_node_index refers to a non-text node or be out of bounds, an exception will be thrown.
@@ -449,14 +490,14 @@ class Element(Context):
         try:
             content = self.get_web_driver().execute_script(
                 "return arguments[0].childNodes[%s].nodeValue" % text_node_index, self)
-        except WebDriverException as wde:
+        except SeleniumWebDriverException as wde:
             raise EasyiumException(wde.msg, self)
 
         if content is None:
             raise EasyiumException("Cannot get text content of a non-text node in element:", self)
         return content
 
-    def set_selection_range(self, start, end):
+    def set_selection_range(self, start: int, end: int):
         """
             Set the selection range for text in this element.
 
@@ -490,7 +531,7 @@ class Element(Context):
                         el.setSelectionRange(start,end);
                     }
                 } else {
-					if (document.createRange && window.getSelection) {
+                    if (document.createRange && window.getSelection) {
                         var range = document.createRange();
                         range.selectNodeContents(el);
                         var textNodes = getTextNodesIn(el);
@@ -523,39 +564,39 @@ class Element(Context):
                         textRange.moveStart('character', start);
                         textRange.select();
                     }
-				}
+                }
             }
 
             setSelectionRange(arguments[0], %s, %s);
         """
         try:
             self.get_web_driver().execute_script(script % (start, end), self)
-        except WebDriverException as wde:
+        except SeleniumWebDriverException as wde:
             raise EasyiumException(wde.msg, self)
 
-    def get_inner_html(self):
+    def get_inner_html(self) -> str:
         """
             Get the inner html of this element.
         """
         try:
             return self.get_web_driver().execute_script("return arguments[0].innerHTML", self)
-        except WebDriverException as wde:
+        except SeleniumWebDriverException as wde:
             raise EasyiumException(wde.msg, self)
 
-    def is_enabled(self):
+    def is_enabled(self) -> bool:
         """
             Returns whether the element is enabled.
         """
         try:
             try:
                 return self._selenium_element().is_enabled()
-            except (NoSuchElementException, StaleElementReferenceException):
+            except (NoSuchElementException, SeleniumStaleElementReferenceException):
                 self.wait_for().visible()
                 return self._selenium_element().is_enabled()
-        except WebDriverException as wde:
+        except SeleniumWebDriverException as wde:
             raise EasyiumException(wde.msg, self)
 
-    def is_selected(self):
+    def is_selected(self) -> bool:
         """
             Returns whether this element is selected.
             Can be used to check if a checkbox or radio button is selected.
@@ -563,13 +604,13 @@ class Element(Context):
         try:
             try:
                 return self._selenium_element().is_selected()
-            except (NoSuchElementException, StaleElementReferenceException):
+            except (NoSuchElementException, SeleniumStaleElementReferenceException):
                 self.wait_for().visible()
                 return self._selenium_element().is_selected()
-        except WebDriverException as wde:
+        except SeleniumWebDriverException as wde:
             raise EasyiumException(wde.msg, self)
 
-    def mouse_over(self, native=False):
+    def mouse_over(self, native: bool = False):
         """
             Do mouse over this element.
         
@@ -591,16 +632,16 @@ class Element(Context):
                     self.get_web_driver().create_action_chains().move_to_element(self._selenium_element()).perform()
                 else:
                     self.get_web_driver().execute_script(script, self)
-            except (NoSuchElementException, StaleElementReferenceException):
+            except (NoSuchElementException, SeleniumStaleElementReferenceException):
                 self.wait_for().exists()
                 if native:
                     self.get_web_driver().create_action_chains().move_to_element(self._selenium_element()).perform()
                 else:
                     self.get_web_driver().execute_script(script, self)
-        except WebDriverException as wde:
+        except SeleniumWebDriverException as wde:
             raise EasyiumException(wde.msg, self)
 
-    def mouse_out(self, native=False):
+    def mouse_out(self, native: bool = False):
         """
             Do mouse out this element.
             
@@ -622,16 +663,16 @@ class Element(Context):
                     self.get_web_driver().create_action_chains().move_by_offset(-99999, -99999).perform()
                 else:
                     self.get_web_driver().execute_script(script, self)
-            except (NoSuchElementException, StaleElementReferenceException):
+            except (NoSuchElementException, SeleniumStaleElementReferenceException):
                 self.wait_for().exists()
                 if native:
                     self.get_web_driver().create_action_chains().move_by_offset(-99999, -99999).perform()
                 else:
                     self.get_web_driver().execute_script(script, self)
-        except WebDriverException as wde:
+        except SeleniumWebDriverException as wde:
             raise EasyiumException(wde.msg, self)
 
-    def drag_and_drop_by_offset(self, x_offset, y_offset):
+    def drag_and_drop_by_offset(self, x_offset: float, y_offset: float):
         """
             Drag and drop to target offset.
 
@@ -647,7 +688,7 @@ class Element(Context):
                 else:
                     self.get_web_driver().create_action_chains().click_and_hold(self._selenium_element()).move_by_offset(
                         x_offset, y_offset).release().perform()
-            except (NoSuchElementException, StaleElementReferenceException):
+            except (NoSuchElementException, SeleniumStaleElementReferenceException):
                 self.wait_for().visible()
                 if context == WebDriverContext.NATIVE_APP:
                     self.get_web_driver().create_touch_action().long_press(self._selenium_element()).move_to(
@@ -655,10 +696,10 @@ class Element(Context):
                 else:
                     self.get_web_driver().create_action_chains().click_and_hold(self._selenium_element()).move_by_offset(
                         x_offset, y_offset).release().perform()
-        except WebDriverException as wde:
+        except SeleniumWebDriverException as wde:
             raise EasyiumException(wde.msg, self)
 
-    def drag_and_drop_to(self, target_element):
+    def drag_and_drop_to(self, target_element: "Element"):
         """
             Drag and drop to target element.
 
@@ -673,7 +714,7 @@ class Element(Context):
                 else:
                     self.get_web_driver().create_action_chains().click_and_hold(
                         self._selenium_element()).move_to_element(target_element._selenium_element()).release().perform()
-            except (NoSuchElementException, StaleElementReferenceException):
+            except (NoSuchElementException, SeleniumStaleElementReferenceException):
                 self.wait_for().visible()
                 target_element.wait_for().visible()
                 if context == WebDriverContext.NATIVE_APP:
@@ -682,10 +723,10 @@ class Element(Context):
                 else:
                     self.get_web_driver().create_action_chains().click_and_hold(
                         self._selenium_element()).move_to_element(target_element._selenium_element()).release().perform()
-        except WebDriverException as wde:
+        except SeleniumWebDriverException as wde:
             raise EasyiumException(wde.msg, self)
 
-    def drag_and_drop_to_with_offset(self, target_element, x_offset, y_offset):
+    def drag_and_drop_to_with_offset(self, target_element: "Element", x_offset: float, y_offset: float):
         """
             Drag and drop to target element with offset.
             The origin is at the top-left corner of web driver and offsets are relative to the top-left corner of the target element.
@@ -703,7 +744,7 @@ class Element(Context):
                 else:
                     self.get_web_driver().create_action_chains().click_and_hold(self._selenium_element()).move_to_element_with_offset(
                         target_element._selenium_element(), x_offset, y_offset).release().perform()
-            except (NoSuchElementException, StaleElementReferenceException):
+            except (NoSuchElementException, SeleniumStaleElementReferenceException):
                 self.wait_for().visible()
                 target_element.wait_for().visible()
                 if context == WebDriverContext.NATIVE_APP:
@@ -712,11 +753,11 @@ class Element(Context):
                 else:
                     self.get_web_driver().create_action_chains().click_and_hold(self._selenium_element()).move_to_element_with_offset(
                         target_element._selenium_element(), x_offset, y_offset).release().perform()
-        except WebDriverException as wde:
+        except SeleniumWebDriverException as wde:
             raise EasyiumException(wde.msg, self)
 
     @SupportedBy(WebDriverPlatform._MOBILE)
-    def multiple_tap(self, count=1):
+    def multiple_tap(self, count: int = 1):
         """
             Perform a multiple-tap action on this element
 
@@ -725,10 +766,10 @@ class Element(Context):
         try:
             try:
                 self.get_web_driver().create_touch_action().tap(self._selenium_element(), None, None, count).perform()
-            except (NoSuchElementException, StaleElementReferenceException):
+            except (NoSuchElementException, SeleniumStaleElementReferenceException):
                 self.wait_for().visible()
                 self.get_web_driver().create_touch_action().tap(self._selenium_element(), None, None, count).perform()
-        except WebDriverException as wde:
+        except SeleniumWebDriverException as wde:
             raise EasyiumException(wde.msg, self)
 
     @SupportedBy(WebDriverPlatform._MOBILE)
@@ -746,7 +787,7 @@ class Element(Context):
         self.multiple_tap(2)
 
     @SupportedBy(WebDriverPlatform._MOBILE)
-    def long_press(self, duration=1000):
+    def long_press(self, duration: int = 1000):
         """
             Long press on this element.
 
@@ -755,14 +796,14 @@ class Element(Context):
         try:
             try:
                 self.get_web_driver().create_touch_action().long_press(self._selenium_element(), None, None, duration).release().perform()
-            except (NoSuchElementException, StaleElementReferenceException):
+            except (NoSuchElementException, SeleniumStaleElementReferenceException):
                 self.wait_for().visible()
                 self.get_web_driver().create_touch_action().long_press(self._selenium_element(), None, None, duration).release().perform()
-        except WebDriverException as wde:
+        except SeleniumWebDriverException as wde:
             raise EasyiumException(wde.msg, self)
 
     @SupportedBy(WebDriverPlatform._MOBILE)
-    def scroll(self, direction):
+    def scroll(self, direction: str):
         """
             Scrolls to direction in this element.
 
@@ -775,14 +816,14 @@ class Element(Context):
                     "element": self._selenium_element().id
                 }
                 self.get_web_driver().execute_script("mobile: scroll", scroll_params)
-            except (NoSuchElementException, StaleElementReferenceException):
+            except (NoSuchElementException, SeleniumStaleElementReferenceException):
                 self.wait_for().visible()
                 scroll_params = {
                     "direction": direction,
                     "element": self._selenium_element().id
                 }
                 self.get_web_driver().execute_script("mobile: scroll", scroll_params)
-        except WebDriverException as wde:
+        except SeleniumWebDriverException as wde:
             raise EasyiumException(wde.msg, self)
 
     def scroll_into_view(self):
@@ -799,7 +840,7 @@ class Element(Context):
                     self.get_web_driver().execute_script("mobile: scrollTo", scroll_params)
                 else:
                     self.get_web_driver().execute_script("arguments[0].scrollIntoView();", self)
-            except (NoSuchElementException, StaleElementReferenceException):
+            except (NoSuchElementException, SeleniumStaleElementReferenceException):
                 self.wait_for().exists()
                 if context == WebDriverContext.NATIVE_APP:
                     scroll_params = {
@@ -808,11 +849,11 @@ class Element(Context):
                     self.get_web_driver().execute_script("mobile: scrollTo", scroll_params)
                 else:
                     self.get_web_driver().execute_script("arguments[0].scrollIntoView();", self)
-        except WebDriverException as wde:
+        except SeleniumWebDriverException as wde:
             raise EasyiumException(wde.msg, self)
 
     @SupportedBy(WebDriverPlatform._MOBILE)
-    def scroll_to(self, target_element, duration=None):
+    def scroll_to(self, target_element: "Element", duration: int = None):
         """
             Scrolls from this element to another.
 
@@ -822,15 +863,15 @@ class Element(Context):
         try:
             try:
                 self.get_web_driver()._selenium_web_driver().scroll(self._selenium_element(), target_element._selenium_element(), duration)
-            except (NoSuchElementException, StaleElementReferenceException):
+            except (NoSuchElementException, SeleniumStaleElementReferenceException):
                 self.wait_for().exists()
                 target_element.wait_for().exists()
                 self.get_web_driver()._selenium_web_driver().scroll(self._selenium_element(), target_element._selenium_element(), duration)
-        except WebDriverException as wde:
+        except SeleniumWebDriverException as wde:
             raise EasyiumException(wde.msg, self)
 
     @SupportedBy(WebDriverPlatform._MOBILE)
-    def pinch(self, percent=200, steps=50):
+    def pinch(self, percent: int = 200, steps: int = 50):
         """
             Pinch on this element a certain amount
 
@@ -840,14 +881,14 @@ class Element(Context):
         try:
             try:
                 self.get_web_driver()._selenium_web_driver().pinch(self._selenium_element(), percent, steps)
-            except (NoSuchElementException, StaleElementReferenceException):
+            except (NoSuchElementException, SeleniumStaleElementReferenceException):
                 self.wait_for().visible()
                 self.get_web_driver()._selenium_web_driver().pinch(self._selenium_element(), percent, steps)
-        except WebDriverException as wde:
+        except SeleniumWebDriverException as wde:
             raise EasyiumException(wde.msg, self)
 
     @SupportedBy(WebDriverPlatform._MOBILE)
-    def zoom(self, percent=200, steps=50):
+    def zoom(self, percent: int = 200, steps: int = 50):
         """
             Zooms in on an element a certain amount.
 
@@ -857,13 +898,13 @@ class Element(Context):
         try:
             try:
                 self.get_web_driver()._selenium_web_driver().zoom(self._selenium_element(), percent, steps)
-            except (NoSuchElementException, StaleElementReferenceException):
+            except (NoSuchElementException, SeleniumStaleElementReferenceException):
                 self.wait_for().visible()
                 self.get_web_driver()._selenium_web_driver().zoom(self._selenium_element(), percent, steps)
-        except WebDriverException as wde:
+        except SeleniumWebDriverException as wde:
             raise EasyiumException(wde.msg, self)
 
-    def get_screenshot_as_file(self, filename):
+    def get_screenshot_as_file(self, filename: str) -> bool:
         """
             Gets the screenshot of the current element. Returns False if there is
             any IOError, else returns True. Use full paths in your filename.
@@ -876,13 +917,13 @@ class Element(Context):
         try:
             try:
                 return self._selenium_element().screenshot(filename)
-            except (NoSuchElementException, StaleElementReferenceException):
+            except (NoSuchElementException, SeleniumStaleElementReferenceException):
                 self.wait_for().exists()
                 return self._selenium_element().screenshot(filename)
-        except WebDriverException as wde:
+        except SeleniumWebDriverException as wde:
             raise EasyiumException(wde.msg, self)
 
-    def save_screenshot(self, filename):
+    def save_screenshot(self, filename: str) -> bool:
         """
             Gets the screenshot of the current element. Returns False if there is
             any IOError, else returns True. Use full paths in your filename.
@@ -894,7 +935,7 @@ class Element(Context):
         """
         return self.get_screenshot_as_file(filename)
 
-    def get_screenshot_as_png(self):
+    def get_screenshot_as_png(self) -> bytes:
         """
             Gets the screenshot of the current element as a binary data.
 
@@ -904,13 +945,13 @@ class Element(Context):
         try:
             try:
                 return self._selenium_element().screenshot_as_png
-            except (NoSuchElementException, StaleElementReferenceException):
+            except (NoSuchElementException, SeleniumStaleElementReferenceException):
                 self.wait_for().exists()
                 return self._selenium_element().screenshot_as_png
-        except WebDriverException as wde:
+        except SeleniumWebDriverException as wde:
             raise EasyiumException(wde.msg, self)
 
-    def get_screenshot_as_base64(self):
+    def get_screenshot_as_base64(self) -> str:
         """
             Gets the screenshot of the current element as a base64 encoded string.
 
@@ -920,28 +961,28 @@ class Element(Context):
         try:
             try:
                 return self._selenium_element().screenshot_as_base64
-            except (NoSuchElementException, StaleElementReferenceException):
+            except (NoSuchElementException, SeleniumStaleElementReferenceException):
                 self.wait_for().exists()
                 return self._selenium_element().screenshot_as_base64
-        except WebDriverException as wde:
+        except SeleniumWebDriverException as wde:
             raise EasyiumException(wde.msg, self)
 
-    def is_displayed(self):
+    def is_displayed(self) -> bool:
         """
             Return whether this element is displayed or not.
         """
         try:
             try:
                 return self._selenium_element().is_displayed()
-            except StaleElementReferenceException:
+            except SeleniumStaleElementReferenceException:
                 self._refresh()
                 return self._selenium_element().is_displayed()
         except NoSuchElementException:
             return False
-        except WebDriverException as wde:
+        except SeleniumWebDriverException as wde:
             raise EasyiumException(wde.msg, self)
 
-    def exists(self):
+    def exists(self) -> bool:
         """
             Return whether this element is existing or not.
         """
@@ -949,10 +990,10 @@ class Element(Context):
             try:
                 self._selenium_element().is_displayed()
                 return True
-            except StaleElementReferenceException:
+            except SeleniumStaleElementReferenceException:
                 self._refresh()
                 return True
         except NoSuchElementException:
             return False
-        except WebDriverException as wde:
+        except SeleniumWebDriverException as wde:
             raise EasyiumException(wde.msg, self)

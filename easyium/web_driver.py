@@ -1,28 +1,41 @@
+from typing import List, Union
+
 from appium.webdriver.clipboard_content_type import ClipboardContentType
 from appium.webdriver.common.multi_action import MultiAction
 from appium.webdriver.common.touch_action import TouchAction
-from appium.webdriver.webdriver import WebDriver as _Appium
+from appium.webdriver.webdriver import WebDriver as AppiumWebDriver
 from selenium.common.exceptions import WebDriverException
-from selenium.webdriver import ActionChains, Ie as _Ie, Firefox as _Firefox, Chrome as _Chrome, Opera as _Opera, \
-    Safari as _Safari, Edge as _Edge, PhantomJS as _PhantomJS, Remote as _Remote
-from selenium.webdriver.common.desired_capabilities import DesiredCapabilities
+from selenium.webdriver import ActionChains, Ie as SeleniumIe, Firefox as SeleniumFirefox, Chrome as SeleniumChrome, Opera as SeleniumOpera, \
+    Safari as SeleniumSafari, Edge as SeleniumEdge
+from selenium.webdriver.chrome.options import Options as ChromeOptions
+from selenium.webdriver.chrome.service import Service as ChromeService
+from selenium.webdriver.common.html5.application_cache import ApplicationCache
+from selenium.webdriver.edge.options import Options as EdgeOptions
+from selenium.webdriver.edge.service import Service as EdgeService
+from selenium.webdriver.firefox.options import Options as FirefoxOptions
+from selenium.webdriver.firefox.service import Service as FirefoxService
+from selenium.webdriver.ie.options import Options as IeOptions
+from selenium.webdriver.ie.service import Service as IeService
+from selenium.webdriver.opera.options import Options as OperaOptions
+from selenium.webdriver.safari.options import Options as SafariOptions
+from selenium.webdriver.safari.service import Service as SafariService
 
 from .alert import Alert
 from .context import Context
 from .decorator import SupportedBy
+from .element import Element
 from .enumeration import WebDriverPlatform, WebDriverContext
-from .utils import StringTypes
 from .waiter import WebDriverWaitFor
 
 
 class WebDriverInfo:
-    def __init__(self, platform, context):
+    def __init__(self, platform: WebDriverPlatform, context: WebDriverContext):
         self.platform = platform
         self.context = context
 
 
 class WebDriver(Context):
-    def __init__(self, selenium_web_driver, web_driver_info):
+    def __init__(self, selenium_web_driver: AppiumWebDriver, web_driver_info: WebDriverInfo):
         """
             Create a wrapper for selenium WebDriver.
         
@@ -37,13 +50,13 @@ class WebDriver(Context):
         self.set_wait_interval(1000)
         self.set_wait_timeout(30000)
 
-    def _selenium_context(self):
+    def _selenium_context(self) -> "AppiumWebDriver":
         return self.__selenium_web_driver
 
-    def _selenium_web_driver(self):
+    def _selenium_web_driver(self) -> AppiumWebDriver:
         return self.__selenium_web_driver
 
-    def get_web_driver(self):
+    def get_web_driver(self) -> "WebDriver":
         """
             Get self.
 
@@ -51,7 +64,7 @@ class WebDriver(Context):
         """
         return self
 
-    def get_web_driver_info(self):
+    def get_web_driver_info(self) -> WebDriverInfo:
         """
             Get current info of this web driver.
 
@@ -59,13 +72,13 @@ class WebDriver(Context):
         """
         return self.__web_driver_info
 
-    def get_desired_capabilities(self):
+    def get_desired_capabilities(self) -> dict:
         """
             Returns the drivers current desired capabilities being used.
         """
-        return self._selenium_web_driver().desired_capabilities
+        return self._selenium_web_driver().capabilities
 
-    def get_application_cache(self):
+    def get_application_cache(self) -> ApplicationCache:
         """
             Returns a ApplicationCache Object to interact with the browser app cache.
         """
@@ -77,27 +90,27 @@ class WebDriver(Context):
         """
         self._selenium_web_driver().quit()
 
-    def create_action_chains(self):
+    def create_action_chains(self) -> ActionChains:
         """
             Create a new selenium.webdriver.common.ActionChains instance.
         """
         return ActionChains(self._selenium_web_driver())
 
     @SupportedBy(WebDriverPlatform._MOBILE)
-    def create_touch_action(self):
+    def create_touch_action(self) -> TouchAction:
         """
             Create a new appium.webdriver.common.TouchAction instance.
         """
         return TouchAction(self._selenium_web_driver())
 
     @SupportedBy(WebDriverPlatform._MOBILE)
-    def create_multi_action(self):
+    def create_multi_action(self) -> MultiAction:
         """
             Create a new appium.webdriver.common.MultiAction instance.
         """
         return MultiAction(self._selenium_web_driver())
 
-    def wait_for(self, interval=None, timeout=None):
+    def wait_for(self, interval: int = None, timeout: int = None) -> WebDriverWaitFor:
         """
             Get a WebDriverWaitFor instance.
 
@@ -110,7 +123,7 @@ class WebDriver(Context):
 
     # Timeouts
 
-    def set_page_load_timeout(self, timeout):
+    def set_page_load_timeout(self, timeout: int):
         """
             Set the amount of time to wait for a page load to complete before throwing an error.
 
@@ -118,7 +131,7 @@ class WebDriver(Context):
         """
         self._selenium_web_driver().set_page_load_timeout(timeout / 1000.0)
 
-    def set_script_timeout(self, timeout):
+    def set_script_timeout(self, timeout: int):
         """
             Set the amount of time that the script should wait during an execute_async_script call before throwing an error.
 
@@ -128,7 +141,7 @@ class WebDriver(Context):
 
     # Execute script
 
-    def execute_script(self, script, *args):
+    def execute_script(self, script: str, *args) -> any:
         """
             Synchronously Executes JavaScript in the current window/frame.
 
@@ -148,7 +161,7 @@ class WebDriver(Context):
 
         return self._selenium_web_driver().execute_script(script, *converted_args)
 
-    def execute_async_script(self, script, *args):
+    def execute_async_script(self, script: str, *args) -> any:
         """
             Asynchronously Executes JavaScript in the current window/frame.
 
@@ -171,14 +184,14 @@ class WebDriver(Context):
     # Orientation
 
     @SupportedBy(WebDriverPlatform._MOBILE)
-    def get_orientation(self):
+    def get_orientation(self) -> str:
         """
             Gets the current orientation of the device
         """
         return self._selenium_web_driver().orientation
 
     @SupportedBy(WebDriverPlatform._MOBILE)
-    def set_orientation(self, value):
+    def set_orientation(self, value: str):
         """
             Sets the current orientation of the device
 
@@ -189,7 +202,7 @@ class WebDriver(Context):
     # Geolocation
 
     @SupportedBy(WebDriverPlatform._MOBILE)
-    def get_location(self):
+    def get_location(self) -> dict:
         """
             Retrieves the current location
 
@@ -213,13 +226,13 @@ class WebDriver(Context):
 
     # Logs
 
-    def get_log_types(self):
+    def get_log_types(self) -> List[str]:
         """
             Gets a list of the available log types.
         """
         return self._selenium_web_driver().log_types
 
-    def get_log(self, log_type):
+    def get_log(self, log_type: str) -> str:
         """
             Gets the log for a given log type
 
@@ -236,7 +249,7 @@ class WebDriver(Context):
     # Settings
 
     @SupportedBy(WebDriverPlatform._MOBILE)
-    def get_settings(self):
+    def get_settings(self) -> dict:
         """
             Returns the appium server Settings for the current session.
             Do not get Settings confused with Desired Capabilities, they are
@@ -245,7 +258,7 @@ class WebDriver(Context):
         return self._selenium_web_driver().get_settings()
 
     @SupportedBy(WebDriverPlatform._MOBILE)
-    def update_settings(self, settings):
+    def update_settings(self, settings: dict):
         """
             Set settings for the current session.
             For more on settings, see: https://github.com/appium/appium/blob/master/docs/en/advanced-concepts/settings.md
@@ -257,9 +270,8 @@ class WebDriver(Context):
     # Activity
 
     @SupportedBy(WebDriverPlatform.ANDROID)
-    def start_activity(self, app_package, app_activity, app_wait_package=None, app_wait_activity=None,
-                       intent_action=None, intent_category=None, intent_flags=None,
-                       optional_intent_arguments=None, stop_app_on_reset=None):
+    def start_activity(self, app_package: str, app_activity: str, app_wait_package: str = None, app_wait_activity: str = None, intent_action: str = None,
+                       intent_category: str = None, intent_flags: str = None, optional_intent_arguments: str = None, stop_app_on_reset: str = None):
         """
             Opens an arbitrary activity during a test. If the activity belongs to
             another application, that application is started and the activity is opened.
@@ -289,14 +301,14 @@ class WebDriver(Context):
         self._selenium_web_driver().start_activity(app_package, app_activity, **options)
 
     @SupportedBy(WebDriverPlatform.ANDROID)
-    def get_current_activity(self):
+    def get_current_activity(self) -> str:
         """
             Retrieves the current activity on the device.
         """
         return self._selenium_web_driver().current_activity
 
     @SupportedBy(WebDriverPlatform.ANDROID)
-    def get_current_package(self):
+    def get_current_package(self) -> str:
         """
             Retrieves the current package running on the device.
         """
@@ -305,8 +317,7 @@ class WebDriver(Context):
     # App
 
     @SupportedBy(WebDriverPlatform._MOBILE)
-    def install_app(self, app_path, replace=True, timeout=60000, allow_test_packages=False,
-                    usd_sd_card=False, grant_permissions=False):
+    def install_app(self, app_path: str, replace: bool = True, timeout: int = 60000, allow_test_packages: bool = False, usd_sd_card: bool = False, grant_permissions: bool = False):
         """
             Install the application found at `app_path` on the device.
 
@@ -329,7 +340,7 @@ class WebDriver(Context):
         self._selenium_web_driver().install_app(app_path, **options)
 
     @SupportedBy(WebDriverPlatform._MOBILE)
-    def is_app_installed(self, bundle_id):
+    def is_app_installed(self, bundle_id: str) -> bool:
         """
             Checks whether the application specified by `bundle_id` is installed on the device.
 
@@ -345,16 +356,16 @@ class WebDriver(Context):
         self._selenium_web_driver().launch_app()
 
     @SupportedBy(WebDriverPlatform._MOBILE)
-    def background_app(self, duration):
+    def background_app(self, duration: int):
         """
             Puts the application in the background on the device for a certain duration.
 
          :param duration: the duration for the application to remain in the background, in ms.
         """
-        self._selenium_web_driver().background_app(duration / 1000.0)
+        self._selenium_web_driver().background_app(int(duration / 1000.0))
 
     @SupportedBy(WebDriverPlatform._MOBILE)
-    def activate_app(self, app_id):
+    def activate_app(self, app_id: str):
         """
             Activates the application if it is not running or is running in the background.
 
@@ -370,7 +381,7 @@ class WebDriver(Context):
         self._selenium_web_driver().close_app()
 
     @SupportedBy(WebDriverPlatform._MOBILE)
-    def terminate_app(self, app_id, timeout=500):
+    def terminate_app(self, app_id: str, timeout: int = 500) -> bool:
         """
             Terminates the application if it is running.
 
@@ -394,7 +405,7 @@ class WebDriver(Context):
         self._selenium_web_driver().reset()
 
     @SupportedBy(WebDriverPlatform._MOBILE)
-    def remove_app(self, app_id, keep_data=False, timeout=20000):
+    def remove_app(self, app_id: str, keep_data: bool = False, timeout: int = 20000):
         """
             Remove the specified application from the device.
 
@@ -411,7 +422,7 @@ class WebDriver(Context):
         self._selenium_web_driver().remove_app(app_id, **options)
 
     @SupportedBy(WebDriverPlatform._MOBILE)
-    def get_app_state(self, app_id):
+    def get_app_state(self, app_id: str) -> int:
         """
             Queries the state of the application.
 
@@ -422,7 +433,7 @@ class WebDriver(Context):
         return self._selenium_web_driver().query_app_state(app_id)
 
     @SupportedBy(WebDriverPlatform._MOBILE)
-    def get_app_strings(self, language=None, string_file=None):
+    def get_app_strings(self, language: str = None, string_file: str = None) -> dict:
         """
             Returns the application strings from the device for the specified language.
 
@@ -432,7 +443,7 @@ class WebDriver(Context):
         return self._selenium_web_driver().app_strings(language, string_file)
 
     @SupportedBy(WebDriverPlatform.ANDROID)
-    def end_test_coverage(self, intent, path):
+    def end_test_coverage(self, intent: str, path: str):
         """
             Ends the coverage collection and pull the coverage.ec file from the device.
             Android only.
@@ -447,7 +458,7 @@ class WebDriver(Context):
     # Files
 
     @SupportedBy(WebDriverPlatform._MOBILE)
-    def push_file(self, destination_path, base64data=None, source_path=None):
+    def push_file(self, destination_path: str, base64data: str = None, source_path: str = None):
         """
             Puts the data from the file at `source_path`, encoded as Base64, in the file specified as `path`.
             Specify either `base64data` or `source_path`, if both specified default to `source_path`
@@ -459,7 +470,7 @@ class WebDriver(Context):
         self._selenium_web_driver().push_file(destination_path, base64data, source_path)
 
     @SupportedBy(WebDriverPlatform._MOBILE)
-    def pull_file(self, path):
+    def pull_file(self, path: str) -> str:
         """
             Retrieves the file at `path`. Returns the file's content encoded as Base64.
 
@@ -468,7 +479,7 @@ class WebDriver(Context):
         return self._selenium_web_driver().pull_file(path)
 
     @SupportedBy(WebDriverPlatform._MOBILE)
-    def pull_folder(self, path):
+    def pull_folder(self, path: str) -> str:
         """
             Retrieves a folder at `path`. Returns the folder's contents zipped and encoded as Base64.
 
@@ -486,7 +497,7 @@ class WebDriver(Context):
         self._selenium_web_driver().shake()
 
     @SupportedBy(WebDriverPlatform._MOBILE)
-    def lock(self, duration=None):
+    def lock(self, duration: int = None):
         """
             Lock the device for a certain period of time.
             No changes are made if the device is already locked.
@@ -495,7 +506,7 @@ class WebDriver(Context):
             The device is going to be locked forever until `unlock` is called if it equals or is less than zero,
             otherwise this call blocks until the timeout expires and unlocks the screen automatically.
         """
-        self._selenium_web_driver().lock(duration / 1000.0)
+        self._selenium_web_driver().lock(int(duration / 1000.0))
 
     @SupportedBy(WebDriverPlatform.ANDROID)
     def unlock(self):
@@ -505,7 +516,7 @@ class WebDriver(Context):
         self._selenium_web_driver().unlock()
 
     @SupportedBy(WebDriverPlatform.ANDROID)
-    def is_locked(self):
+    def is_locked(self) -> bool:
         """
             Checks whether the device is locked.
 
@@ -514,7 +525,7 @@ class WebDriver(Context):
         return self._selenium_web_driver().is_locked()
 
     @SupportedBy(WebDriverPlatform.IOS)
-    def press_button(self, button_name):
+    def press_button(self, button_name: str):
         """
             Sends a physical button name to the device to simulate the user pressing. iOS only.
             Possible button names can be found in
@@ -527,7 +538,7 @@ class WebDriver(Context):
     # Keys
 
     @SupportedBy(WebDriverPlatform.ANDROID)
-    def press_keycode(self, keycode, metastate=None, flags=None):
+    def press_keycode(self, keycode: int, metastate: int = None, flags: int = None):
         """
             Sends a keycode to the device. Android only. Possible keycodes can be
             found in http://developer.android.com/reference/android/view/KeyEvent.html.
@@ -539,7 +550,7 @@ class WebDriver(Context):
         self._selenium_web_driver().press_keycode(keycode, metastate, flags)
 
     @SupportedBy(WebDriverPlatform.ANDROID)
-    def long_press_keycode(self, keycode, metastate=None, flags=None):
+    def long_press_keycode(self, keycode: int, metastate: int = None, flags: int = None):
         """
             Sends a long press of keycode to the device. Android only. Possible keycodes can be
             found in http://developer.android.com/reference/android/view/KeyEvent.html.
@@ -551,7 +562,7 @@ class WebDriver(Context):
         self._selenium_web_driver().long_press_keycode(keycode, metastate, flags)
 
     @SupportedBy(WebDriverPlatform._MOBILE)
-    def hide_keyboard(self, key_name=None, key=None, strategy=None):
+    def hide_keyboard(self, key_name: str = None, key: str = None, strategy: str = None):
         """
             Hides the software keyboard on the device. In iOS, use `key_name` to press
             a particular key, or `strategy`. In Android, no parameters are used.
@@ -563,7 +574,7 @@ class WebDriver(Context):
         self._selenium_web_driver().hide_keyboard(key_name, key, strategy)
 
     @SupportedBy(WebDriverPlatform._MOBILE)
-    def is_keyboard_shown(self):
+    def is_keyboard_shown(self) -> bool:
         """
             Attempts to detect whether a software keyboard is present.
 
@@ -572,7 +583,7 @@ class WebDriver(Context):
         return self._selenium_web_driver().is_keyboard_shown()
 
     @SupportedBy(WebDriverPlatform.ANDROID)
-    def key_event(self, keycode, metastate=None):
+    def key_event(self, keycode: int, metastate: int = None):
         """
             Sends a keycode to the device. Android only. Possible keycodes can be
             found in http://developer.android.com/reference/android/view/KeyEvent.html.
@@ -592,7 +603,7 @@ class WebDriver(Context):
         self._selenium_web_driver().toggle_location_services()
 
     @SupportedBy(WebDriverPlatform.ANDROID)
-    def get_network_connection(self):
+    def get_network_connection(self) -> int:
         """
             Returns an integer bitmask specifying the network connection type.
             Android only.
@@ -601,7 +612,7 @@ class WebDriver(Context):
         return self._selenium_web_driver().network_connection
 
     @SupportedBy(WebDriverPlatform.ANDROID)
-    def set_network_connection(self, connection_type):
+    def set_network_connection(self, connection_type: int):
         """
             Sets the network connection type. Android only.
             Possible values::
@@ -619,7 +630,7 @@ class WebDriver(Context):
         self._selenium_web_driver().set_network_connection(connection_type)
 
     @SupportedBy(WebDriverPlatform.ANDROID)
-    def set_network_speed(self, speed_type):
+    def set_network_speed(self, speed_type: str):
         """
             Set the network speed emulation. Android Emulator only.
 
@@ -630,7 +641,7 @@ class WebDriver(Context):
     # Performance Data
 
     @SupportedBy(WebDriverPlatform.ANDROID)
-    def get_performance_data(self, package_name, data_type, data_read_timeout=None):
+    def get_performance_data(self, package_name: str, data_type: str, data_read_timeout: int = None):
         """
             Returns the information of the system state which is supported to read as like cpu, memory, network traffic, and battery.
 
@@ -647,7 +658,7 @@ class WebDriver(Context):
         return self._selenium_web_driver().get_performance_data(package_name, data_type, data_read_timeout)
 
     @SupportedBy(WebDriverPlatform.ANDROID)
-    def get_performance_data_types(self):
+    def get_performance_data_types(self) -> List[str]:
         """
             Returns the information types of the system state which is supported to read as like cpu, memory, network traffic, and battery.
 
@@ -658,7 +669,7 @@ class WebDriver(Context):
     # Simulator
 
     @SupportedBy(WebDriverPlatform.IOS)
-    def perform_touch_id(self, match):
+    def perform_touch_id(self, match: bool):
         """
             Simulate touchId on iOS Simulator
 
@@ -671,12 +682,12 @@ class WebDriver(Context):
         """
             Toggle enroll touchId on iOS Simulator
         """
-        return self._selenium_web_driver().toggle_touch_id_enrollment()
+        self._selenium_web_driver().toggle_touch_id_enrollment()
 
     # System
 
     @SupportedBy(WebDriverPlatform.ANDROID)
-    def get_system_bars(self):
+    def get_system_bars(self) -> dict:
         """
             Retrieve visibility and bounds information of the status and navigation bars.
 
@@ -697,7 +708,7 @@ class WebDriver(Context):
         return self._selenium_web_driver().get_system_bars()
 
     @SupportedBy(WebDriverPlatform.ANDROID)
-    def get_display_density(self):
+    def get_display_density(self) -> int:
         """
             Get the display density, Android only
 
@@ -713,7 +724,7 @@ class WebDriver(Context):
         self._selenium_web_driver().open_notifications()
 
     @SupportedBy(WebDriverPlatform._MOBILE)
-    def get_device_time(self, format=None):
+    def get_device_time(self, format: str = None) -> str:
         """
             Returns the date and time from the device
 
@@ -727,7 +738,7 @@ class WebDriver(Context):
         return self._selenium_web_driver().get_device_time(format)
 
     @SupportedBy(WebDriverPlatform._MOBILE)
-    def get_battery_info(self):
+    def get_battery_info(self) -> dict:
         """
             Retrieves battery information for the device under test.
 
@@ -752,7 +763,7 @@ class WebDriver(Context):
     # Power
 
     @SupportedBy(WebDriverPlatform.ANDROID)
-    def set_power_capacity(self, percent):
+    def set_power_capacity(self, percent: int):
         """
             Emulate power capacity change on the connected emulator.
 
@@ -761,7 +772,7 @@ class WebDriver(Context):
         self._selenium_web_driver().set_power_capacity(percent)
 
     @SupportedBy(WebDriverPlatform.ANDROID)
-    def set_power_ac(self, ac_state):
+    def set_power_ac(self, ac_state: str):
         """
             Emulate power state change on the connected emulator.
 
@@ -772,7 +783,7 @@ class WebDriver(Context):
     # GSM & SMS
 
     @SupportedBy(WebDriverPlatform.ANDROID)
-    def make_gsm_call(self, phone_number, action):
+    def make_gsm_call(self, phone_number: str, action: str):
         """
             Make GSM call (Emulator only)
 
@@ -785,7 +796,7 @@ class WebDriver(Context):
         self._selenium_web_driver().make_gsm_call(phone_number, action)
 
     @SupportedBy(WebDriverPlatform.ANDROID)
-    def set_gsm_signal(self, strength):
+    def set_gsm_signal(self, strength: int):
         """
             Set GSM signal strength (Emulator only)
 
@@ -797,7 +808,7 @@ class WebDriver(Context):
         self._selenium_web_driver().set_gsm_signal(strength)
 
     @SupportedBy(WebDriverPlatform.ANDROID)
-    def set_gsm_voice(self, state):
+    def set_gsm_voice(self, state: str):
         """
             Set GSM voice state (Emulator only)
 
@@ -809,7 +820,7 @@ class WebDriver(Context):
         self._selenium_web_driver().set_gsm_voice(state)
 
     @SupportedBy(WebDriverPlatform.ANDROID)
-    def send_sms(self, phone_number, message):
+    def send_sms(self, phone_number: str, message: str):
         """
             Emulate send SMS event on the connected emulator.
 
@@ -824,7 +835,7 @@ class WebDriver(Context):
     # Authentication
 
     @SupportedBy(WebDriverPlatform.ANDROID)
-    def perform_finger_print(self, finger_id):
+    def perform_finger_print(self, finger_id: int):
         """
             Authenticate users by using their finger print scans on supported emulators. Android only.
 
@@ -835,21 +846,21 @@ class WebDriver(Context):
     # Context
 
     @SupportedBy(WebDriverPlatform._MOBILE)
-    def get_contexts(self):
+    def get_contexts(self) -> List[str]:
         """
             Returns the contexts within the current session.
         """
         return self._selenium_web_driver().contexts
 
     @SupportedBy(WebDriverPlatform._MOBILE)
-    def get_current_context(self):
+    def get_current_context(self) -> str:
         """
             Returns the current context of the current session.
         """
         return self._selenium_web_driver().current_context
 
     @SupportedBy(WebDriverPlatform._MOBILE)
-    def switch_to_context(self, context_partial_name):
+    def switch_to_context(self, context_partial_name: str):
         """
             Sets the context for the current session.
 
@@ -880,30 +891,30 @@ class WebDriver(Context):
 
     # Window
 
-    def get_current_window_handle(self):
+    def get_current_window_handle(self) -> str:
         """
             Returns the handle of the current window.
         """
         return self._selenium_web_driver().current_window_handle
 
-    def get_window_handles(self):
+    def get_window_handles(self) -> List[str]:
         """
             Returns the handles of all windows within the current session.
         """
         return self._selenium_web_driver().window_handles
 
-    def switch_to_window(self, window_reference):
+    def switch_to_window(self, window_handle: str):
         """
             Switches focus to the specified window.
 
-        :param window_reference: The name or window handle of the window to switch to.
+        :param window_handle: The name or window handle of the window to switch to.
 
         :Usage:
             driver.switch_to_window('main')
         """
-        self._selenium_web_driver().switch_to.window(window_reference)
+        self._selenium_web_driver().switch_to.window(window_handle)
 
-    def switch_to_new_window(self, previous_window_handles):
+    def switch_to_new_window(self, previous_window_handles: List[str]):
         """
             Switch to the new opened window.
 
@@ -939,73 +950,67 @@ class WebDriver(Context):
         """
         self._selenium_web_driver().fullscreen_window()
 
-    def set_window_size(self, width, height, window_reference="current"):
+    def set_window_size(self, width: int, height: int, window_handle: str = "current"):
         """
             Sets the width and height of the specified window.
 
         :param width: the width in pixels to set the window to
         :param height: the height in pixels to set the window to
-        :param window_reference: The name or window handle of the window to set,
-                    default is current window.
+        :param window_handle: The name or window handle of the window to set, default is current window.
 
         :Usage:
             driver.set_window_size(800,600)
         """
-        self._selenium_web_driver().set_window_size(width, height, window_reference)
+        self._selenium_web_driver().set_window_size(width, height, window_handle)
 
-    def get_window_size(self, window_reference="current"):
+    def get_window_size(self, window_handle: str = "current"):
         """
             Gets the width and height of the specified window.
 
-        :param window_reference: The name or window handle of the window to get,
-                    default is current window.
+        :param window_handle: The name or window handle of the window to get, default is current window.
         """
-        return self._selenium_web_driver().get_window_size(window_reference)
+        return self._selenium_web_driver().get_window_size(window_handle)
 
-    def set_window_position(self, x, y, window_reference="current"):
+    def set_window_position(self, x: int, y: int, window_handle: str = "current"):
         """
             Sets the x, y position of the specified window.
 
         :param x: the x-coordinate in pixels to set the window position
         :param y: the y-coordinate in pixels to set the window position
-        :param window_reference: The name or window handle of the window to set,
-                    default is current window.
+        :param window_handle: The name or window handle of the window to set, default is current window.
 
         :Usage:
             driver.set_window_position(0,0)
         """
-        self._selenium_web_driver().set_window_position(x, y, window_reference)
+        self._selenium_web_driver().set_window_position(x, y, window_handle)
 
-    def get_window_position(self, window_reference="current"):
+    def get_window_position(self, window_handle: str = "current") -> dict:
         """
             Gets the x, y position of the specified window.
 
-        :param window_reference: The name or window handle of the window to get,
-                    default is current window.
+        :param window_handle: The name or window handle of the window to get, default is current window.
         """
-        return self._selenium_web_driver().get_window_position(window_reference)
+        return self._selenium_web_driver().get_window_position(window_handle)
 
-    def get_window_rect(self):
+    def get_window_rect(self) -> dict:
         """
-            Gets the x, y coordinates of the window as well as height and width of
-            the current window.
+            Gets the x, y coordinates of the window as well as height and width of the current window.
         """
         return self._selenium_web_driver().get_window_rect()
 
-    def set_window_rect(self, x=None, y=None, width=None, height=None):
+    def set_window_rect(self, x: int = None, y: int = None, width: int = None, height: int = None):
         """
-            Sets the x, y coordinates of the window as well as height and width of
-            the current window.
+            Sets the x, y coordinates of the window as well as height and width of the current window.
         """
         self._selenium_web_driver().set_window_rect(x, y, width, height)
 
-    def get_viewport_size(self):
+    def get_viewport_size(self) -> dict:
         """
             Gets the width and height of viewport.
         """
         return self._selenium_web_driver().execute_script("return {width: window.innerWidth, height: window.innerHeight};")
 
-    def set_viewport_size(self, width, height):
+    def set_viewport_size(self, width: int, height: int):
         """
             Sets the width and height of viewport. When changes the viewport size, the window size will be also changed.
 
@@ -1018,42 +1023,41 @@ class WebDriver(Context):
                 """, width, height)
         self._selenium_web_driver().set_window_size(*window_size)
 
-    def get_title(self):
+    def get_title(self) -> str:
         """
             Returns the title of the current page.
         """
         return self._selenium_web_driver().title
 
-    def get_current_url(self):
+    def get_current_url(self) -> str:
         """
             Gets the URL of the current page.
         """
         return self._selenium_web_driver().current_url
 
-    def get_page_source(self):
+    def get_page_source(self) -> str:
         """
             Gets the source of the current page.
         """
         return self._selenium_web_driver().page_source
 
-    def close_window(self, window_reference="current"):
+    def close_window(self, window_handle: str = "current"):
         """
             Close the specified window.
 
-        :param window_reference: The name or window handle of the window to close,
-                    default is current window.
+        :param window_handle: The name or window handle of the window to close, default is current window.
         """
-        if window_reference == "current" or window_reference == self.get_current_window_handle():
+        if window_handle == "current" or window_handle == self.get_current_window_handle():
             self._selenium_web_driver().close()
         else:
             current_window_handle = self.get_current_window_handle()
-            self.switch_to_window(window_reference)
+            self.switch_to_window(window_handle)
             self._selenium_web_driver().close()
             self.switch_to_window(current_window_handle)
 
     # Navigation
 
-    def get(self, url):
+    def get(self, url: str):
         """
             Loads a web page in the current browser session.
 
@@ -1081,7 +1085,7 @@ class WebDriver(Context):
 
     # Storage
 
-    def get_cookie(self, name):
+    def get_cookie(self, name: str) -> dict:
         """
             Get a single cookie by name. Returns the cookie if found, None if not.
 
@@ -1089,13 +1093,13 @@ class WebDriver(Context):
         """
         return self._selenium_web_driver().get_cookie(name)
 
-    def get_cookies(self):
+    def get_cookies(self) -> List[dict]:
         """
             Returns a set of dictionaries, corresponding to cookies visible in the current session.
         """
         return self._selenium_web_driver().get_cookies()
 
-    def add_cookie(self, cookie_dict):
+    def add_cookie(self, cookie_dict: dict):
         """
             Adds a cookie to your current session.
 
@@ -1109,7 +1113,7 @@ class WebDriver(Context):
         """
         self._selenium_web_driver().add_cookie(cookie_dict)
 
-    def delete_cookie(self, name):
+    def delete_cookie(self, name: str):
         """
             Deletes a single cookie with the given name.
 
@@ -1125,7 +1129,7 @@ class WebDriver(Context):
 
     # Frame
 
-    def switch_to_frame(self, frame_reference):
+    def switch_to_frame(self, frame_reference: Union[int, str, Element]):
         """
             Switches focus to the specified frame, by index (zero-based), locator, or element.
 
@@ -1142,7 +1146,7 @@ class WebDriver(Context):
 
         if isinstance(frame_reference, int):
             frame_element = StaticElement(self, "xpath=(.//iframe)[%s]" % (frame_reference + 1))
-        elif isinstance(frame_reference, StringTypes):
+        elif isinstance(frame_reference, str):
             frame_element = StaticElement(self, frame_reference)
         elif isinstance(frame_reference, Element):
             frame_element = frame_reference
@@ -1167,7 +1171,7 @@ class WebDriver(Context):
     # IME engine
 
     @SupportedBy(WebDriverPlatform.ANDROID)
-    def get_available_ime_engines(self):
+    def get_available_ime_engines(self) -> List[str]:
         """
             Get the available input methods for an Android device. Package and
             activity are returned (e.g., ['com.android.inputmethod.latin/.LatinIME'])
@@ -1176,7 +1180,7 @@ class WebDriver(Context):
         return self._selenium_web_driver().available_ime_engines
 
     @SupportedBy(WebDriverPlatform.ANDROID)
-    def is_ime_service_active(self):
+    def is_ime_service_active(self) -> bool:
         """
             Checks whether the device has IME service active. Returns True/False.
             Android only.
@@ -1184,7 +1188,7 @@ class WebDriver(Context):
         return self._selenium_web_driver().is_ime_active()
 
     @SupportedBy(WebDriverPlatform.ANDROID)
-    def active_ime_engine(self, engine):
+    def active_ime_engine(self, engine: str):
         """
             Activates the given IME engine on the device.
             Android only.
@@ -1202,7 +1206,7 @@ class WebDriver(Context):
         self._selenium_web_driver().deactivate_ime_engine()
 
     @SupportedBy(WebDriverPlatform.ANDROID)
-    def get_current_ime_engine(self):
+    def get_current_ime_engine(self) -> str:
         """
             Returns the activity and package of the currently active IME engine (e.g., 'com.android.inputmethod.latin/.LatinIME').
             Android only.
@@ -1211,7 +1215,7 @@ class WebDriver(Context):
 
     # Alert
 
-    def switch_to_alert(self):
+    def switch_to_alert(self) -> Alert:
         """
             Switches focus to an alert on the page.
 
@@ -1220,7 +1224,7 @@ class WebDriver(Context):
         self.wait_for().alert_present()
         return Alert(self._selenium_web_driver().switch_to.alert)
 
-    def get_alert(self):
+    def get_alert(self) -> Alert:
         """
             Switches focus to an alert on the page.
 
@@ -1228,7 +1232,7 @@ class WebDriver(Context):
         """
         return self.switch_to_alert()
 
-    def is_alert_present(self):
+    def is_alert_present(self) -> bool:
         """
             Return whether the alert is present on the page or not.
         """
@@ -1240,7 +1244,7 @@ class WebDriver(Context):
 
     # Screenshot and recording
 
-    def get_screenshot_as_file(self, filename):
+    def get_screenshot_as_file(self, filename: str) -> bool:
         """
             Gets the screenshot of the current window. Returns False if there is
            any IOError, else returns True. Use full paths in your filename.
@@ -1252,10 +1256,9 @@ class WebDriver(Context):
         """
         return self._selenium_web_driver().get_screenshot_as_file(filename)
 
-    def save_screenshot(self, filename):
+    def save_screenshot(self, filename: str) -> bool:
         """
-            Gets the screenshot of the current window. Returns False if there is
-           any IOError, else returns True. Use full paths in your filename.
+            Gets the screenshot of the current window. Returns False if there is any IOError, else returns True. Use full paths in your filename.
 
         :param filename: The full path you wish to save your screenshot to.
 
@@ -1264,7 +1267,7 @@ class WebDriver(Context):
         """
         return self.get_screenshot_as_file(filename)
 
-    def get_screenshot_as_png(self):
+    def get_screenshot_as_png(self) -> bytes:
         """
             Gets the screenshot of the current window as a binary data.
 
@@ -1273,7 +1276,7 @@ class WebDriver(Context):
         """
         return self._selenium_web_driver().get_screenshot_as_png()
 
-    def get_screenshot_as_base64(self):
+    def get_screenshot_as_base64(self) -> str:
         """
             Gets the screenshot of the current window as a base64 encoded string
             which is useful in embedded images in HTML.
@@ -1284,60 +1287,142 @@ class WebDriver(Context):
         return self._selenium_web_driver().get_screenshot_as_base64()
 
     @SupportedBy(WebDriverPlatform._MOBILE)
-    def start_recording_screen(self, remote_path=None, user=None, password=None, method=None, time_limit=None, forced_restart=None,
-                               bug_report=None, video_quality=None, video_type=None, video_fps=None, video_scale=None, pixel_format=None,
-                               video_size=None, bit_rate=None):
+    def start_recording_screen(self, remote_path: str = None, user: str = None, password: str = None, method: str = None, time_limit: int = None, forced_restart: bool = None,
+                               file_field_name: str = None, form_fields: dict = None, headers: dict = None, video_quality: str = None, video_type: str = None,
+                               video_fps: int = None, video_filters: str = None, video_scale: str = None, pixel_format: str = None, video_size: str = None, bit_rate: int = None,
+                               bug_report: str = None, fps: int = None, capture_cursor: bool = None, capture_click: bool = None, device_id: int = None,
+                               preset: str = None) -> bytes:
         """
             Start asynchronous screen recording process.
 
-        :param remote_path: The remote_path upload option is the path to the remote location,
-            where the resulting video from the previous screen recording should be uploaded.
-            The following protocols are supported: http/https (multipart), ftp.
-            Missing value (the default setting) means the content of the resulting
-            file should be encoded as Base64 and passed as the endpoint response value, but
-            an exception will be thrown if the generated media file is too big to
-            fit into the available process memory.
-            This option only has an effect if there is/was an active screen recording session
-            and forced restart is not enabled (the default setting).
+            +--------------+-----+---------+-----+-------+
+            | Keyword Args | iOS | Android | Win | macOS |
+            +==============+=====+=========+=====+=======+
+            | remotePath   | O   | O       | O   | O     |
+            +--------------+-----+---------+-----+-------+
+            | user         | O   | O       | O   | O     |
+            +--------------+-----+---------+-----+-------+
+            | password     | O   | O       | O   | O     |
+            +--------------+-----+---------+-----+-------+
+            | method       | O   | O       | O   | O     |
+            +--------------+-----+---------+-----+-------+
+            | timeLimit    | O   | O       | O   | O     |
+            +--------------+-----+---------+-----+-------+
+            | forceRestart | O   | O       | O   | O     |
+            +--------------+-----+---------+-----+-------+
+            | fileFieldName| O   | O       | O   | O     |
+            +--------------+-----+---------+-----+-------+
+            | formFields   | O   | O       | O   | O     |
+            +--------------+-----+---------+-----+-------+
+            | headers      | O   | O       | O   | O     |
+            +--------------+-----+---------+-----+-------+
+            | videoQuality | O   |         |     |       |
+            +--------------+-----+---------+-----+-------+
+            | videoType    | O   |         |     |       |
+            +--------------+-----+---------+-----+-------+
+            | videoFps     | O   |         |     |       |
+            +--------------+-----+---------+-----+-------+
+            | videoFilter  | O   |         | O   | O     |
+            +--------------+-----+---------+-----+-------+
+            | videoScale   | O   |         |     |       |
+            +--------------+-----+---------+-----+-------+
+            | pixelFormat  | O   |         |     |       |
+            +--------------+-----+---------+-----+-------+
+            | videoSize    |     | O       |     |       |
+            +--------------+-----+---------+-----+-------+
+            | bitRate      |     | O       |     |       |
+            +--------------+-----+---------+-----+-------+
+            | bugReport    |     | O       |     |       |
+            +--------------+-----+---------+-----+-------+
+            | fps          |     |         | O   | O     |
+            +--------------+-----+---------+-----+-------+
+            | captureCursor|     |         | O   | O     |
+            +--------------+-----+---------+-----+-------+
+            | captureClicks|     |         | O   | O     |
+            +--------------+-----+---------+-----+-------+
+            | deviceId     |     |         |     | O     |
+            +--------------+-----+---------+-----+-------+
+            | preset       |     |         | O   | O     |
+            +--------------+-----+---------+-----+-------+
+            | audioInput   |     |         | O   |       |
+            +--------------+-----+---------+-----+-------+
+
+        :param remote_path: The remotePath upload option is the path to the remote location,
+                where the resulting video from the previous screen recording should be uploaded.
+                The following protocols are supported: http/https (multipart), ftp.
+                Missing value (the default setting) means the content of the resulting
+                file should be encoded as Base64 and passed as the endpoint response value, but
+                an exception will be thrown if the generated media file is too big to
+                fit into the available process memory.
+                This option only has an effect if there is/was an active screen recording session
+                and forced restart is not enabled (the default setting).
         :param user: The name of the user for the remote authentication.
-            Only has an effect if both `remote_path` and `password` are set.
+                Only has an effect if both `remotePath` and `password` are set.
         :param password: The password for the remote authentication.
-            Only has an effect if both `remote_path` and `user` are set.
+                Only has an effect if both `remotePath` and `user` are set.
         :param method: The HTTP method name ('PUT'/'POST'). PUT method is used by default.
-            Only has an effect if `remote_path` is set.
+                Only has an effect if `remotePath` is set.
         :param time_limit: The actual time limit of the recorded video in seconds.
-            The default value for both iOS and Android is 180 seconds (3 minutes).
-            The maximum value for Android is 3 minutes.
-            The maximum value for iOS is 10 minutes.
+                The default value for both iOS and Android is 180 seconds (3 minutes).
+                The default value for macOS is 600 seconds (10 minutes).
+                The maximum value for Android is 3 minutes.
+                The maximum value for iOS is 10 minutes.
+                The maximum value for macOS is 10000 seconds (166 minutes).
         :param forced_restart: Whether to ignore the result of previous capture and start a new recording
-            immediately (`True` value). By default  (`False`) the endpoint will try to catch and return the result of
-            the previous capture if it's still available.
-        :param bug_report: Makes the recorder to display an additional information on the video overlay,
-            such as a timestamp, that is helpful in videos captured to illustrate bugs.
-            This option is only supported since API level 27 (Android P).
+                immediately (`True` value). By default  (`False`) the endpoint will try to catch and
+                return the result of the previous capture if it's still available.
+        :param file_field_name: [multipart/form-data requests] The name of the form field
+                containing the binary payload. "file" by default. (Since Appium 1.18.0)
+        :param form_fields: [multipart/form-data requests] Additional form fields mapping. If any entry has
+                the same key as `fileFieldName` then it is going to be ignored. (Since Appium 1.18.0)
+        :param headers: [multipart/form-data requests] Headers mapping (Since Appium 1.18.0)
 
-        iOS Specific:
-        :param video_quality: The video encoding quality: 'low', 'medium', 'high', 'photo'. Defaults to 'medium'.
-            Only works for real devices.
-        :param video_type: The format of the screen capture to be recorded.
-            Available formats: 'h264', 'mp4' or 'fmp4'. Default is 'mp4'.
-            Only works for Simulator.
-        :param video_fps: The Frames Per Second rate of the recorded video. Change this value if the resulting video is too slow or too fast.
-            Defaults to 10. This can decrease the resulting file size.
-        :param video_scale: The scaling value to apply. Read https://trac.ffmpeg.org/wiki/Scaling for possible values.
-            No scale is applied by default. (Since Appium 1.10.0)
-        :param pixel_format: Output pixel format. Run `ffmpeg -pix_fmts` to list possible values.
-            For Quicktime compatibility, set to "yuv420p" along with videoType: "libx264". (Since Appium 1.12.0)
+        :param video_quality: [iOS] The video encoding quality: 'low', 'medium', 'high', 'photo'. Defaults to 'medium'.
+        :param video_type: [iOS] The format of the screen capture to be recorded.
+                Available formats: Execute `ffmpeg -codecs` in the terminal to see the list of supported video codecs.
+                'mjpeg' by default. (Since Appium 1.10.0)
+        :param video_fps: [iOS] The Frames Per Second rate of the recorded video. Change this value if the
+                resulting video is too slow or too fast. Defaults to 10. This can decrease the resulting file size.
+        :param video_filters: [iOS, Win, macOS] The FFMPEG video filters to apply. These filters allow to scale,
+                flip, rotate and do many other useful transformations on the source video stream. The format of the
+                property must comply with https://ffmpeg.org/ffmpeg-filters.html. (Since Appium 1.15)
+        :param video_scale: [iOS] The scaling value to apply. Read https://trac.ffmpeg.org/wiki/Scaling for
+                possible values. No scale is applied by default. If videoFilters are set then the scale setting is
+                effectively ignored. (Since Appium 1.10.0)
+        :param pixel_format: [iOS] Output pixel format. Run `ffmpeg -pix_fmts` to list possible values.
+                For Quicktime compatibility, set to "yuv420p" along with videoType: "libx264". (Since Appium 1.12.0)
 
-        Android Specific:
-        :param video_size: The video size of the generated media file. The format is WIDTHxHEIGHT.
-            The default value is the device's native display resolution (if supported),
-            1280x720 if not. For best results, use a size supported by your device's Advanced Video Coding (AVC) encoder.
-        :param bit_rate: The video bit rate for the video, in megabits per second.
-            The default value is 4. You can increase the bit rate to improve video quality, but doing so results in larger movie files.
+        :param video_size: [Android] The video size of the generated media file. The format is WIDTHxHEIGHT.
+                The default value is the device's native display resolution (if supported),
+                1280x720 if not. For best results, use a size supported by your device's
+                Advanced Video Coding (AVC) encoder.
+        :param bit_rate: [Android] The video bit rate for the video, in megabits per second.
+                The default value is 4. You can increase the bit rate to improve video quality,
+                but doing so results in larger movie files.
+        :param bug_report: [Android] Makes the recorder to display an additional information on the video overlay,
+                such as a timestamp, that is helpful in videos captured to illustrate bugs.
+                This option is only supported since API level 27 (Android P).
 
-        :return: Base-64 encoded content of the recorded media file or an empty string
-            if the file has been successfully uploaded to a remote location (depends on the actual `remote_path` value).
+        :param fps: [Win, macOS] The count of frames per second in the resulting video.
+                Increasing fps value also increases the size of the resulting video file and the CPU usage.
+        :param capture_cursor: [Win, macOS] Whether to capture the mouse cursor while recording the screen.
+                Disabled by default.
+        :param capture_click: [Win, macOS] Whether to capture the click gestures while recording the screen.
+                Disabled by default.
+        :param device_id: [macOS] Screen device index to use for the recording.
+                The list of available devices could be retrieved using
+                `ffmpeg -f avfoundation -list_devices true -i` command.
+                This option is mandatory and must be always provided.
+        :param preset: [Win, macOS] A preset is a collection of options that will provide a certain encoding
+                speed to compression ratio. A slower preset will provide better compression
+                (compression is quality per filesize). This means that, for example, if you target a certain file size
+                or constant bit rate, you will achieve better quality with a slower preset.
+                Read https://trac.ffmpeg.org/wiki/Encode/H.264 for more details.
+                Possible values are 'ultrafast', 'superfast', 'veryfast'(default), 'faster', 'fast', 'medium', 'slow',
+                'slower', 'veryslow'
+
+        :return: bytes: Base-64 encoded content of the recorded media if `stop_recording_screen` isn't called after previous `start_recording_screen`.
+                Otherwise returns an empty string.
         """
         options = {
             "remotePath": remote_path,
@@ -1346,19 +1431,29 @@ class WebDriver(Context):
             "method": method,
             "timeLimit": time_limit,
             "forcedRestart": forced_restart,
-            "bugReport": bug_report,
+            "fileFieldName": file_field_name,
+            "formFields": form_fields,
+            "headers": headers,
             "videoQuality": video_quality,
             "videoType": video_type,
             "videoFps": video_fps,
+            "videoFilters": video_filters,
             "videoScale": video_scale,
             "pixelFormat": pixel_format,
             "videoSize": video_size,
-            "bitRate": bit_rate
+            "bitRate": bit_rate,
+            "bugReport": bug_report,
+            "fps": fps,
+            "captureCursor": capture_cursor,
+            "captureClick": capture_click,
+            "deviceId": device_id,
+            "preset": preset
         }
         return self._selenium_web_driver().start_recording_screen(**options)
 
     @SupportedBy(WebDriverPlatform._MOBILE)
-    def stop_recording_screen(self, remote_path=None, user=None, password=None, method=None):
+    def stop_recording_screen(self, remote_path: str = None, user: str = None, password: str = None, method: str = None, file_field_name: str = None,
+                              form_fields: dict = None, headers: dict = None) -> bytes:
         """
             Gather the output from the previously started screen recording to a media file.
             
@@ -1375,23 +1470,30 @@ class WebDriver(Context):
             Only has an effect if both `remote_path` and `user` are set.
         :param method: The HTTP method name ('PUT'/'POST'). PUT method is used by default.
             Only has an effect if `remote_path` is set.
+        :param file_field_name: [multipart/form-data requests] The name of the form field
+            containing the binary payload. "file" by default. (Since Appium 1.18.0)
+        :param form_fields: [multipart/form-data requests] Additional form fields mapping. If any entry has
+            the same key as `fileFieldName` then it is going to be ignored. (Since Appium 1.18.0)
+        :param headers: [multipart/form-data requests] Headers mapping (Since Appium 1.18.0)
         
-        :return: Base-64 encoded content of the recorded media file or an empty string
-                if the file has been successfully uploaded to a remote location
+        :return: Base-64 encoded content of the recorded media file or an empty string if the file has been successfully uploaded to a remote location
                 (depends on the actual `remote_path` value).
         """
         options = {
             "remotePath": remote_path,
             "user": user,
             "password": password,
-            "method": method
+            "method": method,
+            "fileFieldName": file_field_name,
+            "formFields": form_fields,
+            "headers": headers
         }
         return self._selenium_web_driver().stop_recording_screen(**options)
 
     # clipboard
 
     @SupportedBy(WebDriverPlatform._MOBILE)
-    def set_clipboard(self, content, content_type=ClipboardContentType.PLAINTEXT, label=None):
+    def set_clipboard(self, content: bytes, content_type: str = ClipboardContentType.PLAINTEXT, label: str = None):
         """
             Set the content of the system clipboard.
 
@@ -1403,7 +1505,7 @@ class WebDriver(Context):
         self._selenium_web_driver().set_clipboard(content, content_type, label)
 
     @SupportedBy(WebDriverPlatform._MOBILE)
-    def set_clipboard_text(self, text, label=None):
+    def set_clipboard_text(self, text: str, label: str = None):
         """
             Copies the given text to the system clipboard.
 
@@ -1413,7 +1515,7 @@ class WebDriver(Context):
         self._selenium_web_driver().set_clipboard_text(text, label)
 
     @SupportedBy(WebDriverPlatform._MOBILE)
-    def get_clipboard(self, content_type=ClipboardContentType.PLAINTEXT):
+    def get_clipboard(self, content_type: str = ClipboardContentType.PLAINTEXT) -> bytes:
         """
             Receives the content of the system clipboard.
 
@@ -1424,7 +1526,7 @@ class WebDriver(Context):
         return self._selenium_web_driver().get_clipboard(content_type)
 
     @SupportedBy(WebDriverPlatform._MOBILE)
-    def get_clipboard_text(self):
+    def get_clipboard_text(self) -> str:
         """
             Receives the text of the system clipboard.
 
@@ -1435,7 +1537,7 @@ class WebDriver(Context):
     # Touch Actions
 
     @SupportedBy(WebDriverPlatform._MOBILE)
-    def swipe(self, start_x, start_y, end_x, end_y, duration=None):
+    def swipe(self, start_x: int, start_y: int, end_x: int, end_y: int, duration: int = None):
         """
             Swipe from one point to another point, for an optional duration.
 
@@ -1451,7 +1553,7 @@ class WebDriver(Context):
         self._selenium_web_driver().swipe(start_x, start_y, end_x, end_y, duration)
 
     @SupportedBy(WebDriverPlatform._MOBILE)
-    def flick(self, start_x, start_y, end_x, end_y):
+    def flick(self, start_x: int, start_y: int, end_x: int, end_y: int):
         """
             Flick from one point to another point.
 
@@ -1466,7 +1568,7 @@ class WebDriver(Context):
         self._selenium_web_driver().flick(start_x, start_y, end_x, end_y)
 
     @SupportedBy(WebDriverPlatform._MOBILE)
-    def scroll(self, direction):
+    def scroll(self, direction: str):
         """
             Scrolls the device to direction.
             It will try to scroll in the first element of type scroll view, table or collection view it finds.
@@ -1479,7 +1581,7 @@ class WebDriver(Context):
         }
         self.execute_script("mobile: scroll", scroll_params)
 
-    def scroll_to(self, element):
+    def scroll_to(self, element: Element):
         """
             Scrolls to the given element.
 
@@ -1499,10 +1601,87 @@ class WebDriver(Context):
         self.quit()
 
 
-class Remote(WebDriver):
-    def __init__(self, command_executor="http://127.0.0.1:4444/wd/hub",
-                 desired_capabilities=None, browser_profile=None, proxy=None,
-                 keep_alive=False, file_detector=None, options=None):
+class Ie(WebDriver):
+    def __init__(self, service: IeService = IeService(), options: IeOptions = IeOptions()):
+        """
+            Creates a new instance of Ie.
+
+        :param service: IE Service instance, providing service
+        :param options: IE Options instance, providing additional options
+        """
+        web_driver_info = WebDriverInfo(WebDriverPlatform.PC, WebDriverContext.IE)
+        selenium_web_driver = SeleniumIe(options=options, service=service)
+        WebDriver.__init__(self, selenium_web_driver=selenium_web_driver, web_driver_info=web_driver_info)
+
+
+class Firefox(WebDriver):
+    def __init__(self, service: FirefoxService = FirefoxService(), options: FirefoxOptions = FirefoxOptions()):
+        """
+            Creates a new instance of Firefox.
+
+        :param service: Firefox Service instance, providing service
+        :param options: Firefox Options instance, providing additional options
+        """
+        web_driver_info = WebDriverInfo(WebDriverPlatform.PC, WebDriverContext.FIREFOX)
+        selenium_web_driver = SeleniumFirefox(service=service, options=options)
+        WebDriver.__init__(self, selenium_web_driver=selenium_web_driver, web_driver_info=web_driver_info)
+
+
+class Chrome(WebDriver):
+    def __init__(self, service: ChromeService = ChromeService(), options: ChromeOptions = ChromeOptions()):
+        """
+            Creates a new instance of Chrome.
+
+        :param service: Chrome Service instance, providing service
+        :param options: Chrome Options instance, providing additional options
+        """
+        web_driver_info = WebDriverInfo(WebDriverPlatform.PC, WebDriverContext.CHROME)
+        selenium_web_driver = SeleniumChrome(service=service, options=options)
+        WebDriver.__init__(self, selenium_web_driver=selenium_web_driver, web_driver_info=web_driver_info)
+
+
+class Opera(WebDriver):
+    def __init__(self, options: OperaOptions = OperaOptions()):
+        """
+            Creates a new instance of Opera.
+
+        :param options: Opera Options instance, providing additional options
+        """
+        web_driver_info = WebDriverInfo(WebDriverPlatform.PC, WebDriverContext.OPERA)
+        selenium_web_driver = SeleniumOpera(options=options)
+        WebDriver.__init__(self, selenium_web_driver=selenium_web_driver, web_driver_info=web_driver_info)
+
+
+class Safari(WebDriver):
+    def __init__(self, service: SafariService = SafariService(), options: SafariOptions = SafariOptions()):
+        """
+            Creates a new instance of Safari.
+
+        :param service: Safari Service instance, providing service
+        :param options: Safari Options instance, providing additional options
+        """
+        web_driver_info = WebDriverInfo(WebDriverPlatform.PC, WebDriverContext.SAFARI)
+        selenium_web_driver = SeleniumSafari(service=service, options=options)
+        WebDriver.__init__(self, selenium_web_driver=selenium_web_driver, web_driver_info=web_driver_info)
+
+
+class Edge(WebDriver):
+    def __init__(self, service: EdgeService = EdgeService(), options: EdgeOptions = EdgeOptions()):
+        """
+            Creates a new instance of Edge.
+
+        :param service: Edge Service instance, providing service
+        :param options: Edge Options instance, providing additional options
+        """
+        web_driver_info = WebDriverInfo(WebDriverPlatform.PC, WebDriverContext.EDGE)
+        selenium_web_driver = SeleniumEdge(service=service, options=options)
+        WebDriver.__init__(self, selenium_web_driver=selenium_web_driver, web_driver_info=web_driver_info)
+
+
+class Appium(WebDriver):
+    def __init__(self, command_executor: str = "http://127.0.0.1:4444/wd/hub", desired_capabilities: dict = None,
+                 browser_profile: str = None, proxy: object = None, keep_alive: bool = False,
+                 direct_connection: bool = True, extensions=[], strict_ssl: bool = True):
         """
             Create a new driver that will issue commands using the wire protocol.
 
@@ -1511,216 +1690,22 @@ class Remote(WebDriver):
         :param browser_profile: A selenium.webdriver.firefox.firefox_profile.FirefoxProfile object. Only used if Firefox is requested. Optional.
         :param proxy: A selenium.webdriver.common.proxy.Proxy object. The browser session will be started with given proxy settings, if possible. Optional.
         :param keep_alive: Whether to configure remote_connection.RemoteConnection to use HTTP keep-alive. Defaults to False.
-        :param file_detector: Pass custom file detector object during instantiation. If None, then default LocalFileDetector() will be used.
-        :param options: instance of a driver options.Options class
         """
-        if "browserName" in desired_capabilities:
-            context = {
-                "internet explorer": WebDriverContext.IE,
-                "firefox": WebDriverContext.FIREFOX,
-                "chrome": WebDriverContext.CHROME,
-                "opera": WebDriverContext.OPERA,
-                "safari": WebDriverContext.SAFARI,
-                "microsoftedge": WebDriverContext.EDGE,
-                "phantomjs": WebDriverContext.PHANTOMJS
-            }.get(desired_capabilities["browserName"].lower(), WebDriverContext.NATIVE_APP)
-        else:
-            context = WebDriverContext.NATIVE_APP
-
         if "platformName" in desired_capabilities:
             platform = {
                 "ios": WebDriverPlatform.IOS,
                 "android": WebDriverPlatform.ANDROID
-            }.get(desired_capabilities["platformName"].lower(), WebDriverPlatform.PC)
+            }.get(desired_capabilities["platformName"].lower(), WebDriverPlatform.IOS)
         else:
-            platform = WebDriverPlatform.PC
+            platform = WebDriverPlatform.IOS
 
-        web_driver_info = WebDriverInfo(platform, context)
+        web_driver_info = WebDriverInfo(platform, WebDriverContext.NATIVE_APP)
 
-        if platform == WebDriverPlatform.PC:
-            selenium_web_driver = _Remote(command_executor=command_executor, desired_capabilities=desired_capabilities,
-                                          browser_profile=browser_profile, proxy=proxy, keep_alive=keep_alive,
-                                          file_detector=file_detector, options=options)
-        else:
-            selenium_web_driver = _Appium(command_executor=command_executor, desired_capabilities=desired_capabilities,
-                                          browser_profile=browser_profile, proxy=proxy, keep_alive=keep_alive)
-            # avoid that "autoWebview" in desired_capabilities affects the default context
-            if web_driver_info.context == WebDriverContext.NATIVE_APP and selenium_web_driver.current_context != "NATIVE_APP":
-                web_driver_info.context = WebDriverContext.WEB_VIEW
+        selenium_web_driver = AppiumWebDriver(command_executor=command_executor, desired_capabilities=desired_capabilities,
+                                              browser_profile=browser_profile, proxy=proxy, keep_alive=keep_alive,
+                                              direct_connection=direct_connection, extensions=extensions, strict_ssl=strict_ssl)
+        # avoid that "autoWebview" in desired_capabilities affects the default context
+        if web_driver_info.context == WebDriverContext.NATIVE_APP and selenium_web_driver.current_context != "NATIVE_APP":
+            web_driver_info.context = WebDriverContext.WEB_VIEW
 
-        WebDriver.__init__(self, selenium_web_driver=selenium_web_driver, web_driver_info=web_driver_info)
-
-
-class Ie(WebDriver):
-    def __init__(self, executable_path='IEDriverServer.exe', capabilities=None,
-                 port=0, timeout=30000, host=None,
-                 log_level=None, service_log_path=None, options=None,
-                 ie_options=None, desired_capabilities=None, log_file=None, keep_alive=False):
-        """
-            Creates a new instance of Ie.
-
-        :param executable_path: path to the IEDriver
-        :param capabilities: a dictionary of capabilities to request when starting the browser session
-        :param port: port you would like the service to run, if left as 0, a free port will be found.
-        :param timeout: connection timeout for IEDriver, in milliseconds
-        :param host: IP address the service port is bound
-        :param log_level: Level of logging of service, may be "FATAL", "ERROR", "WARN", "INFO", "DEBUG", "TRACE". Default is "FATAL".
-        :param service_log_path: target of logging of service, may be "stdout", "stderr" or file path.
-        :param options: IE Options instance, providing additional IE options
-        :param ie_options: IE Options instance, providing additional IE options
-        :param desired_capabilities: alias of capabilities; this will make the signature consistent with RemoteWebDriver.
-        :param log_file: Target of logging of service, may be "stdout", "stderr" or file path. Default is "stdout".
-        :param keep_alive: Whether to configure RemoteConnection to use HTTP keep-alive.
-        """
-        timeout /= 1000.0
-        web_driver_info = WebDriverInfo(WebDriverPlatform.PC, WebDriverContext.IE)
-        selenium_web_driver = _Ie(executable_path=executable_path, capabilities=capabilities,
-                                  port=port, timeout=timeout, host=host,
-                                  log_level=log_level, service_log_path=service_log_path, options=options,
-                                  ie_options=ie_options, desired_capabilities=desired_capabilities,
-                                  log_file=log_file, keep_alive=keep_alive)
-        WebDriver.__init__(self, selenium_web_driver=selenium_web_driver, web_driver_info=web_driver_info)
-
-
-class Firefox(WebDriver):
-    def __init__(self, firefox_profile=None, firefox_binary=None,
-                 timeout=30000, capabilities=None, proxy=None,
-                 executable_path="geckodriver", options=None,
-                 service_log_path="geckodriver.log", firefox_options=None,
-                 service_args=None, desired_capabilities=None, log_path=None,
-                 keep_alive=True):
-        """
-            Creates a new instance of Firefox.
-
-        :param firefox_profile: the firefox profile
-        :param firefox_binary: the firefox binary
-        :param timeout: connection timeout for firefox extension, in milliseconds
-        :param capabilities: a dictionary of capabilities to request when starting the browser session
-        :param proxy: the firefox proxy
-        :param executable_path: path to the GeckoDriver binary
-        :param options: Instance of ``options.Options``.
-        :param service_log_path: Where to log information from the driver.
-        :param firefox_options: Instance of options.Options
-        :param service_args: List of args to pass to the driver service
-        :param desired_capabilities: alias of capabilities. In future versions of this library, this will replace 'capabilities'.
-            This will make the signature consistent with RemoteWebDriver.
-        :param log_path: Where to log information from the driver
-        :param keep_alive: Whether to configure remote_connection.RemoteConnection to use HTTP keep-alive.
-        """
-        timeout /= 1000.0
-        web_driver_info = WebDriverInfo(WebDriverPlatform.PC, WebDriverContext.FIREFOX)
-        selenium_web_driver = _Firefox(firefox_profile=firefox_profile, firefox_binary=firefox_binary,
-                                       timeout=timeout, capabilities=capabilities, proxy=proxy,
-                                       executable_path=executable_path, options=options,
-                                       service_log_path=service_log_path, firefox_options=firefox_options,
-                                       service_args=service_args, desired_capabilities=desired_capabilities, log_path=log_path,
-                                       keep_alive=keep_alive)
-        WebDriver.__init__(self, selenium_web_driver=selenium_web_driver, web_driver_info=web_driver_info)
-
-
-class Chrome(WebDriver):
-    def __init__(self, executable_path="chromedriver", port=0,
-                 options=None, service_args=None,
-                 desired_capabilities=None, service_log_path=None,
-                 chrome_options=None, keep_alive=True):
-        """
-            Creates a new instance of Chrome.
-
-        :param executable_path: path to the executable. If the default is used it assumes the executable is in the $PATH
-        :param port: port you would like the service to run, if left as 0, a free port will be found.
-        :param options: this takes an instance of ChromeOptions
-        :param service_args: list of args to pass to the chromedriver service
-        :param desired_capabilities: Dictionary object with non-browser specific capabilities only, such as "proxy" or "loggingPref".
-        :param service_log_path: path for the chromedriver service to log to
-        :param chrome_options: this takes an instance of ChromeOptions
-        :param keep_alive: Whether to configure ChromeRemoteConnection to use HTTP keep-alive.
-        """
-        web_driver_info = WebDriverInfo(WebDriverPlatform.PC, WebDriverContext.CHROME)
-        selenium_web_driver = _Chrome(executable_path=executable_path, port=port,
-                                      options=options, service_args=service_args,
-                                      desired_capabilities=desired_capabilities, service_log_path=service_log_path,
-                                      chrome_options=chrome_options, keep_alive=keep_alive)
-        WebDriver.__init__(self, selenium_web_driver=selenium_web_driver, web_driver_info=web_driver_info)
-
-
-class Opera(WebDriver):
-    def __init__(self, desired_capabilities=None, executable_path=None, port=0,
-                 service_log_path=None, service_args=None, options=None):
-        """
-            Creates a new instance of Opera.
-
-        :param desired_capabilities: Dictionary object with non-browser specific capabilities only, such as "proxy" or "loggingPref".
-        :param executable_path: path to the executable. If the default is used, it assumes the executable is in the $PATH
-        :param port: port you would like the service to run, if left as 0, a free port will be found.
-        :param service_log_path: path for the chromedriver service to log to
-        :param service_args: list of args to pass to the chromedriver service
-        :param options: Instance of ``options.Options``.
-        """
-        web_driver_info = WebDriverInfo(WebDriverPlatform.PC, WebDriverContext.OPERA)
-        selenium_web_driver = _Opera(desired_capabilities=desired_capabilities, executable_path=executable_path,
-                                     port=port,
-                                     service_log_path=service_log_path, service_args=service_args, options=options)
-        WebDriver.__init__(self, selenium_web_driver=selenium_web_driver, web_driver_info=web_driver_info)
-
-
-class Safari(WebDriver):
-    def __init__(self, port=0, executable_path="/usr/bin/safaridriver", reuse_service=False,
-                 desired_capabilities=DesiredCapabilities.SAFARI, quiet=False,
-                 keep_alive=True, service_args=None):
-        """
-            Creates a new instance of Safari.
-
-        :param port: port you would like the service to run, if left as 0, a free port will be found.
-        :param executable_path: path to the executable. If the default is used it assumes the executable is in the Environment Variable SELENIUM_SERVER_JAR
-        :param desired_capabilities: a dictionary of capabilities to request when starting the browser session
-        :param quiet: whether the service runs quietly
-        :param keep_alive: Whether to configure SafariRemoteConnection to use HTTP keep-alive. Defaults to False.
-        :param service_args: List of args to pass to the safaridriver service
-        """
-        web_driver_info = WebDriverInfo(WebDriverPlatform.PC, WebDriverContext.SAFARI)
-        selenium_web_driver = _Safari(port=port, executable_path=executable_path, reuse_service=reuse_service,
-                                      desired_capabilities=desired_capabilities, quiet=quiet,
-                                      keep_alive=keep_alive, service_args=service_args)
-        WebDriver.__init__(self, selenium_web_driver=selenium_web_driver, web_driver_info=web_driver_info)
-
-
-class Edge(WebDriver):
-    def __init__(self, executable_path='MicrosoftWebDriver.exe',
-                 capabilities=None, port=0, verbose=False, service_log_path=None,
-                 log_path=None, keep_alive=False):
-        """
-            Creates a new instance of Edge.
-
-        :param executable_path: path to the executable
-        :param capabilities: a dictionary of capabilities to request when starting the browser session
-        :param port: port you would like the service to run, if left as 0, a free port will be found.
-        :param verbose: verbose log
-        :param service_log_path: Where to log information from the driver.
-        :param log_path: Deprecated argument for service_log_path
-        :param keep_alive Whether to configure ChromeRemoteConnection to use HTTP keep-alive.
-        """
-        web_driver_info = WebDriverInfo(WebDriverPlatform.PC, WebDriverContext.EDGE)
-        selenium_web_driver = _Edge(executable_path=executable_path,
-                                    capabilities=capabilities, port=port, verbose=verbose, service_log_path=service_log_path,
-                                    log_path=log_path, keep_alive=keep_alive)
-        WebDriver.__init__(self, selenium_web_driver=selenium_web_driver, web_driver_info=web_driver_info)
-
-
-class PhantomJS(WebDriver):
-    def __init__(self, executable_path="phantomjs",
-                 port=0, desired_capabilities=DesiredCapabilities.PHANTOMJS,
-                 service_args=None, service_log_path=None):
-        """
-            Creates a new instance of PhantomJS.
-
-        :param executable_path: path to the executable. If the default is used it assumes the executable is in the $PATH
-        :param port: port you would like the service to run, if left as 0, a free port will be found.
-        :param desired_capabilities: a dictionary of capabilities to request when starting the browser session
-        :param service_args: a list of command line arguments to pass to PhantomJS
-        :param service_log_path: path for phantomjs service to log to
-        """
-        web_driver_info = WebDriverInfo(WebDriverPlatform.PC, WebDriverContext.PHANTOMJS)
-        selenium_web_driver = _PhantomJS(executable_path=executable_path,
-                                         port=port, desired_capabilities=desired_capabilities,
-                                         service_args=service_args, service_log_path=service_log_path)
         WebDriver.__init__(self, selenium_web_driver=selenium_web_driver, web_driver_info=web_driver_info)
