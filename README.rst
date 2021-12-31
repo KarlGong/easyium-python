@@ -63,6 +63,12 @@ For information and suggestions you can contact me at karl.gong@outlook.com
 
 Change Log
 ----------
+2.0.0 (compared to 1.3.8)
+
+- Retire python 2.x
+
+- Support selenium==4.1.0 and appium==2.1.1
+
 1.3.8 (compared to 1.3.7)
 
 - Freeze selenium and appium version.
